@@ -1,0 +1,455 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+:root {
+    --background: #4285f4;
+    --icon-color: #344955;
+    --width: 50px;
+    --height: 50px;
+    --border-radius: 100%;
+}
+
+body {
+    height: 100vh;
+    font-family: "Lexend Deca", sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.wrapper {
+    width: var(--width);
+    height: var(--height);
+    position: absolute;
+    right: 8%;
+    bottom: 10%;
+    border-radius: var(--border-radius);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 6rem;
+    z-index: 9999;
+}
+
+.wrapper .fab {
+    background: var(--background);
+    width: var(--width);
+    height: var(--height);
+    position: relative;
+    z-index: 3;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fab-animation-reverse 0.4s ease-out forwards;
+}
+
+.wrapper .fab::before,
+.wrapper .fab::after {
+    content: "";
+    display: block;
+    position: absolute;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.wrapper .fab::before {
+    width: 4px;
+    height: 18px;
+}
+
+.wrapper .fab::after {
+    width: 18px;
+    height: 4px;
+}
+
+.wrapper .fac {
+    width: 32px;
+    height: 150px;
+    border-radius: 64px;
+    position: absolute;
+    background: #fff;
+    z-index: 2;
+    padding: 0.5rem 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    top: -110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    transition:
+        opacity 0.2s ease-in,
+        top 0.2s ease-in,
+        width 0.1s ease-in;
+    /*&::after {
+    content: "";
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 3px;
+    position: absolute;
+    left: 50%;
+    margin-left: -10px;
+    bottom: -8px;
+    transform: rotate(45deg);
+    z-index: 0;
+  }*/
+}
+
+.wrapper .fac a {
+    color: var(--icon-color);
+    opacity: 0.8;
+}
+
+.wrapper .fac a:hover {
+    transition: 0.2s;
+    opacity: 1;
+    color: #30444f;
+}
+
+.wrapper input {
+    height: 100%;
+    width: 100%;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    position: absolute;
+    z-index: 5;
+    opacity: 0;
+}
+
+.wrapper input:checked ~ .fab {
+    animation: fab-animation 0.4s ease-out forwards;
+}
+
+.wrapper input:checked ~ .fac {
+    width: 32px;
+    height: 150px;
+    animation: fac-animation 0.4s ease-out forwards 0.1s;
+    top: -180px;
+    opacity: 1;
+}
+
+@keyframes fab-animation {
+    0% {
+        transform: rotate(0) scale(1);
+    }
+
+    20% {
+        transform: rotate(60deg) scale(0.93);
+    }
+
+    55% {
+        transform: rotate(35deg) scale(0.97);
+    }
+
+    80% {
+        transform: rotate(48deg) scale(0.94);
+    }
+
+    100% {
+        transform: rotate(45deg) scale(0.95);
+    }
+}
+
+@keyframes fab-animation-reverse {
+    0% {
+        transform: rotate(45deg) scale(0.95);
+    }
+
+    20% {
+        transform: rotate(-15deg);
+    }
+
+    55% {
+        transform: rotate(10deg);
+    }
+
+    80% {
+        transform: rotate(-3deg);
+    }
+
+    100% {
+        transform: rotate(0) scale(1);
+    }
+}
+
+@keyframes fac-animation {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    33% {
+        transform: scale(0.95, 1.05);
+    }
+
+    66% {
+        transform: scale(1.05, 0.95);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+/* style ticket css  */
+
+.ticket {
+    width: 85%;
+    background: #71725e;
+    padding: 20px;
+    font-family: "Courier New", monospace;
+    color: var(--text-color);
+    border-radius: 10px;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+    z-index: 10;
+    position: absolute;
+    top: 150px;
+}
+
+.ticket h4 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-family: Sans-Serif;
+    line-height: 2rem;
+    color: #fff;
+}
+
+.ticket h4 span {
+    color: #000;
+    font-size: 17px;
+    margin-right: 10px;
+    text-align: left;
+    letter-spacing: 1px;
+    font-weight: 700;
+    padding: 5px;
+}
+
+.ticket .date {
+    text-align: center;
+    font-size: 12px;
+    margin: 15px auto;
+}
+
+.ticket .items {
+    border-top: 1px dashed black;
+    border-bottom: 1px dashed black;
+    padding: 10px 0;
+}
+
+.ticket .items div {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    margin-bottom: 15px;
+}
+
+.i1 {
+    background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+    width: 40%;
+    text-align: center;
+    font-weight: 900;
+    font-family: Sans-Serif;
+    color: #001;
+    border-radius: 5px;
+    border: solid 1px #b28fe1;
+    text-transform: uppercase;
+    text-shadow: 3px 3px 6px rgba(66, 68, 90, 1);
+    box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+}
+
+.i2 {
+    background: green;
+    width: 20%;
+    text-align: center;
+    font-size: 20px;
+    box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+}
+
+.i3 {
+    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+    width: 40%;
+    text-align: center;
+    color: #9400d3;
+    font-weight: 900;
+    border-radius: 5px;
+    text-transform: uppercase;
+    box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+    text-shadow: 3px 3px 6px rgba(66, 68, 90, 1);
+}
+
+.ticket .total {
+    margin-top: 10px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ticket .footer,
+.ticket .date {
+    text-align: center;
+    margin: 20px auto;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    background-color: #0000cd;
+    color: #fff;
+    width: fit-content;
+}
+
+/* style css code input search */
+/* From Uiverse.io by vinodjangid07 */
+.input-wrapper {
+    width: fit-content;
+    height: 45px;
+    border-radius: 20px;
+    padding: 5px;
+    box-sizing: content-box;
+    display: flex;
+    align-items: center;
+    background-color: #292524;
+    position: absolute;
+    top: 5%;
+}
+
+.icon {
+    width: 30px;
+    fill: rgb(255, 255, 255);
+    margin-left: 8px;
+    transition: all 0.3s;
+    
+}
+
+.input {
+    max-width: 170px;
+    height: 100%;
+    border: none;
+    outline: none;
+    padding-left: 15px;
+    background-color: #292524;
+    color: white;
+    font-size: 1em;
+}
+
+.input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #292524 inset;
+    -webkit-text-fill-color: #ffffff;
+}
+
+.Subscribe-btn {
+    height: 100%;
+    width: 95px;
+    border: none;
+    border-radius: 15px;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    background-color: #ffffff;
+    font-weight: 500;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.arrow {
+    /* display: none; */
+    position: absolute;
+    margin-right: 150px;
+    transition: all 0.3s;
+}
+
+.input-wrapper:active .icon {
+    transform: scale(1.3);
+}
+
+.Subscribe-btn:hover {
+    color: white;
+}
+
+.Subscribe-btn:hover .arrow {
+    margin-right: 0;
+    animation: jello-vertical 0.9s both;
+    transform-origin: right;
+}
+
+@keyframes jello-vertical {
+    0% {
+        transform: scale3d(1, 1, 1);
+    }
+
+    30% {
+        transform: scale3d(0.75, 1.25, 1);
+    }
+
+    40% {
+        transform: scale3d(1.25, 0.75, 1);
+    }
+
+    50% {
+        transform: scale3d(0.85, 1.15, 1);
+    }
+
+    65% {
+        transform: scale3d(1.05, 0.95, 1);
+    }
+
+    75% {
+        transform: scale3d(0.95, 1.05, 1);
+    }
+
+    100% {
+        transform: scale3d(1, 1, 1);
+    }
+}
+
+.Subscribe-btn:active {
+    transform: scale(0.9);
+}
+
+#reader {
+    position: absolute;
+    top: 50px;
+    width: 300px;
+    display: none;
+    margin-bottom: 0;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    z-index: 999;
+}
+
+.fermer {
+    background: red;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    outline: none;
+    border: none;
+    font-size: 25px;
+    color: #fff;
+    font-weight: 900;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+    position: absolute;
+    top: 25%;
+    right: 12%;
+    display: none;
+    z-index: 1000;
+}
+
+img {
+    width: 70%;
+    height: 50%;
+    position: absolute;
+    opacity: 0.5;
+    z-index: -10;
+}
+
+.active {
+    display: block;
+}
