@@ -10,18 +10,18 @@ const PORT = process.env.PORT || 3000;
 
 app.use(compression());
 app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 // MongoDB connection
 require("dotenv").config(); // تحميل متغيرات البيئة
 
-
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("✅ تم الاتصال بقاعدة البيانات MongoDB"))
-  .catch((err) => console.error("❌ فشل الاتصال بـ MongoDB:", err));
+    .connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => console.log("✅ تم الاتصال بقاعدة البيانات MongoDB"))
+    .catch(err => console.error("❌ فشل الاتصال بـ MongoDB:", err));
 
 // Schema without restrictions (dynamic)
 const productSchema = new mongoose.Schema({}, { strict: false });
