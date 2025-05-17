@@ -2,99 +2,52 @@ const express = require("express");
 const multer = require("multer");
 const XLSX = require("xlsx");
 const mongoose = require("mongoose");
-const compression = require("compression");
-const path = require("path");
-require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(compression());
-app.use(express.static("public"));
-app.use(express.static(path.join(__dirname, "public")));
+// زيادة الحد الأقصى لحجم الطلب (مثلاً 20 ميجابايت)
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
-// زيادة حد حجم الطلبات
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+// الاتصال بقاعدة بيانات MongoDB
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("✅ تم الاتصال بـ MongoDB"))
+.catch((err) => console.error("❌ خطأ في الاتصال بـ MongoDB:", err));
 
-// MongoDB connection
-mongoose
-    .connect(process.env.MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    })
-    .then(() => console.log("✅ تم الاتصال بقاعدة البيانات MongoDB"))
-    .catch(err => console.error("❌ فشل الاتصال بـ MongoDB:", err));
-
-// Schema without restrictions (dynamic)
+// نموذج بيانات ديناميكي
 const productSchema = new mongoose.Schema({}, { strict: false });
 const Product = mongoose.model("Product", productSchema);
 
-// Multer setup (in-memory)
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// إعداد multer لتخزين الملف في الذاكرة
+const upload = multer({ storage: multer.memoryStorage() });
 
-// تحسين: إدخال البيانات على دفعات
-async function insertInBatches(data, batchSize = 1000) {
-    for (let i = 0; i < data.length; i += batchSize) {
-        const batch = data.slice(i, i + batchSize);
-        await Product.insertMany(batch);
-        console.log(`✅ إدخال الدفعة من ${i + 1} إلى ${i + batch.length}`);
-    }
-}
-
-// نقطة رفع الملف
 app.post("/upload", upload.single("file"), async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ error: "❌ لم يتم رفع أي ملف" });
-        }
+  try {
+    if (!req.file) return res.status(400).json({ error: "لم يتم رفع ملف" });
 
-        const workbook = XLSX.read(req.file.buffer, { type: "buffer" });
-        const sheetName = workbook.SheetNames[0];
-        console.log("أسماء الأوراق في الملف:", workbook.SheetNames);
+    // قراءة ملف XLSX من الذاكرة
+    const workbook = XLSX.read(req.file.buffer, { type: "buffer" });
+    const sheetName = workbook.SheetNames[0];
+    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-        const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-        console.log(`✅ تم استخراج ${jsonData.length} سجل من الملف`);
+    if (!jsonData.length)
+      return res.status(400).json({ error: "الملف فارغ أو غير صالح" });
 
-        if (!jsonData.length) {
-            return res
-                .status(400)
-                .json({ error: "❌ لا توجد بيانات داخل الملف" });
-        }
+    // حذف البيانات القديمة وإدخال البيانات الجديدة
+    await Product.deleteMany({});
+    await Product.insertMany(jsonData);
 
-        await Product.deleteMany({});
-        console.log("✅ تم حذف البيانات القديمة");
-
-        await insertInBatches(jsonData);
-
-        res.json({
-            message: "✅ تم رفع الملف وحفظ البيانات بنجاح",
-            count: jsonData.length
-        });
-    } catch (err) {
-        console.error("❌ خطأ أثناء المعالجة:", err);
-        res.status(500).json({
-            error: "❌ حدث خطأ أثناء معالجة الملف",
-            details: err.message
-        });
-    }
-});
-
-// نقطة بحث بسيطة
-app.get("/search", async (req, res) => {
-    const { q } = req.query;
-    if (!q) return res.status(400).send("يرجى إرسال كلمة للبحث");
-
-    const searchRegex = new RegExp(q, "i");
-
-    const results = await Product.find({
-        $or: [{ LIBELLE: searchRegex }, { ANPF: q }, { GENCOD_P: q }]
-    }).limit(10);
-
-    res.json(results);
+    res.json({ message: "✅ تم حفظ البيانات في قاعدة البيانات", count: jsonData.length });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "حدث خطأ أثناء المعالجة" });
+  }
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 الخادم يعمل على http://localhost:${PORT}`);
 });
