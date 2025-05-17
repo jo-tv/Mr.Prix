@@ -12,13 +12,16 @@ app.use(compression());
 app.use(express.static("public"));
 
 // MongoDB connection
+require("dotenv").config(); // تحميل متغيرات البيئة
+
+
 mongoose
-    .connect(
-        "mongodb+srv://josefuccef:KWqrGOEnODt1HLjS@mrprix.kkjr0vt.mongodb.net/mrprix?retryWrites=true&w=majority&appName=MrPrix",
-        { useNewUrlParser: true, useUnifiedTopology: true }
-    )
-    .then(() => console.log("✅ تم الاتصال بقاعدة البيانات MongoDB"))
-    .catch(err => console.error("❌ فشل الاتصال بـ MongoDB:", err));
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ تم الاتصال بقاعدة البيانات MongoDB"))
+  .catch((err) => console.error("❌ فشل الاتصال بـ MongoDB:", err));
 
 // Schema without restrictions (dynamic)
 const productSchema = new mongoose.Schema({}, { strict: false });
