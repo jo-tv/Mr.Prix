@@ -68,13 +68,15 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
         await insertInBatches(jsonData);
 
-        res.json({
+        console.log("✅ سيتم إرسال رد النجاح الآن");
+
+        return res.json({
             message: "✅ تم رفع الملف وحفظ البيانات بنجاح",
             count: jsonData.length
         });
     } catch (err) {
         console.error("❌ خطأ أثناء المعالجة:", err);
-        res.status(500).json({
+        return res.status(500).json({
             error: "❌ حدث خطأ أثناء معالجة الملف",
             details: err.message
         });
