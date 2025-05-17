@@ -4,6 +4,7 @@ const XLSX = require("xlsx");
 const mongoose = require("mongoose");
 const compression = require("compression");
 const path = require("path");
+require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,9 +13,11 @@ app.use(compression());
 app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, "public")));
 
-// MongoDB connection
-require("dotenv").config(); // تحميل متغيرات البيئة
+// زيادة حد حجم الطلبات
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+// MongoDB connection
 mongoose
     .connect(process.env.MONGO_URI, {
         useNewUrlParser: true,
@@ -36,7 +39,7 @@ async function insertInBatches(data, batchSize = 1000) {
     for (let i = 0; i < data.length; i += batchSize) {
         const batch = data.slice(i, i + batchSize);
         await Product.insertMany(batch);
-        console.log(`✅ إدخال الدفعة ${i + 1} إلى ${i + batch.length}`);
+        console.log(`✅ إدخال الدفعة من ${i + 1} إلى ${i + batch.length}`);
     }
 }
 
