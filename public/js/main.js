@@ -9,7 +9,6 @@ window.onload = function () {
         readerDiv.style.display = "block";
 
         const html5QrCode = new Html5Qrcode("reader");
-
         html5QrCode
             .start(
                 { facingMode: "environment" }, // كاميرا خلفية
