@@ -19,6 +19,13 @@ app.use(compression());
 // إعدادات استضافة الملفات الثابتة
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(
+    express.static("public", {
+        extensions: ["html"],
+        index: false // يمنع التحميل التلقائي للـ index.html
+    })
+);
+
 // تمكين استقبال بيانات POST (form data و json) مع تحديد حدود الحجم
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.json({ limit: "10mb" }));
@@ -34,43 +41,51 @@ app.use(
     })
 );
 
-// تحقق من تسجيل الدخول فقط
+// التحقق من أن المستخدم مسجل الدخول
 function isAuthenticated(req, res, next) {
+    // هل توجد جلسة وفيها بيانات المستخدم؟
     if (req.session && req.session.user) {
-        next();
-    } else {
-        if (req.headers.accept && req.headers.accept.includes("text/html")) {
-            // طلب مباشر من المتصفح (الرابط كُتب يدويًا أو إعادة تحميل)
-            return res.redirect("/login.html");
-        } else {
-            // طلب من fetch أو XHR (AJAX)
-            return res.status(401).json({ error: "يجب تسجيل الدخول" });
-        }
+        return next();
     }
+
+    // إذا لم يكن مسجلاً الدخول:
+    // إذا كان الطلب من المتصفح مباشرة (مثل كتابة الرابط في العنوان)
+    if (req.headers.accept && req.headers.accept.includes("text/html")) {
+        return res.redirect("/login"); // تحويل إلى صفحة تسجيل الدخول
+    }
+
+    // إذا كان الطلب من JavaScript (fetch أو AJAX)
+    return res.status(401).json({ error: "يجب تسجيل الدخول" });
 }
 
+// التحقق من أن المستخدم مسؤول (responsable)
 function isResponsable(req, res, next) {
-    if (req.session.user.role === "responsable") {
+    // التأكد أن المستخدم موجود وأنه من نوع "responsable"
+    if (req.session.user && req.session.user.role === "responsable") {
         return next();
-    } else {
-        if (req.headers.accept && req.headers.accept.includes("text/html")) {
-            return res.redirect("/login.html");
-        } else {
-            return res.status(403).json({ error: "هذه الصفحة مخصصة للمسؤول فقط" });
-        }
     }
+
+    // غير مسموح: إما ليس مسجلاً أو ليس مسؤولاً
+    if (req.headers.accept && req.headers.accept.includes("text/html")) {
+        return res.redirect("/login");
+    }
+
+    return res.status(403).json({ error: "هذه الصفحة مخصصة للمسؤول فقط" });
 }
 
+// التحقق من أن المستخدم بائع (vendeur)
 function isVendeur(req, res, next) {
-    if (req.session.user.role === "vendeur") {
+    // التأكد أن المستخدم موجود وأنه من نوع "vendeur"
+    if (req.session.user && req.session.user.role === "vendeur") {
         return next();
-    } else {
-        if (req.headers.accept && req.headers.accept.includes("text/html")) {
-            return res.redirect("/login.html");
-        } else {
-            return res.status(403).json({ error: "هذه الصفحة مخصصة للبائع فقط" });
-        }
     }
+
+    // غير مسموح: إما ليس مسجلاً أو ليس بائعاً
+    if (req.headers.accept && req.headers.accept.includes("text/html")) {
+        return res.redirect("/login");
+    }
+
+    return res.status(403).json({ error: "هذه الصفحة مخصصة للبائع فقط" });
 }
 
 // الاتصال بقاعدة بيانات MongoDB
@@ -279,34 +294,65 @@ app.post("/login", async (req, res) => {
     }
 });
 
+// جلب بيانات الدور الحالي للمستخدم
 app.get("/get-role", isAuthenticated, (req, res) => {
     res.json(req.session.user);
 });
 
+// صفحة الأسعار الخاصة بالمسؤول
 app.get("/prix", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(__dirname + "/index.html");
+    res.sendFile(path.join(__dirname, "views/responsable/index.html"));
 });
 
+// صفحة تسجيل الدخول (إذا كان مسجلاً يتم منعه من الدخول إليها)
+app.get("/login", (req, res) => {
+    // إذا كان مسجلاً بالفعل، أعد توجيهه حسب دوره
+    if (req.session && req.session.user) {
+        return res.redirect(
+            req.session.user.role === "vendeur" ? "/prixVen" : "/"
+        );
+    }
+    res.sendFile(path.join(__dirname, "views/login.html"));
+});
+
+// صفحة التسجيل (نفس منطق صفحة تسجيل الدخول)
+app.get("/register", (req, res) => {
+    if (req.session && req.session.user) {
+        return res.redirect(
+            req.session.user.role === "vendeur" ? "/prixVen" : "/"
+        );
+    }
+    res.sendFile(path.join(__dirname, "views/register.html"));
+});
+
+// الصفحة الرئيسية الخاصة بالمسؤول
+app.get("/", isAuthenticated, isResponsable, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/responsable/index.html"));
+});
+
+// صفحة رفع الملفات للمسؤول
+app.get("/upload", isAuthenticated, isResponsable, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/responsable/upload.html"));
+});
+
+// صفحة الأسعار الخاصة بالبائع
+app.get("/prixVen", isAuthenticated, isVendeur, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/vendeur/prixVen.html"));
+});
+
+// تسجيل الخروج وتدمير الجلسة
+app.get("/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.redirect("/login");
+    });
+});
+
+// ميدلوير نهائي للتعامل مع حالات الرفض (إن وُجد)
 app.use((req, res, next) => {
-    // عندما يرفض middleware الدخول
     if (req.rejectedAccess) {
         return res.status(403).json({ error: "هذه الصفحة مخصصة للمسؤول فقط" });
     }
     next();
-});
-
-app.get("/upload", isAuthenticated, isResponsable, (req, res) => {
-    res.redirect("upload.html");
-});
-
-app.get("/prixVen", isAuthenticated, isVendeur, (req, res) => {
-    res.redirect("prixVen.html");
-});
-
-app.get("/logout", (req, res) => {
-    req.session.destroy(() => {
-        res.redirect("/login.html");
-    });
 });
 
 app.listen(PORT, () => {
