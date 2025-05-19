@@ -335,6 +335,10 @@ app.get("/upload", isAuthenticated, isResponsable, (req, res) => {
     res.sendFile(path.join(__dirname, "views/responsable/upload.html"));
 });
 
+app.get("/cmd", isAuthenticated, isResponsable, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/responsable/search.html"));
+});
+
 // صفحة الأسعار الخاصة بالبائع
 app.get("/prixVen", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/prixVen.html"));

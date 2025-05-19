@@ -3,46 +3,60 @@ const readerDiv = document.getElementById("reader");
 const input = document.querySelector(".input");
 const ticket = document.querySelector(".ticket");
 const btnFermer = document.querySelector(".fermer");
-window.onload = function () {
-    icon.addEventListener("click", () => {
-        btnFermer.style.display = "block";
-        readerDiv.style.display = "block";
+let html5QrCode = null;
 
-        const html5QrCode = new Html5Qrcode("reader");
-        html5QrCode
-            .start(
-                { facingMode: "environment" }, // كاميرا خلفية
-                { fps: 10, qrbox: 250 },
-                qrCodeMessage => {
-                    input.value = qrCodeMessage;
-                    html5QrCode.stop().then(() => {
-                        readerDiv.style.display = "none";
-                    });
-                },
-                errorMessage => {
-                    // تجاهل الأخطاء المؤقتة
-                }
-            )
-            .catch(err => {
-                console.error("فشل بدء الكاميرا:", err);
-            });
-    });
+function showReader() {
+    readerDiv.style.display = "block";
+    btnFermer.style.display = "block";
+
+    html5QrCode = new Html5Qrcode("reader");
+    html5QrCode
+        .start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 250 },
+            qrCodeMessage => {
+                input.value = qrCodeMessage;
+                stopReader();
+            },
+            errorMessage => {
+                // تجاهل الأخطاء المؤقتة
+            }
+        )
+        .catch(err => {
+            console.error("فشل بدء الكاميرا:", err);
+            hideReader(); // إخفاء القارئ عند الفشل
+        });
+}
+
+function stopReader() {
+    if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+            html5QrCode.clear();
+            hideReader();
+        });
+    } else {
+        hideReader();
+    }
+}
+
+function hideReader() {
+    readerDiv.style.display = "none";
+    btnFermer.style.display = "none";
+}
+
+window.onload = function () {
+    icon.addEventListener("click", showReader);
 };
+
+btnFermer.addEventListener("click", stopReader);
+btnFermer.addEventListener("click", ()=>{
+   btnFermer.style.display = "none"
+});
 
 document.querySelector(".Subscribe-btn").addEventListener("click", () => {
     if (input.value === "") {
-        btnFermer.style.display = "none";
+        hideReader();
     }
 });
 
-document.querySelector("input").addEventListener("focus", () => {
-    if (readerDiv) {
-        readerDiv.style.display = "none";
-        btnFermer.style.display = "none";
-    }
-});
-
-btnFermer.addEventListener("click", () => {
-    readerDiv.style.display = "none";
-    btnFermer.style.display = "none";
-});
+input.addEventListener("focus", hideReader);

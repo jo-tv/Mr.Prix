@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gestion des Produits</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+        <!-- ===== CSS ===== -->
+        <link rel="stylesheet" href="css/search.css" />
+    </head>
+    <body>
+        <h1>Gestion des Produits</h1>
+        <div class="search-bar">
+            <input
+                id="textSearch"
+                type="text"
+                name="text"
+                placeholder="Rechercher un produit..."
+            />
+            <button class="bb" id="searchBtn">
+                <i class="fa fa-search"></i> Rechercher
+            </button>
+            <button class="bb" id="scanBtn">
+                <i class="fa fa-qrcode"></i> Scanner
+            </button>
+        </div>
+        <div
+            id="reader"
+            style="width: 300px; height: 300px; display: none; margin-top: 15px"
+        ></div>
+        <div class="form-container" id="productForm" style="display: none">
+            <div class="form-group">
+                <label for="libelle">Libellé</label>
+                <input type="text" id="libelle" placeholder="Libellé" />
+            </div>
+            <div class="form-group">
+                <label for="gencode">GenCode</label>
+                <input type="text" id="gencode" placeholder="GenCode" />
+            </div>
+            <div class="form-group">
+                <label for="anpf">ANPF</label>
+                <input type="text" id="anpf" placeholder="ANPF" />
+            </div>
+            <div class="form-group">
+                <label for="fournisseur">Fournisseur</label>
+                <input type="text" id="fournisseur" placeholder="Fournisseur" />
+            </div>
+            <div class="form-group">
+                <label for="stock">Stock</label>
+                <input type="text" id="stock" placeholder="Stock" />
+            </div>
+            <div class="form-group">
+                <label for="prix">Prix TTC</label>
+                <input type="text" id="prix" placeholder="Prix TTC" />
+            </div>
+            <div class="form-group">
+                <label for="qte">Quantité</label>
+                <input
+                    type="number"
+                    id="qte"
+                    placeholder="Quantité"
+                    value="0"
+                    class="infor"
+                />
+            </div>
+            <div class="form-group">
+                <label for="adresse">Adresse</label>
+                <input
+                    type="text"
+                    id="adresse"
+                    placeholder="Adresse"
+                    class="infor"
+                />
+            </div>
+            <button id="ajouterBtn">
+                <i class="fa fa-plus"></i> Ajouter au tableau
+            </button>
+        </div>
+        <div class="form-container">
+            <input
+                type="text"
+                id="nomFichier"
+                placeholder="Nom du fichier..."
+            />
+            <button class="bb" onclick="exportToExcel()">
+                <i class="fa fa-file-excel"></i> Exporter en Excel
+            </button>
+            <button class="bb" onclick="window.print()">
+                <i class="fa fa-print"></i> Imprimer
+            </button>
+            <button class="btnRed" onclick="clearTable()">
+                <i class="fa fa-trash"></i> Vider
+            </button>
+        </div>
+        <table id="produitTable">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+
+        <!--- ______code nav bar_________  -->
+        <div class="wrapper">
+            <input type="checkbox" />
+            <div class="fab"></div>
+            <div class="fac">
+                <a href="prix"
+                    ><i
+                        class="fas fa-cash-register"
+                        style="font-size: 28px; color: green"
+                    ></i>
+                </a>
+                <a href="cmd"
+                    ><i
+                        class="far fa-file-excel"
+                        style="font-size: 28px; color: #da70d6"
+                    ></i
+                ></a>
+                <a href="upload"
+                    ><i
+                        class="fas fa-file-arrow-up"
+                        style="font-size: 28px; color: #0000ff"
+                    ></i
+                ></a>
+                <a href="logout"
+                    ><i
+                        class="fas fa-sign-out-alt"
+                        style="font-size: 28px; color: red"
+                    ></i
+                ></a>
+            </div>
+        </div>
+
+        <!--- ______fin code nav bar_________  -->
+
+        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="js/codebar.min.js"></script>
+        <script src="js/search.js"></script>
+    </body>
+</html>
