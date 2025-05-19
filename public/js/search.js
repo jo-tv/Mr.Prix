@@ -30,40 +30,74 @@ document.getElementById("searchBtn").addEventListener("click", function () {
 // زر الإضافة: إضافة المنتج إلى الجدول وlocalStorage
 document.getElementById("ajouterBtn").addEventListener("click", function () {
     const libelle = document.getElementById("libelle").value.trim();
-    // منع إضافة منتجات مكررة بناءً على الاسم (libelle)
-    if (
-        [...document.querySelectorAll("#produitTable tbody tr")].some(
-            row => row.children[0].textContent === libelle
-        )
-    ) {
-        alert("Produit déjà ajouté");
-        return;
-    }
+    const gencode = document.getElementById("gencode").value.trim();
+    const anpf = document.getElementById("anpf").value.trim();
+    const fournisseur = document.getElementById("fournisseur").value.trim();
+    const stock = document.getElementById("stock").value.trim();
+    const prix = document.getElementById("prix").value.trim();
+    const qte = document.getElementById("qte").value.trim() || "0";
+    const adresse = document.getElementById("adresse").value.trim();
+
+    // تحقق من الحقول المطلوبة
+    if (!libelle) return alert("Champ manquant : Libellé");
+    if (!gencode) return alert("Champ manquant : GenCode");
+    if (!anpf) return alert("Champ manquant : ANPF");
+
     const product = {
         libelle,
-        gencode: document.getElementById("gencode").value.trim(),
-        anpf: document.getElementById("anpf").value.trim(),
-        fournisseur: document.getElementById("fournisseur").value.trim(),
-        stock: document.getElementById("stock").value.trim(),
-        prix: document.getElementById("prix").value.trim(),
-        qte: document.getElementById("qte").value.trim() || "0",
-        adresse: document.getElementById("adresse").value.trim()
+        gencode,
+        anpf,
+        fournisseur,
+        stock,
+        prix,
+        qte,
+        adresse
     };
 
-    // إضافة المنتج للجدول
-    addProductToTable(product);
+    // التحقق من وجود منتجات سابقة بنفس libellé وتمييزها
+    const rows = document.querySelectorAll("#produitTable tbody tr");
+    let isDuplicate = false;
 
-    // حفظ المنتج في localStorage
+    rows.forEach(row => {
+        const rowLibelle = row.children[0]?.textContent?.trim();
+        if (rowLibelle === libelle) {
+            row.classList.add("duplicate");
+            isDuplicate = true;
+        }
+    });
+
+    // إضافة المنتج
+    addProductToTable(product);
     saveProductToStorage(product);
 
-    // إعادة تعيين النموذج وإخفاؤه
+    // تفريغ الحقول وإخفاء النموذج
     document.getElementById("productForm").reset();
     document.getElementById("productForm").style.display = "none";
+
+    if (isDuplicate) {
+        alert("Produit ajouté, mais il est un doublon.");
+    }
 });
 
 // دالة لإضافة صف جديد في الجدول مع إمكانية التعديل (contenteditable)
 function addProductToTable(product) {
+    const existingRows = [...document.querySelectorAll("#produitTable tbody tr")];
+    let isDuplicate = false;
+
+    // التحقق من وجود libellé مكرر
+    existingRows.forEach(row => {
+        const libelleCell = row.querySelector("td:first-child .cell-content");
+        if (libelleCell && libelleCell.textContent.trim() === product.libelle) {
+            row.classList.add("duplicate");
+            isDuplicate = true;
+        }
+    });
+
     const row = document.createElement("tr");
+    if (isDuplicate) {
+        row.classList.add("duplicate");
+    }
+
     row.innerHTML = `
     <td>
       <label class="cell-label">Libellé</label>
@@ -103,20 +137,21 @@ function addProductToTable(product) {
       </button>
     </td>
   `;
+
     document.querySelector("#produitTable tbody").appendChild(row);
 }
 
 // دالة لحفظ المنتجات في localStorage (تخزين كمصفوفة JSON)
 function saveProductToStorage(product) {
     let products = JSON.parse(localStorage.getItem("produits") || "[]");
-    products.push(product);
+    products.unshift(product);
     localStorage.setItem("produits", JSON.stringify(products));
 }
 
 // دالة تحميل المنتجات من localStorage وعرضها في الجدول عند بدء الصفحة
 function loadProductsFromStorage() {
     let products = JSON.parse(localStorage.getItem("produits") || "[]");
-    products.reverse().forEach(p => addProductToTable(p));
+    products.forEach(p => addProductToTable(p));
 }
 
 // حذف صف المنتج من الجدول ومن localStorage
@@ -305,3 +340,7 @@ function clearTable() {
         alert("تم مسح جميع البيانات بنجاح.");
     }
 }
+
+document.querySelector("#plus").addEventListener("click", () => {
+    document.querySelector(".form-container").style.display = "block";
+});

@@ -16,7 +16,6 @@ h1 {
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    
 }
 input,
 button,
@@ -395,4 +394,9 @@ th {
     100% {
         transform: scale(1, 1);
     }
+}
+.duplicate {
+    background-color: #ffeeba !important;
+    border: 2px solid #f0ad4e;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 }
