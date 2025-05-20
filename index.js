@@ -198,7 +198,7 @@ app.get("/api/search", async (req, res) => {
     const qStr = q.toString();
     const qInt = parseInt(q, 10);
 
-    const conditions = [{ LIBELLE: qStr }, { ANPF: qStr }];
+    const conditions = [{ LIBELLE: qStr }, { ANPF: qStr }, { GENCOD_P: qStr }];
 
     if (!isNaN(qInt)) {
         conditions.push({ GENCOD_P: qInt });

@@ -37,10 +37,11 @@
             id="reader"
             style="width: 300px; height: 300px; display: none; margin-top: 15px"
         ></div>
-        <div class="form-container" id="productForm" style="display: none">
+         <div class="form-container" id="productForm" style="display: none">
             <div class="form-group">
                 <label for="libelle">Libellé</label>
                 <input
+                    readonly
                     type="text"
                     id="libelle"
                     placeholder="Libellé"
@@ -50,6 +51,7 @@
             <div class="form-group">
                 <label for="gencode">GenCode</label>
                 <input
+                    readonly
                     type="number"
                     id="gencode"
                     placeholder="GenCode"
@@ -58,19 +60,43 @@
             </div>
             <div class="form-group">
                 <label for="anpf">ANPF</label>
-                <input type="number" id="anpf" placeholder="ANPF" required />
+                <input
+                    readonly
+                    type="number"
+                    id="anpf"
+                    placeholder="ANPF"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label for="fournisseur">Fournisseur</label>
-                <input type="text" id="fournisseur" placeholder="Fournisseur" />
+                <input
+                    readonly
+                    type="text"
+                    id="fournisseur"
+                    placeholder="Fournisseur"
+                    required
+                />
             </div>
-            <div class="form-group">
+            <div class="form-group" style="display: none">
                 <label for="stock">Stock</label>
-                <input type="text" id="stock" placeholder="Stock" />
+                <input
+                    readonly
+                    type="text"
+                    id="stock"
+                    placeholder="Stock"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label for="prix">Prix TTC</label>
-                <input type="text" id="prix" placeholder="Prix TTC" />
+                <input
+                    readonly
+                    type="text"
+                    id="prix"
+                    placeholder="Prix TTC"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label for="qte">Quantité</label>

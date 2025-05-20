@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#007bff" />
+        <meta name="theme-color" content="#007bff" />
         <title>Gestion des Produits</title>
         <link
             rel="stylesheet"
@@ -41,6 +41,7 @@
             <div class="form-group">
                 <label for="libelle">Libellé</label>
                 <input
+                    readonly
                     type="text"
                     id="libelle"
                     placeholder="Libellé"
@@ -50,6 +51,7 @@
             <div class="form-group">
                 <label for="gencode">GenCode</label>
                 <input
+                    readonly
                     type="number"
                     id="gencode"
                     placeholder="GenCode"
@@ -58,19 +60,43 @@
             </div>
             <div class="form-group">
                 <label for="anpf">ANPF</label>
-                <input type="number" id="anpf" placeholder="ANPF" required />
+                <input
+                    readonly
+                    type="number"
+                    id="anpf"
+                    placeholder="ANPF"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label for="fournisseur">Fournisseur</label>
-                <input type="text" id="fournisseur" placeholder="Fournisseur" />
+                <input
+                    readonly
+                    type="text"
+                    id="fournisseur"
+                    placeholder="Fournisseur"
+                    required
+                />
             </div>
-            <div class="form-group">
+            <div class="form-group" style="display: none">
                 <label for="stock">Stock</label>
-                <input type="text" id="stock" placeholder="Stock" />
+                <input
+                    readonly
+                    type="text"
+                    id="stock"
+                    placeholder="Stock"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label for="prix">Prix TTC</label>
-                <input type="text" id="prix" placeholder="Prix TTC" />
+                <input
+                    readonly
+                    type="text"
+                    id="prix"
+                    placeholder="Prix TTC"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label for="qte">Quantité</label>
@@ -158,6 +184,19 @@
                 </div>
             </div>
         </div>
+        <div id="noticeModal" class="modal-overlay">
+  <div class="modal-content">
+    <p id="noticeMessage"></p>
+    <div class="modal-actions">
+      <button id="noticeOk" class="btn yes">موافق</button>
+      <label class="toggle-label">
+        <input type="checkbox" id="toggleDuplicateCheck" checked />
+        تعطيل التحقق من التكرار
+      </label>
+    </div>
+  </div>
+</div>
+
 
         <!--- ______fin code nav bar_________  -->
 
