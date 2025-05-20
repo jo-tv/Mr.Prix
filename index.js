@@ -323,7 +323,7 @@ app.get("/login", (req, res) => {
 });
 
 // صفحة التسجيل (نفس منطق صفحة تسجيل الدخول)
-app.get("/register", (req, res) => {
+app.get("/tassgile", (req, res) => {
     if (req.session && req.session.user) {
         return res.redirect(
             req.session.user.role === "vendeur" ? "/prixVen" : "/"
@@ -349,6 +349,9 @@ app.get("/cmd", isAuthenticated, isResponsable, (req, res) => {
 // صفحة الأسعار الخاصة بالبائع
 app.get("/prixVen", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/prixVen.html"));
+});
+app.get("/inventaire", isAuthenticated, isVendeur, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/vendeur/inventaire.html"));
 });
 
 // تسجيل الخروج وتدمير الجلسة

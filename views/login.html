@@ -119,8 +119,8 @@
 
     const form = e.target;
     const data = {
-        username: form.username.value,
-        password: form.password.value
+        username: form.username.value.trim(),
+        password: form.password.value.trim()
     };
 
     try {
