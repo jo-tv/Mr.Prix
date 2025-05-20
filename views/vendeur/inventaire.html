@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#007bff" />
+        <meta name="theme-color" content="#007bff" />
         <title>Gestion des Produits</title>
         <link
             rel="stylesheet"
@@ -37,7 +37,7 @@
             id="reader"
             style="width: 300px; height: 300px; display: none; margin-top: 15px"
         ></div>
-         <div class="form-container" id="productForm" style="display: none">
+        <div class="form-container" id="productForm" style="display: none">
             <div class="form-group">
                 <label for="libelle">Libellé</label>
                 <input
@@ -175,6 +175,22 @@
                     <button id="confirmNo" class="btn btn-secondary">
                         إلغاء
                     </button>
+                </div>
+            </div>
+        </div>
+        <div id="noticeModal" class="modal-overlay">
+            <div class="modal-content">
+                <p id="noticeMessage"></p>
+                <div class="modal-actions">
+                    <button id="noticeOk" class="btn yes">موافق</button>
+                    <label class="toggle-label">
+                        <input
+                            type="checkbox"
+                            id="toggleDuplicateCheck"
+                            checked
+                        />
+                        تعطيل التحقق من التكرار
+                    </label>
                 </div>
             </div>
         </div>

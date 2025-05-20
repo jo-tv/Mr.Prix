@@ -383,17 +383,52 @@ function exportToExcel() {
 
     const ws = XLSX.utils.aoa_to_sheet(data);
 
+    // تنسيق وتوسيط جميع الخلايا
     const range = XLSX.utils.decode_range(ws["!ref"]);
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
-        if (!ws[cellAddress]) continue;
-        ws[cellAddress].s = {
-            font: { bold: true, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: "4F81BD" } },
-            alignment: { horizontal: "center", vertical: "center" }
-        };
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
+            const cell = ws[cell_address];
+
+            if (cell) {
+                // تنسيق الرأس
+                if (R === 0) {
+                    cell.s = {
+                        font: { bold: true, name: "Arial", sz: 12, color: { rgb: "FFFFFF" } },
+                        fill: { fgColor: { rgb: "4F81BD" } },
+                        alignment: { horizontal: "center", vertical: "center" },
+                        border: {
+                            top: { style: "thin", color: { rgb: "000000" } },
+                            bottom: { style: "thin", color: { rgb: "000000" } },
+                            left: { style: "thin", color: { rgb: "000000" } },
+                            right: { style: "thin", color: { rgb: "000000" } }
+                        }
+                    };
+                } else {
+                    // تنسيق باقي الخلايا
+                    cell.s = {
+                        font: { name: "Calibri", sz: 11 },
+                        alignment: { horizontal: "center", vertical: "center" },
+                        border: {
+                            top: { style: "thin", color: { rgb: "CCCCCC" } },
+                            bottom: { style: "thin", color: { rgb: "CCCCCC" } },
+                            left: { style: "thin", color: { rgb: "CCCCCC" } },
+                            right: { style: "thin", color: { rgb: "CCCCCC" } }
+                        }
+                    };
+
+                    // تحويل الرقم إذا كان قابلًا للتحويل
+                    const val = cell.v;
+                    if (!isNaN(val) && val !== "") {
+                        cell.t = "n";
+                        cell.v = Number(val);
+                    }
+                }
+            }
+        }
     }
 
+    // تحديد عرض الأعمدة تلقائيًا
     const colWidths = header.map(h => ({
         wch: Math.max(10, h.length + 5)
     }));
