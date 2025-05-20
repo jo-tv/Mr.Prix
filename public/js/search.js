@@ -449,3 +449,17 @@ function clearTable() {
 document.querySelector("#plus").addEventListener("click", () => {
     document.querySelector(".form-container").style.display = "block";
 });
+
+self.addEventListener('install', event => {
+  console.log('Service Worker installing.');
+});
+
+self.addEventListener('fetch', event => {
+  // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
+});
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('Service Worker Registered'))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  }

@@ -3,7 +3,9 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Login Mr-Prix</title>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#007bff" />
+        <title>Login Mr-JO</title>
         <link rel="stylesheet" href="css/login.css" />
         <style>
             /* تنسيق بسيط لظهور الرسائل */
@@ -114,65 +116,79 @@
             };
 
             // التعامل مع إرسال نموذج تسجيل الدخول
-            document.getElementById("loginForm").addEventListener("submit", async e => {
-    e.preventDefault();
+            document
+                .getElementById("loginForm")
+                .addEventListener("submit", async e => {
+                    e.preventDefault();
 
-    const form = e.target;
-    const data = {
-        username: form.username.value.trim(),
-        password: form.password.value.trim()
-    };
+                    const form = e.target;
+                    const data = {
+                        username: form.username.value.trim(),
+                        password: form.password.value.trim()
+                    };
 
-    try {
-        const response = await fetch("/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
+                    try {
+                        const response = await fetch("/login", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(data)
+                        });
 
-        const text = await response.text();
+                        const text = await response.text();
 
-        if (response.ok && text === "success") {
-            messageBox.textContent = "تم تسجيل الدخول بنجاح";
-            infoDiv.style.backgroundColor = "#4CAF50";
-            infoDiv.style.color = "white";
-            infoDiv.style.opacity = "1";
+                        if (response.ok && text === "success") {
+                            messageBox.textContent = "تم تسجيل الدخول بنجاح";
+                            infoDiv.style.backgroundColor = "#4CAF50";
+                            infoDiv.style.color = "white";
+                            infoDiv.style.opacity = "1";
 
-            // جلب الدور وتوجيه المستخدم
-            const roleRes = await fetch("/get-role");
-if (!roleRes.ok) {
-    const err = await roleRes.json();
-    messageBox.textContent = err.error || "حدث خطأ";
-    infoDiv.style.backgroundColor = "#f44336";
-    infoDiv.style.color = "white";
-    infoDiv.style.opacity = "1";
-    return;
-}
-            const user = await roleRes.json();
+                            // جلب الدور وتوجيه المستخدم
+                            const roleRes = await fetch("/get-role");
+                            if (!roleRes.ok) {
+                                const err = await roleRes.json();
+                                messageBox.textContent = err.error || "حدث خطأ";
+                                infoDiv.style.backgroundColor = "#f44336";
+                                infoDiv.style.color = "white";
+                                infoDiv.style.opacity = "1";
+                                return;
+                            }
+                            const user = await roleRes.json();
 
-            if (user.role === "vendeur") {
-                window.location.href = "/prixVen";
-            } else if (user.role === "responsable") {
-                window.location.href = "/prix";
-            }
-        } else {
-            messageBox.textContent = text;
-            infoDiv.style.backgroundColor = "#f44336";
-            infoDiv.style.color = "white";
-            infoDiv.style.opacity = "1";
-        }
-    } catch (error) {
-        console.error(error);
-        messageBox.textContent = "حدث خطأ في الاتصال بالخادم.";
-        infoDiv.style.backgroundColor = "#f44336";
-        infoDiv.style.color = "white";
-        infoDiv.style.opacity = "1";
-    }
+                            if (user.role === "vendeur") {
+                                window.location.href = "/prixVen";
+                            } else if (user.role === "responsable") {
+                                window.location.href = "/prix";
+                            }
+                        } else {
+                            messageBox.textContent = text;
+                            infoDiv.style.backgroundColor = "#f44336";
+                            infoDiv.style.color = "white";
+                            infoDiv.style.opacity = "1";
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        messageBox.textContent = "حدث خطأ في الاتصال بالخادم.";
+                        infoDiv.style.backgroundColor = "#f44336";
+                        infoDiv.style.color = "white";
+                        infoDiv.style.opacity = "1";
+                    }
 
-    setTimeout(() => {
-        infoDiv.style.opacity = "0";
-    }, 4000);
+                    setTimeout(() => {
+                        infoDiv.style.opacity = "0";
+                    }, 4000);
+                });
+                self.addEventListener('install', event => {
+  console.log('Service Worker installing.');
 });
+
+self.addEventListener('fetch', event => {
+  // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
+});
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('Service Worker Registered'))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  }
         </script>
     </body>
 </html>

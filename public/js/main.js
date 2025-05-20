@@ -60,3 +60,16 @@ document.querySelector(".Subscribe-btn").addEventListener("click", () => {
 });
 
 input.addEventListener("focus", hideReader);
+
+self.addEventListener('install', event => {
+  console.log('Service Worker installing.');
+});
+
+self.addEventListener('fetch', event => {
+  // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
+});
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('Service Worker Registered'))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  }

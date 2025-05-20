@@ -5,6 +5,8 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#007bff" />
 
         <!-- ===== CSS ===== -->
         <link rel="stylesheet" href="css/style.css" />
@@ -159,6 +161,13 @@
                             console.error("Erreur:", err);
                         });
                 });
+                self.addEventListener('install', event => {
+  console.log('Service Worker installing.');
+});
+
+self.addEventListener('fetch', event => {
+  // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
+});
         </script>
 
         <script src="js/main.js"></script>
