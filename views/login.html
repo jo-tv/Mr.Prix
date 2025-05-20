@@ -106,7 +106,7 @@
             document.getElementById("signupLink").onclick = e => {
                 e.preventDefault();
                 infoDiv.style.opacity = "1";
-                messageBox.textContent = "يرجى الانتقال إلى صفحة التسجيل.";
+                messageBox.textContent = " لا يمكنك تسجيل المرجوا تواصل معنا  ";
                 infoDiv.style.backgroundColor = "#2196F3";
                 infoDiv.style.color = "white";
             };
@@ -177,18 +177,24 @@
                         infoDiv.style.opacity = "0";
                     }, 4000);
                 });
-                self.addEventListener('install', event => {
-  console.log('Service Worker installing.');
-});
+            self.addEventListener("install", event => {
+                console.log("Service Worker installing.");
+            });
 
-self.addEventListener('fetch', event => {
-  // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
-});
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log('Service Worker Registered'))
-      .catch(err => console.error('Service Worker registration failed:', err));
-  }
+            self.addEventListener("fetch", event => {
+                // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
+            });
+            if ("serviceWorker" in navigator) {
+                navigator.serviceWorker
+                    .register("/sw.js")
+                    .then(() => console.log("Service Worker Registered"))
+                    .catch(err =>
+                        console.error(
+                            "Service Worker registration failed:",
+                            err
+                        )
+                    );
+            }
         </script>
     </body>
 </html>
