@@ -9,13 +9,18 @@ document.getElementById("searchBtn").addEventListener("click", function () {
         .querySelector('input[name="text"]')
         .value.trim()
         .toLowerCase();
-    if (!query) return alert("Entrez un nom ou code produit");
+
+    if (!query) {
+        showModalMessage("يرجى إدخال اسم أو كود المنتج");
+        return;
+    }
 
     fetch(`/api/search?q=${encodeURIComponent(query)}`)
         .then(res => (res.ok ? res.json() : Promise.reject("Non trouvé")))
         .then(products => {
             const p = products[0];
-            if (!p) return alert("Produit introuvable");
+            if (!p) return showModalMessage("المنتج غير موجود");
+
             document.getElementById("libelle").value = p.LIBELLE;
             document.getElementById("gencode").value = p.GENCOD_P;
             document.getElementById("anpf").value = p.ANPF;
@@ -24,8 +29,24 @@ document.getElementById("searchBtn").addEventListener("click", function () {
             document.getElementById("prix").value = p.PV_TTC;
             document.getElementById("productForm").style.display = "block";
         })
-        .catch(() => alert("Produit introuvable"));
+        .catch(() => showModalMessage("المنتج غير موجود"));
 });
+
+function showModalMessage(message) {
+    const modal = document.getElementById("confirmModal");
+    const msgEl = modal.querySelector(".modal-content p");
+    const actions = modal.querySelector(".modal-actions");
+
+    msgEl.textContent = message;
+    actions.style.display = "none";
+    modal.style.display = "block";
+
+    setTimeout(() => {
+        modal.style.display = "none";
+        msgEl.textContent = "هل أنت متأكد أنك تريد حذف هذا المنتج؟";
+        actions.style.display = "flex";
+    }, 2000);
+}
 
 // زر الإضافة: إضافة المنتج إلى الجدول وlocalStorage
 document.getElementById("ajouterBtn").addEventListener("click", function () {
@@ -54,15 +75,17 @@ document.getElementById("ajouterBtn").addEventListener("click", function () {
         adresse
     };
 
-    // التحقق من وجود منتجات سابقة بنفس libellé وتمييزها
     const rows = document.querySelectorAll("#produitTable tbody tr");
     let isDuplicate = false;
 
     rows.forEach(row => {
-        const rowLibelle = row.children[0]?.textContent?.trim();
-        if (rowLibelle === libelle) {
+        const firstCell = row.querySelector("td .cell-content");
+        if (firstCell && firstCell.textContent.trim() === libelle) {
             row.classList.add("duplicate");
             isDuplicate = true;
+            alert(
+                "Attention : produit déjà présent, ajouté de nouveau et marqué."
+            );
         }
     });
 
@@ -71,80 +94,127 @@ document.getElementById("ajouterBtn").addEventListener("click", function () {
     saveProductToStorage(product);
 
     // تفريغ الحقول وإخفاء النموذج
-    document.getElementById("productForm").reset();
-    document.getElementById("productForm").style.display = "none";
+    // تفريغ الحقول يدويًا
+    document.getElementById("libelle").value = "";
+    document.getElementById("gencode").value = "";
+    document.getElementById("anpf").value = "";
+    document.getElementById("fournisseur").value = "";
+    document.getElementById("stock").value = "";
+    document.getElementById("prix").value = "";
+    document.getElementById("qte").value = "";
+    document.getElementById("adresse").value = "";
 
-    if (isDuplicate) {
-        alert("Produit ajouté, mais il est un doublon.");
-    }
+    // إخفاء النموذج
+    document.querySelector(".form-container").style.display = "none";
 });
 
-// دالة لإضافة صف جديد في الجدول مع إمكانية التعديل (contenteditable)
+// ========== [إضافة صف جديد في الجدول + تحديد التكرار + حفظ عند التعديل] ==========
 function addProductToTable(product) {
-    const existingRows = [...document.querySelectorAll("#produitTable tbody tr")];
+    const existingRows = [
+        ...document.querySelectorAll("#produitTable tbody tr")
+    ];
     let isDuplicate = false;
 
-    // التحقق من وجود libellé مكرر
+    // [التحقق من وجود libellé مكرر]
     existingRows.forEach(row => {
         const libelleCell = row.querySelector("td:first-child .cell-content");
         if (libelleCell && libelleCell.textContent.trim() === product.libelle) {
-            row.classList.add("duplicate");
+            row.classList.add("duplicate"); // تمييز الصف إذا مكرر
             isDuplicate = true;
         }
     });
 
+    // [إنشاء صف جديد]
     const row = document.createElement("tr");
-    if (isDuplicate) {
-        row.classList.add("duplicate");
-    }
+    if (isDuplicate) row.classList.add("duplicate");
 
+    // [ملء محتوى الصف الجديد]
     row.innerHTML = `
-    <td>
-      <label class="cell-label">Libellé</label>
-      <div class="cell-content" contenteditable="true">${product.libelle}</div>
-    </td>
-    <td>
-      <label class="cell-label">Gencode</label>
-      <div class="cell-content" contenteditable="true">${product.gencode}</div>
-    </td>
-    <td>
-      <label class="cell-label">ANPF</label>
-      <div class="cell-content" contenteditable="true">${product.anpf}</div>
-    </td>
-    <td>
-      <label class="cell-label">Fournisseur</label>
-      <div class="cell-content" contenteditable="true">${product.fournisseur}</div>
-    </td>
-    <td>
-      <label class="cell-label">Stock</label>
-      <div class="cell-content" contenteditable="true">${product.stock}</div>
-    </td>
-    <td>
-      <label class="cell-label">Prix</label>
-      <div class="cell-content" contenteditable="true">${product.prix}</div>
-    </td>
-    <td>
-      <label class="cell-label">Quantité</label>
-      <div class="cell-content" contenteditable="true">${product.qte}</div>
-    </td>
-    <td>
-      <label class="cell-label">Adresse</label>
-      <div class="cell-content" contenteditable="true">${product.adresse}</div>
-    </td>
-    <td class="actions" style="text-align:center;">
-      <button class="btnRed" onclick="removeProduct(this)" style="cursor:pointer;">
-        <i class="fa fa-trash"></i>
-      </button>
-    </td>
-  `;
+        <td><label class="cell-label">Libellé</label>
+            <div class="cell-content" contenteditable="true">${product.libelle}</div></td>
+        <td><label class="cell-label">Gencode</label>
+            <div class="cell-content" contenteditable="true">${product.gencode}</div></td>
+        <td><label class="cell-label">ANPF</label>
+            <div class="cell-content" contenteditable="true">${product.anpf}</div></td>
+        <td><label class="cell-label">Fournisseur</label>
+            <div class="cell-content" contenteditable="true">${product.fournisseur}</div></td>
+        <td><label class="cell-label">Stock Système</label>
+            <div class="cell-content" contenteditable="true">${product.stock}</div></td>
+        <td><label class="cell-label">Prix</label>
+            <div class="cell-content" contenteditable="true">${product.prix} <span class="spa">DH/TTC</span></div></td>
+        <td><label class="cell-label">Stock Physique</label>
+            <div class="cell-content" contenteditable="true">${product.qte}</div></td>
+        <td><label class="cell-label">Adresse</label>
+            <div class="cell-content" contenteditable="true">${product.adresse}</div></td>
+        <td class="actions" style="text-align:center;">
+            <button class="btnRed" onclick="removeProduct(this)" style="cursor:pointer;">
+                <i class="fa fa-trash"></i>
+            </button>
+        </td>
+    `;
 
+    // [عند فقدان التركيز من أي خلية، يتم حفظ التعديلات]
+    const updateOnBlur = () => {
+        const updatedProduct = {
+            libelle: row.children[0]
+                .querySelector(".cell-content")
+                .textContent.trim(),
+            gencode: row.children[1]
+                .querySelector(".cell-content")
+                .textContent.trim(),
+            anpf: row.children[2]
+                .querySelector(".cell-content")
+                .textContent.trim(),
+            fournisseur: row.children[3]
+                .querySelector(".cell-content")
+                .textContent.trim(),
+            stock: row.children[4]
+                .querySelector(".cell-content")
+                .textContent.trim(),
+            prix: row.children[5]
+                .querySelector(".cell-content")
+                .textContent.replace("DH/TTC", "")
+                .trim(),
+            qte: row.children[6]
+                .querySelector(".cell-content")
+                .textContent.trim(),
+            adresse: row.children[7]
+                .querySelector(".cell-content")
+                .textContent.trim()
+        };
+
+        updateProductInStorage(updatedProduct);
+    };
+
+    // [ربط الحدث على جميع الخلايا القابلة للتعديل]
+    row.querySelectorAll(".cell-content").forEach(cell => {
+        cell.addEventListener("blur", updateOnBlur);
+    });
+
+    // [إضافة الصف إلى الجدول]
     document.querySelector("#produitTable tbody").appendChild(row);
 }
 
-// دالة لحفظ المنتجات في localStorage (تخزين كمصفوفة JSON)
+// ========== [تخزين منتج جديد في localStorage] ==========
 function saveProductToStorage(product) {
     let products = JSON.parse(localStorage.getItem("produits") || "[]");
-    products.unshift(product);
+    products.unshift(product); // إضافة في أول القائمة
+    localStorage.setItem("produits", JSON.stringify(products));
+}
+
+// ========== [تحديث منتج موجود في localStorage عند التعديل] ==========
+function updateProductInStorage(updatedProduct) {
+    let products = JSON.parse(localStorage.getItem("produits") || "[]");
+
+    // العثور على المنتج حسب libelle (يمكن استبداله بـ gencode إذا أردت دقة أكبر)
+    const index = products.findIndex(p => p.libelle === updatedProduct.libelle);
+
+    if (index !== -1) {
+        products[index] = updatedProduct; // تحديث البيانات
+    } else {
+        products.unshift(updatedProduct); // أو إضافته إذا لم يكن موجودًا
+    }
+
     localStorage.setItem("produits", JSON.stringify(products));
 }
 
@@ -157,12 +227,29 @@ function loadProductsFromStorage() {
 // حذف صف المنتج من الجدول ومن localStorage
 function removeProduct(button) {
     const row = button.closest("tr");
-    const libelle = row.children[0].textContent;
-    row.remove();
+    const libelle = row.children[0].textContent.trim();
 
-    let products = JSON.parse(localStorage.getItem("produits") || "[]");
-    products = products.filter(p => p.libelle !== libelle);
-    localStorage.setItem("produits", JSON.stringify(products));
+    const modal = document.getElementById("confirmModal");
+    const yesBtn = document.getElementById("confirmYes");
+    const noBtn = document.getElementById("confirmNo");
+
+    modal.style.display = "block";
+
+    // إذا وافق المستخدم على الحذف
+    yesBtn.onclick = () => {
+        row.remove();
+
+        let products = JSON.parse(localStorage.getItem("produits") || "[]");
+        products = products.filter(p => p.libelle !== libelle);
+        localStorage.setItem("produits", JSON.stringify(products));
+
+        modal.style.display = "none";
+    };
+
+    // إذا ألغى المستخدم
+    noBtn.onclick = () => {
+        modal.style.display = "none";
+    };
 }
 
 const scanBtn = document.getElementById("scanBtn");
@@ -232,45 +319,41 @@ scanBtn.addEventListener("click", () => {
     }
 });
 
-function exportToExcel() {
-    const nom = document.getElementById("nomFichier").value.trim();
-    if (!nom) return alert("Nom de fichier requis");
+function showModalMessage(message) {
+    const modal = document.getElementById("confirmModal");
+    const msgEl = modal.querySelector(".modal-content p");
+    const actions = modal.querySelector(".modal-actions");
 
-    // جلب بيانات من localStorage (مثال على اسم المفتاح "products")
-    const dataJSON = localStorage.getItem("products");
-    if (!dataJSON) return alert("Aucune donnée dans localStorage");
+    msgEl.textContent = message;
+    actions.style.display = "none";
+    modal.style.display = "block";
 
-    const data = JSON.parse(dataJSON);
-
-    // تحويل البيانات إلى ورقة عمل Excel
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Produits");
-
-    // توليد ملف Excel وبدء التنزيل
-    XLSX.writeFile(workbook, nom + ".xlsx");
+    setTimeout(() => {
+        modal.style.display = "none";
+        msgEl.textContent = "هل أنت متأكد أنك تريد حذف هذا المنتج؟";
+        actions.style.display = "flex";
+    }, 3000);
 }
 
 function exportToExcel() {
     const nom = document.getElementById("nomFichier").value.trim();
     if (!nom) {
-        alert("Nom de fichier requis");
+        showModalMessage("اسم الملف مطلوب");
         return;
     }
 
     const produitsJSON = localStorage.getItem("produits");
     if (!produitsJSON) {
-        alert("Aucune donnée dans localStorage");
+        showModalMessage("لا توجد بيانات في التخزين المحلي");
         return;
     }
 
     const produits = JSON.parse(produitsJSON);
     if (produits.length === 0) {
-        alert("Aucune donnée dans localStorage");
+        showModalMessage("لا توجد بيانات في التخزين المحلي");
         return;
     }
 
-    // تحويل بيانات JSON إلى مصفوفة صفوف مع رؤوس الأعمدة
     const header = Object.keys(produits[0]);
     const data = [header];
 
@@ -279,39 +362,33 @@ function exportToExcel() {
         data.push(row);
     });
 
-    // إنشاء ورقة عمل (worksheet) من البيانات
     const ws = XLSX.utils.aoa_to_sheet(data);
 
-    // إضافة تنسيقات: لون رأس الجدول وخط عريض
     const range = XLSX.utils.decode_range(ws["!ref"]);
     for (let C = range.s.c; C <= range.e.c; ++C) {
         const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
         if (!ws[cellAddress]) continue;
         ws[cellAddress].s = {
             font: { bold: true, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: "4F81BD" } }, // لون أزرق جذاب
+            fill: { fgColor: { rgb: "4F81BD" } },
             alignment: { horizontal: "center", vertical: "center" }
         };
     }
 
-    // ضبط عرض الأعمدة تلقائياً
     const colWidths = header.map(h => ({
         wch: Math.max(10, h.length + 5)
     }));
     ws["!cols"] = colWidths;
 
-    // إنشاء مصنف جديد (workbook) وإضافة الورقة
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Produits");
 
-    // إعداد خيارات الكتابة لتحسين التنسيق
     const wbout = XLSX.write(wb, {
         bookType: "xlsx",
         type: "binary",
         cellStyles: true
     });
 
-    // تحويل البيانات الثنائية إلى Blob
     function s2ab(s) {
         const buf = new ArrayBuffer(s.length);
         const view = new Uint8Array(buf);
@@ -323,7 +400,6 @@ function exportToExcel() {
         type: "application/octet-stream"
     });
 
-    // إنشاء رابط تحميل وتحفيز التنزيل
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = nom + ".xlsx";
@@ -331,14 +407,43 @@ function exportToExcel() {
     link.click();
     document.body.removeChild(link);
 }
+
 function clearTable() {
-    if (confirm("هل أنت متأكد من مسح جميع بيانات المنتجات؟")) {
-        // مسح محتوى الجدول
+    const modal = document.getElementById("confirmModal");
+    const message = modal.querySelector(".modal-content p");
+    const actions = modal.querySelector(".modal-actions");
+    const yesBtn = document.getElementById("confirmYes");
+    const noBtn = document.getElementById("confirmNo");
+
+    // عرض رسالة التأكيد لمسح الكل
+    message.textContent = "هل أنت متأكد من مسح جميع بيانات المنتجات؟";
+    actions.style.display = "flex";
+    modal.style.display = "block";
+
+    // إزالة أي مستمعات قديمة
+    const newYes = yesBtn.cloneNode(true);
+    yesBtn.parentNode.replaceChild(newYes, yesBtn);
+
+    // عند الضغط على "نعم"
+    newYes.addEventListener("click", () => {
         document.querySelector("#produitTable tbody").innerHTML = "";
-        // مسح البيانات من localStorage
         localStorage.removeItem("produits");
-        alert("تم مسح جميع البيانات بنجاح.");
-    }
+
+        // عرض رسالة النجاح
+        message.textContent = "تم مسح جميع البيانات بنجاح.";
+        actions.style.display = "none";
+
+        setTimeout(() => {
+            modal.style.display = "none";
+            message.textContent = "هل أنت متأكد أنك تريد حذف هذا المنتج؟";
+            actions.style.display = "flex";
+        }, 2000);
+    });
+
+    // إلغاء
+    noBtn.onclick = () => {
+        modal.style.display = "none";
+    };
 }
 
 document.querySelector("#plus").addEventListener("click", () => {
