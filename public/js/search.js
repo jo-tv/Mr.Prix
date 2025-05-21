@@ -17,6 +17,7 @@ document.getElementById("searchBtn").addEventListener("click", function () {
 
     fetch(`/api/search?q=${encodeURIComponent(query)}`)
         .then(res => (res.ok ? res.json() : Promise.reject("Non trouvé")))
+
         .then(products => {
             const p = products[0];
             if (!p) return showModalMessage("المنتج غير موجود");
@@ -28,6 +29,7 @@ document.getElementById("searchBtn").addEventListener("click", function () {
             document.getElementById("stock").value = p.STOCK;
             document.getElementById("prix").value = p.PV_TTC;
             document.getElementById("productForm").style.display = "block";
+            
         })
         .catch(() => showModalMessage("المنتج غير موجود"));
 });
@@ -58,6 +60,7 @@ document.getElementById("ajouterBtn").addEventListener("click", function () {
     const prix = document.getElementById("prix").value.trim();
     const qte = document.getElementById("qte").value.trim() || "0";
     const adresse = document.getElementById("adresse").value.trim();
+    document.querySelector("#textSearch").value = "";
 
     if (!libelle) return alert("Champ manquant : Libellé");
     if (!gencode) return alert("Champ manquant : GenCode");
@@ -394,7 +397,12 @@ function exportToExcel() {
                 // تنسيق الرأس
                 if (R === 0) {
                     cell.s = {
-                        font: { bold: true, name: "Arial", sz: 12, color: { rgb: "FFFFFF" } },
+                        font: {
+                            bold: true,
+                            name: "Arial",
+                            sz: 12,
+                            color: { rgb: "FFFFFF" }
+                        },
                         fill: { fgColor: { rgb: "4F81BD" } },
                         alignment: { horizontal: "center", vertical: "center" },
                         border: {

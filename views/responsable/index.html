@@ -6,7 +6,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#007bff" />
+        <meta name="theme-color" content="#007bff" />
 
         <!-- ===== CSS ===== -->
         <link rel="stylesheet" href="css/style.css" />
@@ -132,6 +132,7 @@
                             if (!response.ok) {
                                 throw new Error("لم يتم العثور على المنتج");
                             }
+                            document.querySelector("input").value = "";
                             return response.json();
                         })
                         .then(products => {
@@ -174,7 +175,7 @@
                             console.error("Erreur:", err);
                         });
                 });
-        
+
             function showModalMessage(msg) {
                 const modal = document.getElementById("modalMessage");
                 const modalText = document.getElementById("modalText");
@@ -185,6 +186,7 @@
                 const closeBtn = document.getElementById("modalCloseBtn");
                 closeBtn.onclick = () => {
                     modal.style.display = "none";
+                    window.location.reload()
                 };
 
                 // إغلاق عند الضغط خارج المودال
@@ -194,13 +196,13 @@
                     }
                 };
             }
-            self.addEventListener('install', event => {
-  console.log('Service Worker installing.');
-});
+            self.addEventListener("install", event => {
+                console.log("Service Worker installing.");
+            });
 
-self.addEventListener('fetch', event => {
-  // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
-});
+            self.addEventListener("fetch", event => {
+                // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
+            });
         </script>
 
         <script src="js/main.js"></script>
