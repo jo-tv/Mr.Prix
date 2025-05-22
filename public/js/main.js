@@ -9,28 +9,33 @@ function showReader() {
     readerDiv.style.display = "block";
     btnFermer.style.display = "block";
 
-    html5QrCode = new Html5Qrcode("reader");
-    html5QrCode
-        .start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
-            qrCodeMessage => {
-                input.value = qrCodeMessage;
-                stopReader();
-                document.querySelector(".Subscribe-btn").click()
-            },
-            errorMessage => {
-                // تجاهل الأخطاء المؤقتة
-            }
-        )
-        .catch(err => {
-            console.error("فشل بدء الكاميرا:", err);
-            hideReader(); // إخفاء القارئ عند الفشل
-        });
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+    }
+
+    if (!html5QrCode._isScanning) {
+        html5QrCode
+            .start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                qrCodeMessage => {
+                    input.value = qrCodeMessage;
+                    stopReader();
+                    document.querySelector(".Subscribe-btn").click();
+                },
+                errorMessage => {
+                    // تجاهل الأخطاء المؤقتة
+                }
+            )
+            .catch(err => {
+                console.error("فشل بدء الكاميرا:", err);
+                hideReader();
+            });
+    }
 }
 
 function stopReader() {
-    if (html5QrCode) {
+    if (html5QrCode && html5QrCode._isScanning) {
         html5QrCode.stop().then(() => {
             html5QrCode.clear();
             hideReader();
@@ -50,9 +55,6 @@ window.onload = function () {
 };
 
 btnFermer.addEventListener("click", stopReader);
-btnFermer.addEventListener("click", ()=>{
-   btnFermer.style.display = "none"
-});
 
 document.querySelector(".Subscribe-btn").addEventListener("click", () => {
     if (input.value === "") {
@@ -62,21 +64,16 @@ document.querySelector(".Subscribe-btn").addEventListener("click", () => {
 
 input.addEventListener("focus", hideReader);
 
-self.addEventListener('install', event => {
-  console.log('Service Worker installing.');
-});
-
-self.addEventListener('fetch', event => {
-  // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
-});
+// Service Worker
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js")
-      .then(registration => {
-        console.log("Service Worker registered with scope:", registration.scope);
-      })
-      .catch(error => {
-        console.error("Service Worker registration failed:", error);
-      });
-  });
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then(registration => {
+                console.log("Service Worker registered with scope:", registration.scope);
+            })
+            .catch(error => {
+                console.error("Service Worker registration failed:", error);
+            });
+    });
 }

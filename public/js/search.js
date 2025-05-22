@@ -251,69 +251,66 @@ function removeProduct(button) {
 
 const scanBtn = document.getElementById("scanBtn");
 const reader = document.getElementById("reader");
-let html5QrCode;
+const textSearch = document.getElementById("textSearch");
+const searchBtn = document.querySelector("#searchBtn");
+
+let html5QrCode = new Html5Qrcode("reader");
 let isScanning = false;
+let availableCameras = [];
+
+// تحميل الكاميرات مرة واحدة عند تحميل الصفحة
+window.addEventListener("load", () => {
+    Html5Qrcode.getCameras()
+        .then(cameras => {
+            availableCameras = cameras;
+        })
+        .catch(err => {
+            alert("خطأ في الحصول على الكاميرات: " + err);
+        });
+});
 
 scanBtn.addEventListener("click", () => {
     if (isScanning) {
-        // إذا الماسح يعمل، نوقفه ونخفي العرض
-        html5QrCode
-            .stop()
-            .then(() => {
-                reader.style.display = "none";
-                isScanning = false;
-                scanBtn.textContent = "Scanner";
-            })
-            .catch(err => {
-                console.error("Error stopping scanner:", err);
-            });
+        html5QrCode.stop().then(() => {
+            reader.style.display = "none";
+            isScanning = false;
+            scanBtn.textContent = "Scanner";
+        }).catch(err => {
+            console.error("Error stopping scanner:", err);
+        });
     } else {
-        // نبدأ تشغيل الماسح
-        reader.style.display = "block";
-        html5QrCode = new Html5Qrcode("reader");
+        if (availableCameras.length === 0) {
+            alert("لم يتم العثور على كاميرات.");
+            return;
+        }
 
-        Html5Qrcode.getCameras()
-            .then(cameras => {
-                const backCam =
-                    cameras.find(cam =>
-                        cam.label.toLowerCase().includes("back")
-                    ) || cameras[0];
-                if (!backCam) {
-                    alert("Caméra non trouvée");
-                    return;
-                }
-                html5QrCode
-                    .start(
-                        { deviceId: { exact: backCam.id } },
-                        { fps: 10, qrbox: 250 },
-                        decodedText => {
-                            // وضع النص الممسوح في حقل البحث بدلاً من alert
-                            document.getElementById("textSearch").value =
-                                decodedText;
-                            // بعد المسح، نوقف الماسح ونخفيه تلقائيًا
-                            html5QrCode.stop().then(() => {
-                                reader.style.display = "none";
-                                isScanning = false;
-                                scanBtn.textContent = "Scanner";
-                                document.querySelector("#searchBtn").click();
-                            });
-                        },
-                        errorMessage => {
-                            // يمكن تجاهل أو طباعة الأخطاء الصغيرة هنا
-                            // console.warn(`Scan error: ${errorMessage}`);
-                        }
-                    )
-                    .then(() => {
-                        isScanning = true;
-                        scanBtn.textContent = "Arrêter le scanner";
-                    })
-                    .catch(err => {
-                        alert("خطأ في تشغيل الكاميرا: " + err);
-                    });
-            })
-            .catch(err => {
-                alert("خطأ في الحصول على الكاميرات: " + err);
-            });
+        const backCam = availableCameras.find(cam =>
+            cam.label.toLowerCase().includes("back")
+        ) || availableCameras[0];
+
+        reader.style.display = "block";
+
+        html5QrCode.start(
+            { deviceId: { exact: backCam.id } },
+            { fps: 10, qrbox: 250 },
+            decodedText => {
+                textSearch.value = decodedText;
+                html5QrCode.stop().then(() => {
+                    reader.style.display = "none";
+                    isScanning = false;
+                    scanBtn.textContent = "Scanner";
+                    searchBtn.click(); // تشغيل البحث تلقائيًا
+                });
+            },
+            errorMessage => {
+                // تجاهل أخطاء المسح البسيطة
+            }
+        ).then(() => {
+            isScanning = true;
+            scanBtn.textContent = "Arrêter le scanner";
+        }).catch(err => {
+            alert("خطأ في تشغيل الكاميرا: " + err);
+        });
     }
 });
 
