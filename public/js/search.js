@@ -279,7 +279,7 @@ scanBtn.addEventListener("click", async () => {
 
             await html5QrCode.start(
                 { deviceId: { exact: camera.id } },
-                { fps: 1, qrbox: 300 },
+                { fps: 7, qrbox: 280 },
                 decodedText => {
                     input.value = decodedText;
                     html5QrCode.stop().then(() => {
