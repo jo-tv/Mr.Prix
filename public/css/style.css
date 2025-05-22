@@ -15,7 +15,6 @@ body {
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    overflow: hidden;
     margin: 0;
     padding: 0;
     position: relative;
@@ -219,6 +218,7 @@ body {
     position: absolute;
     top: 150px;
     display: none;
+    zoom: 0.9;
 }
 
 .ticket h4 {
@@ -227,14 +227,12 @@ body {
     line-height: 2rem;
     letter-spacing: 0.8px;
     font-weight: 900;
-    font-size: 22px;
-
     color: #a152dc;
 }
 
 .ticket h4 span {
     color: #000;
-    font-size: 17px;
+    font-size: 15px;
     margin-right: 10px;
     text-align: left;
     letter-spacing: 1px;
@@ -277,7 +275,6 @@ body {
     width: 15%;
     text-align: center;
     align-items: center;
-    font-size: 25px;
     color: #fff;
 }
 
@@ -358,7 +355,7 @@ body {
     fill: rgb(255, 255, 255);
     margin-left: 8px;
     transition: all 0.3s;
-    color: #fff;
+    color: #000;
     font-size: 30px;
 }
 
@@ -370,7 +367,8 @@ body {
     padding-left: 15px;
     background-color: #c0c0c0;
     color: white;
-    font-size: 1em;
+    font-size: 0.9em;
+    letter-spacing: 2px;
 }
 
 .input:-webkit-autofill {
