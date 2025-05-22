@@ -19,7 +19,7 @@
             src="https://kit.fontawesome.com/fb67a05d46.js"
             crossorigin="anonymous"
         ></script>
-        <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
         <title>Programe prix Mr bricolage</title>
     </head>
     <body>
@@ -137,12 +137,15 @@
       <div><span class="i1">Stock</span><span class="i2"><i class="fa-solid fa-boxes-stacked"></i></span><span class="i3">${
           product.STOCK
       }</span></div>
-      <div><span class="i1">Prix TTC</span><span class="i2"><i class="fa-solid fa-sack-dollar"></i></span><span class="i3">${
+      <div><span class="i1">Prix TTC</span><span class="i2"><i class="fa-solid
+      fa-sack-dollar"></i></span><span class="i3">${
           product.PV_TTC
       } DH</span></div>
     </div>
     <div class="total">
-      <span class="i1">PRIX</span><span class="i3">${product.PV_TTC} DH</span>
+      <span class="i1">PRIX</span><span class="i3 i4">${
+          product.PV_TTC
+      } DH</span>
     </div>
     <div class="footer">Merci de votre visite !</div>
 `;
@@ -175,13 +178,6 @@
                     }
                 };
             }
-            self.addEventListener("install", event => {
-                console.log("Service Worker installing.");
-            });
-
-            self.addEventListener("fetch", event => {
-                // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
-            });
         </script>
 
         <script src="js/main.js"></script>

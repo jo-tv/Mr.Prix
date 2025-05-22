@@ -17,7 +17,7 @@ const urlsToCache = [
     "/js/codebar.min.js",
     "/img/back.png",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2",
-    "https://unpkg.com/html5-qrcode"
+    "https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js",
 ];
 
 // عند التثبيت - cache الملفات المهمة

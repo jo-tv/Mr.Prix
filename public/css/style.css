@@ -9,7 +9,7 @@
 }
 
 body {
-    height: 100vh;
+    min-height: 100vh;
     font-family: "Lexend Deca", sans-serif;
     display: flex;
     flex-direction: column;
@@ -264,6 +264,7 @@ body {
     background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
     width: 30%;
     text-align: center;
+    align-items: center;
     color: #001;
     border-radius: 5px;
     border: solid 1px #b28fe1;
@@ -275,6 +276,7 @@ body {
     background: #404040;
     width: 15%;
     text-align: center;
+    align-items: center;
     font-size: 25px;
     color: #fff;
 }
@@ -283,6 +285,7 @@ body {
     background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
     width: 55%;
     text-align: center;
+    align-items: center;
     color: #9400d3;
     border-radius: 5px;
     text-transform: uppercase;
@@ -291,15 +294,29 @@ body {
 .i1,
 .i2,
 .i3 {
-    padding: 7px 0;
+    padding: 4px 0;
     font-weight: 700;
     letter-spacing: 1px;
+}
+.ticket .i4 {
+    background: #0000cd !important;
+    box-shadow:
+        #e6ce76 0px 2px 4px,
+        #e6ce76 0px 7px 13px -3px,
+        #e6ce76 0px -3px 0px inset;
+    color: #fff;
+    font-size: 20px;
+    margin: 10px auto;
+    width: 40%;
+    padding: 10px;
+    letter-spacing: 2px;
 }
 .ticket .total {
     margin-top: 10px;
     font-weight: bold;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .ticket .footer,
@@ -503,19 +520,4 @@ img {
 }
 #modalCloseBtn:hover {
     background-color: #3a5a8a;
-}
-@media (min-width: 780px) {
-    .ticket {
-        width: 90%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-    .input-wrapper {
-        scale: 1.5;
-    }
-    .wrapper {
-        scale: 1.5;
-    }
 }
