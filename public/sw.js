@@ -7,16 +7,17 @@ const urlsToCache = [
     "/cmd",
     "/prixVen",
     "/inventaire",
-    "/offline.html", // صفحة احتياطية للعرض عند عدم وجود انترنت (إذا عندك)
+    "/offline.html",
     "/css/login.css",
     "/css/search.css",
     "/css/style.css",
     "/css/upload.css",
     "/js/main.js",
     "/js/search.js",
+    "/js/codebar.min.js",
     "/img/back.png",
-    // ملفات خطوط فونت أوسم مثلا من cdn مع دعم CORS
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2"
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2",
+    "https://unpkg.com/html5-qrcode"
 ];
 
 // عند التثبيت - cache الملفات المهمة
@@ -46,9 +47,12 @@ self.addEventListener("activate", event => {
 
 // عند كل طلب - جلب من الكاش أولاً ثم الشبكة، مع fallback لصفحة offline عند فقدان الانترنت
 self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request).catch(() => caches.match("/offline.html"));
-    })
-  );
+    event.respondWith(
+        caches.match(event.request).then(response => {
+            return (
+                response ||
+                fetch(event.request).catch(() => caches.match("/offline.html"))
+            );
+        })
+    );
 });

@@ -21,7 +21,6 @@ function showReader() {
                 qrCodeMessage => {
                     input.value = qrCodeMessage;
                     stopReader();
-                    document.querySelector(".Subscribe-btn").click();
                 },
                 errorMessage => {
                     // تجاهل الأخطاء المؤقتة
@@ -44,6 +43,8 @@ function stopReader() {
         hideReader();
     }
 }
+
+
 
 function hideReader() {
     readerDiv.style.display = "none";
@@ -70,7 +71,10 @@ if ("serviceWorker" in navigator) {
         navigator.serviceWorker
             .register("/sw.js")
             .then(registration => {
-                console.log("Service Worker registered with scope:", registration.scope);
+                console.log(
+                    "Service Worker registered with scope:",
+                    registration.scope
+                );
             })
             .catch(error => {
                 console.error("Service Worker registration failed:", error);
