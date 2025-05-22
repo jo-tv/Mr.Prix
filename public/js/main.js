@@ -26,7 +26,7 @@ function showReader() {
                 html5QrCode
                     .start(
                         { deviceId: { exact: backCamera.id } },
-                        { fps: 7, qrbox: 280 }, // حجم أكبر ودقة أبطأ لأداء أفضل
+                        { fps: 3, qrbox: 300 }, // حجم أكبر ودقة أبطأ لأداء أفضل
                         qrCodeMessage => {
                             html5QrCode.stop().then(() => {
                                 input.value = qrCodeMessage;
