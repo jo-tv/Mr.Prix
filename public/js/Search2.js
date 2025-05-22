@@ -17,6 +17,7 @@ document.getElementById("searchBtn").addEventListener("click", function () {
 
     fetch(`/api/search?q=${encodeURIComponent(query)}`)
         .then(res => (res.ok ? res.json() : Promise.reject("Non trouvé")))
+
         .then(products => {
             const p = products[0];
             if (!p) return showModalMessage("المنتج غير موجود");
@@ -58,6 +59,7 @@ document.getElementById("ajouterBtn").addEventListener("click", function () {
     const prix = document.getElementById("prix").value.trim();
     const qte = document.getElementById("qte").value.trim() || "0";
     const adresse = document.getElementById("adresse").value.trim();
+    document.querySelector("#textSearch").value = "";
 
     if (!libelle) return alert("Champ manquant : Libellé");
     if (!gencode) return alert("Champ manquant : GenCode");
@@ -76,18 +78,6 @@ document.getElementById("ajouterBtn").addEventListener("click", function () {
     };
 
     const rows = document.querySelectorAll("#produitTable tbody tr");
-    let isDuplicate = false;
-
-    rows.forEach(row => {
-        const firstCell = row.querySelector("td .cell-content");
-        if (firstCell && firstCell.textContent.trim() === libelle) {
-            row.classList.add("duplicate");
-            isDuplicate = true;
-            alert(
-                "Attention : produit déjà présent, ajouté de nouveau et marqué."
-            );
-        }
-    });
 
     addProductToTable(product);
     saveProductToStorage(product);
@@ -110,12 +100,14 @@ function addProductToTable(product) {
         ...document.querySelectorAll("#produitTable tbody tr")
     ];
     let isDuplicate = false;
+    // عرض تنبيه في منتصف الشاشة عند التكرار
 
     existingRows.forEach(row => {
         const libelleCell = row.querySelector("td:first-child .cell-content");
         if (libelleCell && libelleCell.textContent.trim() === product.libelle) {
             row.classList.add("duplicate");
             isDuplicate = true;
+            showDuplicateAlert("هذا المنتج موجود بالفعل!");
         }
     });
 
@@ -183,6 +175,26 @@ function addProductToTable(product) {
     });
 
     document.querySelector("#produitTable tbody").appendChild(row);
+}
+
+function showDuplicateAlert(message) {
+    // إزالة أي تنبيه قديم
+    const existingAlert = document.querySelector(".duplicate-alert");
+    if (existingAlert) existingAlert.remove();
+
+    // إنشاء التنبيه
+    const alert = document.createElement("div");
+    alert.className = "duplicate-alert";
+    alert.dir = "rtl"; // اجعل الاتجاه من اليمين لليسار
+    alert.innerHTML = `<i class="fa fa-exclamation-triangle" style="margin-left: 8px; color: #f39c12;"></i> ${message}`;
+
+    // إضافته للصفحة
+    document.body.appendChild(alert);
+
+    // إزالته بعد ثانية واحدة
+    setTimeout(() => {
+        alert.remove();
+    }, 1000);
 }
 
 // ========== [تخزين منتج جديد في localStorage] ==========
@@ -349,17 +361,57 @@ function exportToExcel() {
 
     const ws = XLSX.utils.aoa_to_sheet(data);
 
+    // تنسيق وتوسيط جميع الخلايا
     const range = XLSX.utils.decode_range(ws["!ref"]);
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
-        if (!ws[cellAddress]) continue;
-        ws[cellAddress].s = {
-            font: { bold: true, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: "4F81BD" } },
-            alignment: { horizontal: "center", vertical: "center" }
-        };
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
+            const cell = ws[cell_address];
+
+            if (cell) {
+                // تنسيق الرأس
+                if (R === 0) {
+                    cell.s = {
+                        font: {
+                            bold: true,
+                            name: "Arial",
+                            sz: 12,
+                            color: { rgb: "FFFFFF" }
+                        },
+                        fill: { fgColor: { rgb: "4F81BD" } },
+                        alignment: { horizontal: "center", vertical: "center" },
+                        border: {
+                            top: { style: "thin", color: { rgb: "000000" } },
+                            bottom: { style: "thin", color: { rgb: "000000" } },
+                            left: { style: "thin", color: { rgb: "000000" } },
+                            right: { style: "thin", color: { rgb: "000000" } }
+                        }
+                    };
+                } else {
+                    // تنسيق باقي الخلايا
+                    cell.s = {
+                        font: { name: "Calibri", sz: 11 },
+                        alignment: { horizontal: "center", vertical: "center" },
+                        border: {
+                            top: { style: "thin", color: { rgb: "CCCCCC" } },
+                            bottom: { style: "thin", color: { rgb: "CCCCCC" } },
+                            left: { style: "thin", color: { rgb: "CCCCCC" } },
+                            right: { style: "thin", color: { rgb: "CCCCCC" } }
+                        }
+                    };
+
+                    // تحويل الرقم إذا كان قابلًا للتحويل
+                    const val = cell.v;
+                    if (!isNaN(val) && val !== "") {
+                        cell.t = "n";
+                        cell.v = Number(val);
+                    }
+                }
+            }
+        }
     }
 
+    // تحديد عرض الأعمدة تلقائيًا
     const colWidths = header.map(h => ({
         wch: Math.max(10, h.length + 5)
     }));
@@ -443,11 +495,15 @@ self.addEventListener("fetch", event => {
     // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
 });
 
+
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker
-        .register("/sw.js")
-        .then(() => console.log("Service Worker Registered"))
-        .catch(err =>
-            console.error("Service Worker registration failed:", err)
-        );
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js")
+      .then(registration => {
+        console.log("Service Worker registered with scope:", registration.scope);
+      })
+      .catch(error => {
+        console.error("Service Worker registration failed:", error);
+      });
+  });
 }

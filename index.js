@@ -301,6 +301,14 @@ app.post("/login", async (req, res) => {
     }
 });
 
+
+app.use(express.static("public"));
+
+// هذا السطر يسمح بتحميل sw.js مباشرة
+app.get('/sw.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'sw.js'));
+});
+
 // جلب بيانات الدور الحالي للمستخدم
 app.get("/get-role", isAuthenticated, (req, res) => {
     res.json(req.session.user);

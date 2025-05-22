@@ -13,6 +13,14 @@ const User = require("./models/user.js");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// الاتصال بقاعدة بيانات MongoDB
+mongoose
+    .connect(process.env.MONGO_URI, {
+        // لا حاجة لاستخدام الخيارات deprecated منذ إصدار 4.0
+    })
+    .then(() => console.log("✅ تم الاتصال بقاعدة البيانات MongoDB"))
+    .catch(err => console.error("❌ فشل الاتصال بـ MongoDB:", err));
+
 // تفعيل ضغط GZIP لتحسين الأداء
 app.use(compression());
 
@@ -31,16 +39,23 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.json({ limit: "10mb" }));
 
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 
 app.use(
     session({
         secret: "secret-key",
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: false } // اجعلها true مع https
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGO_URI, // أو ضع الرابط مباشرة للتجربة
+            collectionName: "sessions"
+        }),
+        cookie: {
+            secure: false, // اجعلها true إذا كنت تستخدم HTTPS
+            maxAge: 1000 * 60 * 60 * 4 // مدة الجلسة: يوم واحد
+        }
     })
 );
-
 // التحقق من أن المستخدم مسجل الدخول
 function isAuthenticated(req, res, next) {
     // هل توجد جلسة وفيها بيانات المستخدم؟
@@ -87,14 +102,6 @@ function isVendeur(req, res, next) {
 
     return res.status(403).json({ error: "هذه الصفحة مخصصة للبائع فقط" });
 }
-
-// الاتصال بقاعدة بيانات MongoDB
-mongoose
-    .connect(process.env.MONGO_URI, {
-        // لا حاجة لاستخدام الخيارات deprecated منذ إصدار 4.0
-    })
-    .then(() => console.log("✅ تم الاتصال بقاعدة البيانات MongoDB"))
-    .catch(err => console.error("❌ فشل الاتصال بـ MongoDB:", err));
 
 // نموذج ديناميكي لبيانات المنتجات (schema غير محدد)
 const productSchema = new mongoose.Schema({}, { strict: false });
@@ -191,7 +198,7 @@ app.get("/api/search", async (req, res) => {
     const qStr = q.toString();
     const qInt = parseInt(q, 10);
 
-    const conditions = [{ LIBELLE: qStr }, { ANPF: qStr }];
+    const conditions = [{ LIBELLE: qStr }, { ANPF: qStr }, { GENCOD_P: qStr }];
 
     if (!isNaN(qInt)) {
         conditions.push({ GENCOD_P: qInt });
@@ -316,7 +323,7 @@ app.get("/login", (req, res) => {
 });
 
 // صفحة التسجيل (نفس منطق صفحة تسجيل الدخول)
-app.get("/register", (req, res) => {
+app.get("/tassgile", (req, res) => {
     if (req.session && req.session.user) {
         return res.redirect(
             req.session.user.role === "vendeur" ? "/prixVen" : "/"
@@ -342,6 +349,9 @@ app.get("/cmd", isAuthenticated, isResponsable, (req, res) => {
 // صفحة الأسعار الخاصة بالبائع
 app.get("/prixVen", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/prixVen.html"));
+});
+app.get("/inventaire", isAuthenticated, isVendeur, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/vendeur/inventaire.html"));
 });
 
 // تسجيل الخروج وتدمير الجلسة

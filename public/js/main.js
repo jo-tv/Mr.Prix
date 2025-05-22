@@ -17,6 +17,7 @@ function showReader() {
             qrCodeMessage => {
                 input.value = qrCodeMessage;
                 stopReader();
+                document.querySelector(".Subscribe-btn").click()
             },
             errorMessage => {
                 // تجاهل الأخطاء المؤقتة
@@ -68,8 +69,14 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', event => {
   // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
 });
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log('Service Worker Registered'))
-      .catch(err => console.error('Service Worker registration failed:', err));
-  }
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js")
+      .then(registration => {
+        console.log("Service Worker registered with scope:", registration.scope);
+      })
+      .catch(error => {
+        console.error("Service Worker registration failed:", error);
+      });
+  });
+}

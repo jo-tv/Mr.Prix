@@ -29,7 +29,6 @@ document.getElementById("searchBtn").addEventListener("click", function () {
             document.getElementById("stock").value = p.STOCK;
             document.getElementById("prix").value = p.PV_TTC;
             document.getElementById("productForm").style.display = "block";
-            
         })
         .catch(() => showModalMessage("المنتج غير موجود"));
 });
@@ -79,52 +78,6 @@ document.getElementById("ajouterBtn").addEventListener("click", function () {
     };
 
     const rows = document.querySelectorAll("#produitTable tbody tr");
-    let isDuplicate = false;
-
-    let checkDuplicates = true;
-
-    function handleDuplicateCheck(libelle, onContinue) {
-        for (const row of rows) {
-            const firstCell = row.querySelector("td .cell-content");
-            if (firstCell && firstCell.textContent.trim() === libelle) {
-                row.classList.add("duplicate");
-                isDuplicate = true;
-
-                if (checkDuplicates) {
-                    showNotice(
-                        "Attention : produit déjà présent, ajouté de nouveau et marqué.",
-                        () => {
-                            if (typeof onContinue === "function") onContinue();
-                        }
-                    );
-                    return; // أوقف التنفيذ حتى يضغط المستخدم
-                }
-
-                break; // في حال التحقق معطّل
-            }
-        }
-
-        if (typeof onContinue === "function") onContinue();
-    }
-    function showNotice(message, callback) {
-        const modal = document.getElementById("noticeModal");
-        const messageElement = document.getElementById("noticeMessage");
-        const okBtn = document.getElementById("noticeOk");
-        const disableCheckbox = document.getElementById(
-            "disableCheckDuplicate"
-        );
-
-        messageElement.textContent = message;
-        modal.style.display = "flex";
-
-        okBtn.onclick = () => {
-            checkDuplicates = !disableCheckbox.checked;
-            modal.style.display = "none";
-            if (typeof callback === "function") {
-                callback();
-            }
-        };
-    }
 
     addProductToTable(product);
     saveProductToStorage(product);
@@ -147,12 +100,14 @@ function addProductToTable(product) {
         ...document.querySelectorAll("#produitTable tbody tr")
     ];
     let isDuplicate = false;
+    // عرض تنبيه في منتصف الشاشة عند التكرار
 
     existingRows.forEach(row => {
         const libelleCell = row.querySelector("td:first-child .cell-content");
         if (libelleCell && libelleCell.textContent.trim() === product.libelle) {
             row.classList.add("duplicate");
             isDuplicate = true;
+            showDuplicateAlert("هذا المنتج موجود بالفعل!");
         }
     });
 
@@ -220,6 +175,26 @@ function addProductToTable(product) {
     });
 
     document.querySelector("#produitTable tbody").appendChild(row);
+}
+
+function showDuplicateAlert(message) {
+    // إزالة أي تنبيه قديم
+    const existingAlert = document.querySelector(".duplicate-alert");
+    if (existingAlert) existingAlert.remove();
+
+    // إنشاء التنبيه
+    const alert = document.createElement("div");
+    alert.className = "duplicate-alert";
+    alert.dir = "rtl"; // اجعل الاتجاه من اليمين لليسار
+    alert.innerHTML = `<i class="fa fa-exclamation-triangle" style="margin-left: 8px; color: #f39c12;"></i> ${message}`;
+
+    // إضافته للصفحة
+    document.body.appendChild(alert);
+
+    // إزالته بعد ثانية واحدة
+    setTimeout(() => {
+        alert.remove();
+    }, 1000);
 }
 
 // ========== [تخزين منتج جديد في localStorage] ==========
@@ -320,6 +295,7 @@ scanBtn.addEventListener("click", () => {
                                 reader.style.display = "none";
                                 isScanning = false;
                                 scanBtn.textContent = "Scanner";
+                                document.querySelector("#searchBtn").click();
                             });
                         },
                         errorMessage => {
@@ -507,9 +483,27 @@ function clearTable() {
         modal.style.display = "none";
     };
 }
+// داله لتفريغ حقول ادخال عنصر غير موجود
+function checkAndUnlockFields() {
+    const inputs = document.querySelectorAll("#productForm input");
+    let hasEmpty = false;
+
+    inputs.forEach(input => {
+        if (input.value.trim() === "") {
+            hasEmpty = true;
+        }
+    });
+
+    if (hasEmpty) {
+        inputs.forEach(input => {
+            input.removeAttribute("readonly");
+        });
+    }
+}
 
 document.querySelector("#plus").addEventListener("click", () => {
     document.querySelector(".form-container").style.display = "block";
+    checkAndUnlockFields();
 });
 
 self.addEventListener("install", event => {
@@ -521,45 +515,17 @@ self.addEventListener("fetch", event => {
 });
 
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker
-        .register("/sw.js")
-        .then(() => console.log("Service Worker Registered"))
-        .catch(err =>
-            console.error("Service Worker registration failed:", err)
-        );
-}
-let checkDuplicates = true;
-
-// زر تبديل التحقق
-document
-    .getElementById("toggleDuplicateCheck")
-    .addEventListener("change", function () {
-        checkDuplicates = this.checked;
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then(registration => {
+                console.log(
+                    "Service Worker registered with scope:",
+                    registration.scope
+                );
+            })
+            .catch(error => {
+                console.error("Service Worker registration failed:", error);
+            });
     });
-
-// نافذة التنبيه
-function showNotice(message) {
-    return new Promise(resolve => {
-        const modal = document.getElementById("noticeModal");
-        const msg = document.getElementById("noticeMessage");
-        const btn = document.getElementById("noticeOk");
-
-        msg.textContent = message;
-        modal.style.display = "flex";
-
-        btn.onclick = () => {
-            modal.style.display = "none";
-            resolve();
-        };
-    });
-}
-
-// مثال للاستخدام:
-async function onProductDuplicateDetected() {
-    if (!checkDuplicates) return;
-
-    await showNotice(
-        "Attention : produit déjà présent, ajouté de nouveau et marqué."
-    );
-    // تابع الإجراء بعد الضغط على موافق
 }
