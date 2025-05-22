@@ -249,68 +249,59 @@ function removeProduct(button) {
     };
 }
 
+// JavaScript
 const scanBtn = document.getElementById("scanBtn");
 const reader = document.getElementById("reader");
-const textSearch = document.getElementById("textSearch");
-const searchBtn = document.querySelector("#searchBtn");
+const input = document.getElementById("textSearch");
+const searchBtn = document.getElementById("searchBtn");
 
-let html5QrCode = new Html5Qrcode("reader");
+let html5QrCode;
 let isScanning = false;
-let availableCameras = [];
 
-// تحميل الكاميرات مرة واحدة عند تحميل الصفحة
-window.addEventListener("load", () => {
-    Html5Qrcode.getCameras()
-        .then(cameras => {
-            availableCameras = cameras;
-        })
-        .catch(err => {
-            alert("خطأ في الحصول على الكاميرات: " + err);
-        });
-});
-
-scanBtn.addEventListener("click", () => {
+scanBtn.addEventListener("click", async () => {
     if (isScanning) {
-        html5QrCode.stop().then(() => {
+        await html5QrCode.stop();
+        await html5QrCode.clear();
+        reader.style.display = "none";
+        scanBtn.textContent = "Scanner";
+        isScanning = false;
+    } else {
+        try {
+            const cameras = await Html5Qrcode.getCameras();
+            if (!cameras.length) throw new Error("لا توجد كاميرات متاحة");
+
+            const camera = cameras.find(cam =>
+                cam.label.toLowerCase().includes("back")
+            ) || cameras[0];
+
+            reader.style.display = "block";
+            html5QrCode = new Html5Qrcode("reader");
+
+            await html5QrCode.start(
+                { deviceId: { exact: camera.id } },
+                { fps: 10, qrbox: 250 },
+                decodedText => {
+                    input.value = decodedText;
+                    html5QrCode.stop().then(() => {
+                        html5QrCode.clear();
+                        reader.style.display = "none";
+                        scanBtn.textContent = "Scanner";
+                        isScanning = false;
+                        searchBtn.click();
+                    });
+                },
+                error => {
+                    // تجاهل الأخطاء البسيطة
+                }
+            );
+
+            scanBtn.textContent = "Arrêter le scanner";
+            isScanning = true;
+        } catch (err) {
+            alert("خطأ في تشغيل الكاميرا: " + err.message);
             reader.style.display = "none";
             isScanning = false;
-            scanBtn.textContent = "Scanner";
-        }).catch(err => {
-            console.error("Error stopping scanner:", err);
-        });
-    } else {
-        if (availableCameras.length === 0) {
-            alert("لم يتم العثور على كاميرات.");
-            return;
         }
-
-        const backCam = availableCameras.find(cam =>
-            cam.label.toLowerCase().includes("back")
-        ) || availableCameras[0];
-
-        reader.style.display = "block";
-
-        html5QrCode.start(
-            { deviceId: { exact: backCam.id } },
-            { fps: 10, qrbox: 250 },
-            decodedText => {
-                textSearch.value = decodedText;
-                html5QrCode.stop().then(() => {
-                    reader.style.display = "none";
-                    isScanning = false;
-                    scanBtn.textContent = "Scanner";
-                    searchBtn.click(); // تشغيل البحث تلقائيًا
-                });
-            },
-            errorMessage => {
-                // تجاهل أخطاء المسح البسيطة
-            }
-        ).then(() => {
-            isScanning = true;
-            scanBtn.textContent = "Arrêter le scanner";
-        }).catch(err => {
-            alert("خطأ في تشغيل الكاميرا: " + err);
-        });
     }
 });
 
