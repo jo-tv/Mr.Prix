@@ -218,7 +218,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
     display: none;
     zoom: 0.9;
 }
@@ -456,7 +456,10 @@ body {
     width: 300px;
     display: none;
     margin-bottom: 0;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    box-shadow:
+        rgba(0, 0, 0, 0.3) 0px 19px 38px,
+        rgba(0, 0, 0, 0.22) 0px 15px 12px;
+    border: dashed solid #4285f4;
     z-index: 999;
 }
 
