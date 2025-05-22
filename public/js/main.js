@@ -13,24 +13,47 @@ function showReader() {
         html5QrCode = new Html5Qrcode("reader");
     }
 
-    if (!html5QrCode._isScanning) {
-        html5QrCode
-            .start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
-                qrCodeMessage => {
-                    input.value = qrCodeMessage;
-                    stopReader();
-                },
-                errorMessage => {
-                    // تجاهل الأخطاء المؤقتة
-                }
-            )
-            .catch(err => {
-                console.error("فشل بدء الكاميرا:", err);
+    // الحصول على الكاميرات المتاحة
+    Html5Qrcode.getCameras()
+        .then(devices => {
+            if (devices && devices.length) {
+                // محاولة اختيار الكاميرا الخلفية أو استخدام أول كاميرا متاحة
+                const backCamera =
+                    devices.find(device =>
+                        device.label.toLowerCase().includes("back")
+                    ) || devices[0];
+
+                html5QrCode
+                    .start(
+                        { deviceId: { exact: backCamera.id } },
+                        { fps: 1, qrbox: 300 }, // حجم أكبر ودقة أبطأ لأداء أفضل
+                        qrCodeMessage => {
+                            html5QrCode.stop().then(() => {
+                                input.value = qrCodeMessage;
+                                stopReader();
+
+                                const searchButton =
+                                    document.querySelector(".Subscribe-btn");
+                                if (searchButton) searchButton.click();
+                            });
+                        },
+                        errorMessage => {
+                            // تجاهل الأخطاء المؤقتة
+                        }
+                    )
+                    .catch(err => {
+                        console.error("فشل بدء الكاميرا:", err);
+                        hideReader();
+                    });
+            } else {
+                console.error("لا توجد كاميرات متاحة.");
                 hideReader();
-            });
-    }
+            }
+        })
+        .catch(err => {
+            console.error("خطأ في الحصول على الكاميرات:", err);
+            hideReader();
+        });
 }
 
 function stopReader() {
@@ -43,8 +66,6 @@ function stopReader() {
         hideReader();
     }
 }
-
-
 
 function hideReader() {
     readerDiv.style.display = "none";
@@ -83,42 +104,40 @@ if ("serviceWorker" in navigator) {
 }
 
 self.addEventListener("install", function (event) {
-                event.waitUntil(
-                    caches.open("v1").then(function (cache) {
-                        return Promise.all(
-                            urlsToCache.map(url =>
-                                fetch(url)
-                                    .then(response => {
-                                        if (!response.ok)
-                                            throw new Error(
-                                                "Failed to fetch " + url
-                                            );
-                                        return cache.put(url, response.clone());
-                                    })
-                                    .catch(err => {
-                                        console.warn("لم يتم تخزين:", url, err);
-                                    })
-                            )
-                        );
-                    })
-                );
-            });
+    event.waitUntil(
+        caches.open("v1").then(function (cache) {
+            return Promise.all(
+                urlsToCache.map(url =>
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok)
+                                throw new Error("Failed to fetch " + url);
+                            return cache.put(url, response.clone());
+                        })
+                        .catch(err => {
+                            console.warn("لم يتم تخزين:", url, err);
+                        })
+                )
+            );
+        })
+    );
+});
 
-            self.addEventListener("fetch", event => {
-                event.respondWith(
-                    caches.match(event.request).then(response => {
-                        // إذا وجدنا الملف في الكاش نرجعه
-                        if (response) {
-                            return response;
-                        }
+self.addEventListener("fetch", event => {
+    event.respondWith(
+        caches.match(event.request).then(response => {
+            // إذا وجدنا الملف في الكاش نرجعه
+            if (response) {
+                return response;
+            }
 
-                        // إذا لم نجده نحاول تحميله من الشبكة
-                        return fetch(event.request).catch(() => {
-                            // في حال فشل الاتصال بالشبكة (مثلاً بدون إنترنت)، نظهر صفحة offline إن كانت موجودة
-                            if (event.request.mode === "navigate") {
-                                return caches.match("/offline.html");
-                            }
-                        });
-                    })
-                );
+            // إذا لم نجده نحاول تحميله من الشبكة
+            return fetch(event.request).catch(() => {
+                // في حال فشل الاتصال بالشبكة (مثلاً بدون إنترنت)، نظهر صفحة offline إن كانت موجودة
+                if (event.request.mode === "navigate") {
+                    return caches.match("/offline.html");
+                }
             });
+        })
+    );
+});

@@ -270,16 +270,16 @@ scanBtn.addEventListener("click", async () => {
             const cameras = await Html5Qrcode.getCameras();
             if (!cameras.length) throw new Error("لا توجد كاميرات متاحة");
 
-            const camera = cameras.find(cam =>
-                cam.label.toLowerCase().includes("back")
-            ) || cameras[0];
+            const camera =
+                cameras.find(cam => cam.label.toLowerCase().includes("back")) ||
+                cameras[0];
 
             reader.style.display = "block";
             html5QrCode = new Html5Qrcode("reader");
 
             await html5QrCode.start(
                 { deviceId: { exact: camera.id } },
-                { fps: 10, qrbox: 250 },
+                { fps: 1, qrbox: 300 },
                 decodedText => {
                     input.value = decodedText;
                     html5QrCode.stop().then(() => {
@@ -510,44 +510,41 @@ if ("serviceWorker" in navigator) {
     });
 }
 
-
 self.addEventListener("install", function (event) {
-                event.waitUntil(
-                    caches.open("v1").then(function (cache) {
-                        return Promise.all(
-                            urlsToCache.map(url =>
-                                fetch(url)
-                                    .then(response => {
-                                        if (!response.ok)
-                                            throw new Error(
-                                                "Failed to fetch " + url
-                                            );
-                                        return cache.put(url, response.clone());
-                                    })
-                                    .catch(err => {
-                                        console.warn("لم يتم تخزين:", url, err);
-                                    })
-                            )
-                        );
-                    })
-                );
-            });
+    event.waitUntil(
+        caches.open("v1").then(function (cache) {
+            return Promise.all(
+                urlsToCache.map(url =>
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok)
+                                throw new Error("Failed to fetch " + url);
+                            return cache.put(url, response.clone());
+                        })
+                        .catch(err => {
+                            console.warn("لم يتم تخزين:", url, err);
+                        })
+                )
+            );
+        })
+    );
+});
 
-            self.addEventListener("fetch", event => {
-                event.respondWith(
-                    caches.match(event.request).then(response => {
-                        // إذا وجدنا الملف في الكاش نرجعه
-                        if (response) {
-                            return response;
-                        }
+self.addEventListener("fetch", event => {
+    event.respondWith(
+        caches.match(event.request).then(response => {
+            // إذا وجدنا الملف في الكاش نرجعه
+            if (response) {
+                return response;
+            }
 
-                        // إذا لم نجده نحاول تحميله من الشبكة
-                        return fetch(event.request).catch(() => {
-                            // في حال فشل الاتصال بالشبكة (مثلاً بدون إنترنت)، نظهر صفحة offline إن كانت موجودة
-                            if (event.request.mode === "navigate") {
-                                return caches.match("/offline.html");
-                            }
-                        });
-                    })
-                );
+            // إذا لم نجده نحاول تحميله من الشبكة
+            return fetch(event.request).catch(() => {
+                // في حال فشل الاتصال بالشبكة (مثلاً بدون إنترنت)، نظهر صفحة offline إن كانت موجودة
+                if (event.request.mode === "navigate") {
+                    return caches.match("/offline.html");
+                }
             });
+        })
+    );
+});
