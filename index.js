@@ -361,6 +361,9 @@ app.get("/prixVen", isAuthenticated, isVendeur, (req, res) => {
 app.get("/inventaire", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/inventaire.html"));
 });
+app.get("/galerie", isAuthenticated, isVendeur, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/vendeur/galerie.html"));
+});
 
 // تسجيل الخروج وتدمير الجلسة
 app.get("/logout", (req, res) => {

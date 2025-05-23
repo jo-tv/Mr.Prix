@@ -414,42 +414,44 @@ th {
         rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 }
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 9999;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 .modal-content {
-  background-color: white;
-  margin: 15% auto;
-  padding: 20px;
-  width: 300px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 .modal-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-around;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
 }
 .btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 .btn-danger {
-  background-color: #e74c3c;
-  color: white;
+    background-color: #e74c3c;
+    color: white;
 }
 .btn-secondary {
-  background-color: #bdc3c7;
-  color: black;
+    background-color: #bdc3c7;
+    color: black;
 }
-  .modal-overlay {
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -460,9 +462,9 @@ th {
     justify-content: center;
     align-items: center;
     z-index: 9999;
-  }
+}
 
-  .modal-content {
+.modal-content {
     background: white;
     padding: 20px 30px;
     border-radius: 10px;
@@ -470,43 +472,43 @@ th {
     text-align: center;
     max-width: 400px;
     width: 90%;
-  }
+}
 
-  .modal-actions {
+.modal-actions {
     margin-top: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
-  }
+}
 
-  .btn {
+.btn {
     padding: 8px 16px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
-  }
+}
 
-  .btn.yes {
+.btn.yes {
     background-color: #2196f3;
     color: white;
-  }
+}
 
-  .toggle-label {
+.toggle-label {
     font-size: 14px;
     display: flex;
     align-items: center;
     gap: 5px;
     cursor: pointer;
-  }
+}
 
-  .toggle-label input {
+.toggle-label input {
     transform: scale(1.2);
-  }
-  
-  .duplicate-alert {
+}
+
+.duplicate-alert {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -523,8 +525,20 @@ th {
 }
 
 @keyframes fadeInOut {
-    0% { opacity: 0; transform: translate(-50%, -60%); }
-    20% { opacity: 1; transform: translate(-50%, -50%); }
-    80% { opacity: 1; transform: translate(-50%, -50%); }
-    100% { opacity: 0; transform: translate(-50%, -40%); }
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
 }

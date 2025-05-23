@@ -46,7 +46,7 @@ function showModalMessage(message) {
         modal.style.display = "none";
         msgEl.textContent = "هل أنت متأكد أنك تريد حذف هذا المنتج؟";
         actions.style.display = "flex";
-    }, 2000);
+    }, 1000);
 }
 
 // زر الإضافة: إضافة المنتج إلى الجدول وlocalStorage
@@ -96,11 +96,12 @@ document.getElementById("ajouterBtn").addEventListener("click", function () {
 
 // ========== [إضافة صف جديد في الجدول + تحديد التكرار + حفظ عند التعديل] ==========
 function addProductToTable(product) {
+    product.id = Number(product.id) || Date.now(); // ضمان وجود ID
+
     const existingRows = [
         ...document.querySelectorAll("#produitTable tbody tr")
     ];
     let isDuplicate = false;
-    // عرض تنبيه في منتصف الشاشة عند التكرار
 
     existingRows.forEach(row => {
         const libelleCell = row.querySelector("td:first-child .cell-content");
@@ -112,7 +113,7 @@ function addProductToTable(product) {
     });
 
     const row = document.createElement("tr");
-    row.setAttribute("data-id", product.id); // مهم
+    row.setAttribute("data-id", product.id);
     if (isDuplicate) row.classList.add("duplicate");
 
     row.innerHTML = `
@@ -131,15 +132,16 @@ function addProductToTable(product) {
     <td><label class="cell-label">Adresse</label>
         <div class="cell-content" contenteditable="true">${product.adresse}</div></td>
     <td class="actions" style="text-align:center;">
-        <button class="btnRed" onclick="removeProduct(this)" style="cursor:pointer;">
+        <button class="btnRed" onclick="removeProduct(this)">
             <i class="fa fa-trash"></i>
         </button>
     </td>
     `;
 
+    // عند الخروج من الخلية: تحديث المنتج
     const updateOnBlur = () => {
         const updatedProduct = {
-            id: product.id,
+            id: Number(product.id), // مهم
             libelle: row.children[0]
                 .querySelector(".cell-content")
                 .textContent.trim(),
@@ -152,27 +154,27 @@ function addProductToTable(product) {
             fournisseur: row.children[3]
                 .querySelector(".cell-content")
                 .textContent.trim(),
-            stock: row.children[4]
-                .querySelector(".cell-content")
-                .textContent.trim(),
-            prix: row.children[5]
+            prix: row.children[4]
                 .querySelector(".cell-content")
                 .textContent.replace("DH/TTC", "")
                 .trim(),
-            qte: row.children[6]
+            qte: row.children[5]
                 .querySelector(".cell-content")
                 .textContent.trim(),
-            adresse: row.children[7]
+            adresse: row.children[6]
                 .querySelector(".cell-content")
-                .textContent.trim()
+                .textContent.trim(),
+            stock: product.stock // احتفظ بالقيمة الأصلية
         };
 
         updateProductInStorage(updatedProduct);
     };
 
-    row.querySelectorAll(".cell-content").forEach(cell => {
-        cell.addEventListener("blur", updateOnBlur);
-    });
+    row.querySelectorAll(".cell-content[contenteditable='true']").forEach(
+        cell => {
+            cell.addEventListener("blur", updateOnBlur);
+        }
+    );
 
     document.querySelector("#produitTable tbody").appendChild(row);
 }
@@ -199,20 +201,32 @@ function showDuplicateAlert(message) {
 
 // ========== [تخزين منتج جديد في localStorage] ==========
 function saveProductToStorage(product) {
+    product.id = Number(product.id) || Date.now(); // تأكيد أن id رقمي أو إنشاء جديد
+
     let products = JSON.parse(localStorage.getItem("produits") || "[]");
-    products.unshift(product); // إضافة في أول القائمة
-    localStorage.setItem("produits", JSON.stringify(products));
+
+    const exists = products.find(p => Number(p.id) === product.id);
+    if (!exists) {
+        products.unshift(product);
+        localStorage.setItem("produits", JSON.stringify(products));
+    } else {
+        console.warn("المنتج موجود بالفعل!");
+    }
 }
 
 // ========== [تحديث منتج موجود في localStorage عند التعديل] ==========
 function updateProductInStorage(updatedProduct) {
     let products = JSON.parse(localStorage.getItem("produits") || "[]");
 
-    const index = products.findIndex(p => p.id === updatedProduct.id);
+    const index = products.findIndex(
+        p => Number(p.id) === Number(updatedProduct.id)
+    );
 
     if (index !== -1) {
         products[index] = updatedProduct;
         localStorage.setItem("produits", JSON.stringify(products));
+    } else {
+        console.warn("المنتج غير موجود للتعديل.");
     }
 }
 

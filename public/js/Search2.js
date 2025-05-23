@@ -46,7 +46,7 @@ function showModalMessage(message) {
         modal.style.display = "none";
         msgEl.textContent = "هل أنت متأكد أنك تريد حذف هذا المنتج؟";
         actions.style.display = "flex";
-    }, 2000);
+    }, 1000);
 }
 
 // زر الإضافة: إضافة المنتج إلى الجدول وlocalStorage
@@ -96,11 +96,12 @@ document.getElementById("ajouterBtn").addEventListener("click", function () {
 
 // ========== [إضافة صف جديد في الجدول + تحديد التكرار + حفظ عند التعديل] ==========
 function addProductToTable(product) {
+    product.id = Number(product.id) || Date.now(); // ضمان وجود ID
+
     const existingRows = [
         ...document.querySelectorAll("#produitTable tbody tr")
     ];
     let isDuplicate = false;
-    // عرض تنبيه في منتصف الشاشة عند التكرار
 
     existingRows.forEach(row => {
         const libelleCell = row.querySelector("td:first-child .cell-content");
@@ -112,7 +113,7 @@ function addProductToTable(product) {
     });
 
     const row = document.createElement("tr");
-    row.setAttribute("data-id", product.id); // مهم
+    row.setAttribute("data-id", product.id);
     if (isDuplicate) row.classList.add("duplicate");
 
     row.innerHTML = `
@@ -131,15 +132,16 @@ function addProductToTable(product) {
     <td><label class="cell-label">Adresse</label>
         <div class="cell-content" contenteditable="true">${product.adresse}</div></td>
     <td class="actions" style="text-align:center;">
-        <button class="btnRed" onclick="removeProduct(this)" style="cursor:pointer;">
+        <button class="btnRed" onclick="removeProduct(this)">
             <i class="fa fa-trash"></i>
         </button>
     </td>
     `;
 
+    // عند الخروج من الخلية: تحديث المنتج
     const updateOnBlur = () => {
         const updatedProduct = {
-            id: product.id,
+            id: Number(product.id), // مهم
             libelle: row.children[0]
                 .querySelector(".cell-content")
                 .textContent.trim(),
@@ -152,27 +154,27 @@ function addProductToTable(product) {
             fournisseur: row.children[3]
                 .querySelector(".cell-content")
                 .textContent.trim(),
-            stock: row.children[4]
-                .querySelector(".cell-content")
-                .textContent.trim(),
-            prix: row.children[5]
+            prix: row.children[4]
                 .querySelector(".cell-content")
                 .textContent.replace("DH/TTC", "")
                 .trim(),
-            qte: row.children[6]
+            qte: row.children[5]
                 .querySelector(".cell-content")
                 .textContent.trim(),
-            adresse: row.children[7]
+            adresse: row.children[6]
                 .querySelector(".cell-content")
-                .textContent.trim()
+                .textContent.trim(),
+            stock: product.stock // احتفظ بالقيمة الأصلية
         };
 
         updateProductInStorage(updatedProduct);
     };
 
-    row.querySelectorAll(".cell-content").forEach(cell => {
-        cell.addEventListener("blur", updateOnBlur);
-    });
+    row.querySelectorAll(".cell-content[contenteditable='true']").forEach(
+        cell => {
+            cell.addEventListener("blur", updateOnBlur);
+        }
+    );
 
     document.querySelector("#produitTable tbody").appendChild(row);
 }
@@ -199,20 +201,32 @@ function showDuplicateAlert(message) {
 
 // ========== [تخزين منتج جديد في localStorage] ==========
 function saveProductToStorage(product) {
+    product.id = Number(product.id) || Date.now(); // تأكيد أن id رقمي أو إنشاء جديد
+
     let products = JSON.parse(localStorage.getItem("produits") || "[]");
-    products.unshift(product); // إضافة في أول القائمة
-    localStorage.setItem("produits", JSON.stringify(products));
+
+    const exists = products.find(p => Number(p.id) === product.id);
+    if (!exists) {
+        products.unshift(product);
+        localStorage.setItem("produits", JSON.stringify(products));
+    } else {
+        console.warn("المنتج موجود بالفعل!");
+    }
 }
 
 // ========== [تحديث منتج موجود في localStorage عند التعديل] ==========
 function updateProductInStorage(updatedProduct) {
     let products = JSON.parse(localStorage.getItem("produits") || "[]");
 
-    const index = products.findIndex(p => p.id === updatedProduct.id);
+    const index = products.findIndex(
+        p => Number(p.id) === Number(updatedProduct.id)
+    );
 
     if (index !== -1) {
         products[index] = updatedProduct;
         localStorage.setItem("produits", JSON.stringify(products));
+    } else {
+        console.warn("المنتج غير موجود للتعديل.");
     }
 }
 
@@ -249,70 +263,59 @@ function removeProduct(button) {
     };
 }
 
+// JavaScript
 const scanBtn = document.getElementById("scanBtn");
 const reader = document.getElementById("reader");
+const input = document.getElementById("textSearch");
+const searchBtn = document.getElementById("searchBtn");
+
 let html5QrCode;
 let isScanning = false;
 
-scanBtn.addEventListener("click", () => {
+scanBtn.addEventListener("click", async () => {
     if (isScanning) {
-        // إذا الماسح يعمل، نوقفه ونخفي العرض
-        html5QrCode
-            .stop()
-            .then(() => {
-                reader.style.display = "none";
-                isScanning = false;
-                scanBtn.textContent = "Scanner";
-            })
-            .catch(err => {
-                console.error("Error stopping scanner:", err);
-            });
+        await html5QrCode.stop();
+        await html5QrCode.clear();
+        reader.style.display = "none";
+        scanBtn.textContent = "Scanner";
+        isScanning = false;
     } else {
-        // نبدأ تشغيل الماسح
-        reader.style.display = "block";
-        html5QrCode = new Html5Qrcode("reader");
+        try {
+            const cameras = await Html5Qrcode.getCameras();
+            if (!cameras.length) throw new Error("لا توجد كاميرات متاحة");
 
-        Html5Qrcode.getCameras()
-            .then(cameras => {
-                const backCam =
-                    cameras.find(cam =>
-                        cam.label.toLowerCase().includes("back")
-                    ) || cameras[0];
-                if (!backCam) {
-                    alert("Caméra non trouvée");
-                    return;
-                }
-                html5QrCode
-                    .start(
-                        { deviceId: { exact: backCam.id } },
-                        { fps: 10, qrbox: 250 },
-                        decodedText => {
-                            // وضع النص الممسوح في حقل البحث بدلاً من alert
-                            document.getElementById("textSearch").value =
-                                decodedText;
-                            // بعد المسح، نوقف الماسح ونخفيه تلقائيًا
-                            html5QrCode.stop().then(() => {
-                                reader.style.display = "none";
-                                isScanning = false;
-                                scanBtn.textContent = "Scanner";
-                            });
-                        },
-                        errorMessage => {
-                            // يمكن تجاهل أو طباعة الأخطاء الصغيرة هنا
-                            // console.warn(`Scan error: ${errorMessage}`);
-                        }
-                    )
-                    .then(() => {
-                        isScanning = true;
-                        scanBtn.textContent = "Arrêter le scanner";
-                    })
-                    .catch(err => {
-                        alert("خطأ في تشغيل الكاميرا: " + err);
+            const camera =
+                cameras.find(cam => cam.label.toLowerCase().includes("back")) ||
+                cameras[0];
+
+            reader.style.display = "block";
+            html5QrCode = new Html5Qrcode("reader");
+
+            await html5QrCode.start(
+                { deviceId: { exact: camera.id } },
+                { fps: 7, qrbox: 280 },
+                decodedText => {
+                    input.value = decodedText;
+                    html5QrCode.stop().then(() => {
+                        html5QrCode.clear();
+                        reader.style.display = "none";
+                        scanBtn.textContent = "Scanner";
+                        isScanning = false;
+                        searchBtn.click();
                     });
-            })
-            .catch(err => {
-                alert("خطأ في الحصول على الكاميرات: " + err);
-            });
+                },
+                error => {
+                    // تجاهل الأخطاء البسيطة
+                }
+            );
+
+            scanBtn.textContent = "Arrêter le scanner";
+            isScanning = true;
+        } catch (err) {
+            alert("خطأ في تشغيل الكاميرا: " + err.message);
+            reader.style.display = "none";
+            isScanning = false;
+        }
     }
 });
 
@@ -482,28 +485,80 @@ function clearTable() {
         modal.style.display = "none";
     };
 }
+// داله لتفريغ حقول ادخال عنصر غير موجود
+function checkAndUnlockFields() {
+    const inputs = document.querySelectorAll("#productForm input");
+    let hasEmpty = false;
+
+    inputs.forEach(input => {
+        if (input.value.trim() === "") {
+            hasEmpty = true;
+        }
+    });
+
+    if (hasEmpty) {
+        inputs.forEach(input => {
+            input.removeAttribute("readonly");
+        });
+    }
+}
 
 document.querySelector("#plus").addEventListener("click", () => {
     document.querySelector(".form-container").style.display = "block";
+    checkAndUnlockFields();
 });
 
-self.addEventListener("install", event => {
-    console.log("Service Worker installing.");
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then(registration => {
+                console.log(
+                    "Service Worker registered with scope:",
+                    registration.scope
+                );
+            })
+            .catch(error => {
+                console.error("Service Worker registration failed:", error);
+            });
+    });
+}
+
+self.addEventListener("install", function (event) {
+    event.waitUntil(
+        caches.open("v1").then(function (cache) {
+            return Promise.all(
+                urlsToCache.map(url =>
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok)
+                                throw new Error("Failed to fetch " + url);
+                            return cache.put(url, response.clone());
+                        })
+                        .catch(err => {
+                            console.warn("لم يتم تخزين:", url, err);
+                        })
+                )
+            );
+        })
+    );
 });
 
 self.addEventListener("fetch", event => {
-    // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
+    event.respondWith(
+        caches.match(event.request).then(response => {
+            // إذا وجدنا الملف في الكاش نرجعه
+            if (response) {
+                return response;
+            }
+
+            // إذا لم نجده نحاول تحميله من الشبكة
+            return fetch(event.request).catch(() => {
+                // في حال فشل الاتصال بالشبكة (مثلاً بدون إنترنت)، نظهر صفحة offline إن كانت موجودة
+                if (event.request.mode === "navigate") {
+                    return caches.match("/offline.html");
+                }
+            });
+        })
+    );
 });
-
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js")
-      .then(registration => {
-        console.log("Service Worker registered with scope:", registration.scope);
-      })
-      .catch(error => {
-        console.error("Service Worker registration failed:", error);
-      });
-  });
-}
