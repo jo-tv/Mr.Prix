@@ -7,7 +7,6 @@ const urlsToCache = [
     "/cmd",
     "/prixVen",
     "/inventaire",
-    "/galerie",
     "/offline.html",
     "/css/login.css",
     "/css/search.css",
