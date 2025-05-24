@@ -354,15 +354,16 @@ app.get("/cmd", isAuthenticated, isResponsable, (req, res) => {
     res.sendFile(path.join(__dirname, "views/responsable/search.html"));
 });
 
+app.get("/galerie", isAuthenticated, isResponsable, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/responsable/galerie.html"));
+});
+
 // صفحة الأسعار الخاصة بالبائع
 app.get("/prixVen", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/prixVen.html"));
 });
 app.get("/inventaire", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/inventaire.html"));
-});
-app.get("/galerie", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/galerie.html"));
 });
 
 // تسجيل الخروج وتدمير الجلسة
