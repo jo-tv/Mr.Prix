@@ -282,22 +282,20 @@ th {
     position: absolute;
     background: #fff;
     z-index: 2;
-    padding: 0.5rem 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    padding: 0.5rem;
+    margin: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     opacity: 0;
-    top: -110px;
+    top: -1100px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    box-shadow:
-        rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
-        rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
     transition:
         opacity 0.2s ease-in,
         top 0.2s ease-in,
         width 0.1s ease-in;
-    /*     /*&::after {
+    /*&::after {
     content: "";
     width: 20px;
     height: 20px;

@@ -46,6 +46,7 @@ body {
     justify-content: center;
     align-items: center;
     animation: fab-animation-reverse 0.4s ease-out forwards;
+    
 }
 
 .wrapper .fab::before,
@@ -74,10 +75,11 @@ body {
     position: absolute;
     background: #fff;
     z-index: 2;
-    padding: 0.5rem 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    padding: 0.5rem;
+    margin: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     opacity: 0;
-    top: -110px;
+    top: -1100px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
