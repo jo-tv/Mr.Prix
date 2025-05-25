@@ -104,7 +104,13 @@ function isVendeur(req, res, next) {
 }
 
 // نموذج ديناميكي لبيانات المنتجات (schema غير محدد)
-const productSchema = new mongoose.Schema({}, { strict: false });
+const productSchema = new mongoose.Schema(
+  {},
+  {
+    strict: false,
+    timestamps: { createdAt: 'createdAt', updatedAt: false }
+  }
+);
 const Product = mongoose.model("Product", productSchema);
 
 // إعداد multer لتخزين الملفات في الذاكرة (memory)

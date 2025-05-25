@@ -103,6 +103,117 @@ if ("serviceWorker" in navigator) {
     });
 }
 
+document.querySelector(".Subscribe-btn").addEventListener("click", function () {
+    const searchText = document
+        .querySelector('input[name="text"]')
+        .value.trim()
+        .toLowerCase();
+
+    if (!searchText) {
+        showModalMessage("🛍️ من فضلك أدخل اسم المنتج أو رمزه قبل المتابعة!");
+        return;
+    }
+
+    fetch(`/api/search?q=${encodeURIComponent(searchText)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("لم يتم العثور على المنتج");
+            }
+            document.querySelector(".ticket").style.display = "block";
+            document.querySelector("input").value = "";
+            return response.json();
+        })
+        .then(products => {
+            if (!products || products.length === 0) {
+                throw new Error("لم يتم العثور على المنتج");
+            }
+            const product = products[0];
+
+            const ticketDiv = document.querySelector(".ticket");
+            ticketDiv.innerHTML = `
+    <h4><span>LIBELLE :</span> ${product.LIBELLE}</h4>
+    <div class="date">Date : ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}</div>
+    <div class="items">
+      <div><span class="i1">GenCode</span><span class="i2"><i class="fa-solid fa-barcode"></i></span><span class="i3">${
+          product.GENCOD_P
+      }</span></div>
+      <div><span class="i1">ANPF</span><span class="i2"><i class="fa-solid fa-qrcode"></i></span><span class="i3">${
+          product.ANPF
+      }</span></div>
+      <div><span class="i1">Fourni</span><span class="i2"><i class="fa-solid fa-user-tie"></i></span><span class="i3">${
+          product.FOURNISSEUR_P
+      }</span></div>
+      <div><span class="i1">Stock</span><span class="i2"><i class="fa-solid
+      fa-boxes-stacked"></i></span><span id="stk" class="i3">${
+          product.STOCK
+      }</span></div>
+      <div><span class="i1">Prix TTC</span><span class="i2"><i class="fa-solid
+      fa-sack-dollar"></i></span><span class="i3">${
+          product.PV_TTC
+      } DH</span></div>
+    </div>
+    <div class="total">
+      <span class="i1">PRIX</span><span class="i3 i4">${
+          product.PV_TTC
+      } DH</span>
+    </div>
+    <div class="footer">Merci de votre visite !</div>
+`;
+            const stockValue = parseInt(product.STOCK);
+            const stockElement = document.getElementById("stk");
+
+            if (stockValue === 0) {
+                stockElement.style.setProperty(
+                    "background-color",
+                    "red",
+                    "important"
+                );
+                stockElement.style.setProperty("color", "white", "important");
+            } else if (stockValue > 0 && stockValue <= 20) {
+                stockElement.style.setProperty(
+                    "background-color",
+                    "orange",
+                    "important"
+                );
+                stockElement.style.setProperty("color", "white", "important");
+            } else if (stockValue > 20) {
+                stockElement.style.setProperty(
+                    "background-color",
+                    "green",
+                    "important"
+                );
+                stockElement.style.setProperty("color", "white", "important");
+            }
+        })
+        .catch(err => {
+            showModalMessage("🔍 لم نجد أي منتج مطابق لـ: " + searchText);
+            console.error("Erreur:", err);
+        });
+});
+
+function showModalMessage(msg) {
+    const modal = document.getElementById("modalMessage");
+    const modalText = document.getElementById("modalText");
+    modalText.textContent = msg;
+    modal.style.display = "flex";
+
+    // زر الإغلاق
+    const closeBtn = document.getElementById("modalCloseBtn");
+    closeBtn.onclick = () => {
+        modal.style.display = "none";
+        window.location.reload();
+    };
+
+    // إغلاق عند الضغط خارج المودال
+    window.onclick = event => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+}
+
+// كود تخزين بيانات الموقع داخل كاش
+
 self.addEventListener("install", function (event) {
     event.waitUntil(
         caches.open("v1").then(function (cache) {
