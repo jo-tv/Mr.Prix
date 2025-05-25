@@ -147,22 +147,40 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
       fa-boxes-stacked"></i></span><span id="stk" class="i3">${
           product.STOCK
       }</span></div>
-      <div><span class="i1">Prix TTC</span><span class="i2"><i class="fa-solid
-      fa-sack-dollar"></i></span><span class="i3">${
-          product.PV_TTC
-      } DH</span></div>
+      <div><span class="i1">Status</span><span class="i2"><i class="fas fa-exclamation-triangle"></i></span><span class="i3" id="etatProduit" ></span></div>
     </div>
     <div class="total">
-      <span class="i1">PRIX</span><span class="i3 i4">${
+      <span class="i1">prix</span><span class="i3 i4">${
           product.PV_TTC
       } DH</span>
     </div>
     <div class="footer">Merci de votre visite !</div>
 `;
+            const etatElement = document.getElementById("etatProduit");
+            if (product.LIBELLE.trim().startsWith("[S]")) {
+                etatElement.textContent = "Produit Désactivé";
+                etatElement.style.setProperty(
+                    "background-color",
+                    "orange",
+                    "important"
+                );
+                etatElement.style.setProperty("font-size", "16px", "important");
+                etatElement.style.setProperty("color", "red", "important");
+            } else {
+                etatElement.textContent = "Produit Active";
+                etatElement.style.setProperty(
+                    "background-color",
+                    "#fff",
+                    "important"
+                );
+                etatElement.style.setProperty("font-size", "16px", "important");
+                etatElement.style.setProperty("color", "green", "important");
+            }
+
             const stockValue = parseInt(product.STOCK);
             const stockElement = document.getElementById("stk");
 
-            if (stockValue === 0) {
+            if (stockValue <= 0) {
                 stockElement.style.setProperty(
                     "background-color",
                     "red",
