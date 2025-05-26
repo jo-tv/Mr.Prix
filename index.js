@@ -314,6 +314,10 @@ app.get("/sw.js", (req, res) => {
     res.sendFile(path.join(__dirname, "sw.js"));
 });
 
+app.get("/offline.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "views/login-register/offline.html"));
+});
+
 // جلب بيانات الدور الحالي للمستخدم
 app.get("/get-role", isAuthenticated, (req, res) => {
     res.json(req.session.user);

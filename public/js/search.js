@@ -299,7 +299,8 @@ scanBtn.addEventListener("click", async () => {
                     html5QrCode.stop().then(() => {
                         html5QrCode.clear();
                         reader.style.display = "none";
-                        scanBtn.innerHTML = '<i class="fa fa-qrcode"></i> Scanner';
+                        scanBtn.innerHTML =
+                            '<i class="fa fa-qrcode"></i> Scanner';
                         isScanning = false;
                         searchBtn.click();
                     });
@@ -525,41 +526,12 @@ if ("serviceWorker" in navigator) {
     });
 }
 
-self.addEventListener("install", function (event) {
-    event.waitUntil(
-        caches.open("v1").then(function (cache) {
-            return Promise.all(
-                urlsToCache.map(url =>
-                    fetch(url)
-                        .then(response => {
-                            if (!response.ok)
-                                throw new Error("Failed to fetch " + url);
-                            return cache.put(url, response.clone());
-                        })
-                        .catch(err => {
-                            console.warn("لم يتم تخزين:", url, err);
-                        })
-                )
-            );
-        })
-    );
-});
-
-self.addEventListener("fetch", event => {
-    event.respondWith(
-        caches.match(event.request).then(response => {
-            // إذا وجدنا الملف في الكاش نرجعه
-            if (response) {
-                return response;
-            }
-
-            // إذا لم نجده نحاول تحميله من الشبكة
-            return fetch(event.request).catch(() => {
-                // في حال فشل الاتصال بالشبكة (مثلاً بدون إنترنت)، نظهر صفحة offline إن كانت موجودة
-                if (event.request.mode === "navigate") {
-                    return caches.match("/offline.html");
-                }
-            });
-        })
-    );
-});
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").then(reg => {
+            console.log("Service Worker registered:", reg.scope);
+        }).catch(err => {
+            console.error("Service Worker failed:", err);
+        });
+    });
+}

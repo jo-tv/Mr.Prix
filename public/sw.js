@@ -20,7 +20,7 @@ const urlsToCache = [
     "https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js",
 ];
 
-// عند التثبيت - cache الملفات المهمة
+// تثبيت Service Worker وتخزين الملفات
 self.addEventListener("install", event => {
     console.log("Service Worker installing...");
     event.waitUntil(
@@ -28,31 +28,39 @@ self.addEventListener("install", event => {
             return cache.addAll(urlsToCache);
         })
     );
+    self.skipWaiting(); // لتفعيله مباشرة
 });
 
-// عند التفعيل - تنظيف الكاشات القديمة
+// تفعيل Service Worker وتنظيف الكاشات القديمة
 self.addEventListener("activate", event => {
     event.waitUntil(
-        caches.keys().then(keys => {
-            return Promise.all(
+        caches.keys().then(keys =>
+            Promise.all(
                 keys.map(key => {
                     if (key !== CACHE_NAME) {
                         return caches.delete(key);
                     }
                 })
-            );
-        })
+            )
+        )
     );
+    self.clients.claim(); // لتفعيل الخدمة على جميع الصفحات
 });
 
-// عند كل طلب - جلب من الكاش أولاً ثم الشبكة، مع fallback لصفحة offline عند فقدان الانترنت
+// التعامل مع الطلبات
 self.addEventListener("fetch", event => {
     event.respondWith(
         caches.match(event.request).then(response => {
-            return (
-                response ||
-                fetch(event.request).catch(() => caches.match("/offline.html"))
-            );
+            // إذا وجد في الكاش، يتم إرجاعه
+            if (response) return response;
+
+            // إذا لم يوجد، نحاول تحميله من الشبكة
+            return fetch(event.request).catch(err => {
+                // إذا كان الطلب من نوع "navigate" (طلب صفحة HTML)
+                if (event.request.mode === "navigate") {
+                    return caches.match("/offline.html");
+                }
+            });
         })
     );
 });
