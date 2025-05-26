@@ -17,7 +17,7 @@ window.onload = () => {
         if (!throttle) {
             animateGallery();
             throttle = true;
-            setTimeout(() => throttle = false, 2000);
+            setTimeout(() => (throttle = false), 2000);
         }
     });
 
