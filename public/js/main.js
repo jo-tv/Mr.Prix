@@ -4,7 +4,6 @@ const input = document.querySelector(".input");
 const ticket = document.querySelector(".ticket");
 const btnFermer = document.querySelector(".fermer");
 
-
 let html5QrCode = null;
 let isScanning = false;
 
@@ -68,15 +67,18 @@ function showReader() {
 
 function stopReader() {
     if (html5QrCode && isScanning) {
-        html5QrCode.stop().then(() => {
-            html5QrCode.clear();
-            isScanning = false;
-            hideReader();
-        }).catch(err => {
-            console.warn("تعذر إيقاف الماسح:", err);
-            isScanning = false;
-            hideReader();
-        });
+        html5QrCode
+            .stop()
+            .then(() => {
+                html5QrCode.clear();
+                isScanning = false;
+                hideReader();
+            })
+            .catch(err => {
+                console.warn("تعذر إيقاف الماسح:", err);
+                isScanning = false;
+                hideReader();
+            });
     } else {
         hideReader();
     }
@@ -240,14 +242,18 @@ function showModalMessage(msg) {
         }
     };
 }
-
-// Service Worker
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js").then(reg => {
-            console.log("Service Worker registered:", reg.scope);
-        }).catch(err => {
-            console.error("Service Worker failed:", err);
-        });
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then(registration => {
+                console.log(
+                    "Service Worker registered with scope:",
+                    registration.scope
+                );
+            })
+            .catch(error => {
+                console.error("Service Worker registration failed:", error);
+            });
     });
 }
