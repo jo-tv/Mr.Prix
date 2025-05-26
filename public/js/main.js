@@ -3,7 +3,10 @@ const readerDiv = document.getElementById("reader");
 const input = document.querySelector(".input");
 const ticket = document.querySelector(".ticket");
 const btnFermer = document.querySelector(".fermer");
+
+
 let html5QrCode = null;
+let isScanning = false;
 
 function showReader() {
     readerDiv.style.display = "block";
@@ -13,11 +16,13 @@ function showReader() {
         html5QrCode = new Html5Qrcode("reader");
     }
 
-    // الحصول على الكاميرات المتاحة
+    if (isScanning) return; // لا تعيد التشغيل إذا كان يعمل
+
+    isScanning = true;
+
     Html5Qrcode.getCameras()
         .then(devices => {
             if (devices && devices.length) {
-                // محاولة اختيار الكاميرا الخلفية أو استخدام أول كاميرا متاحة
                 const backCamera =
                     devices.find(device =>
                         device.label.toLowerCase().includes("back")
@@ -26,11 +31,13 @@ function showReader() {
                 html5QrCode
                     .start(
                         { deviceId: { exact: backCamera.id } },
-                        { fps: 3, qrbox: 300 }, // حجم أكبر ودقة أبطأ لأداء أفضل
+                        { fps: 3, qrbox: 300 },
                         qrCodeMessage => {
                             html5QrCode.stop().then(() => {
+                                html5QrCode.clear();
                                 input.value = qrCodeMessage;
-                                stopReader();
+                                isScanning = false;
+                                hideReader();
 
                                 const searchButton =
                                     document.querySelector(".Subscribe-btn");
@@ -43,23 +50,44 @@ function showReader() {
                     )
                     .catch(err => {
                         console.error("فشل بدء الكاميرا:", err);
+                        isScanning = false;
                         hideReader();
                     });
             } else {
                 console.error("لا توجد كاميرات متاحة.");
+                isScanning = false;
                 hideReader();
             }
         })
         .catch(err => {
             console.error("خطأ في الحصول على الكاميرات:", err);
+            isScanning = false;
             hideReader();
         });
 }
 
 function stopReader() {
-    if (html5QrCode && html5QrCode._isScanning) {
+    if (html5QrCode && isScanning) {
         html5QrCode.stop().then(() => {
             html5QrCode.clear();
+            isScanning = false;
+            hideReader();
+        }).catch(err => {
+            console.warn("تعذر إيقاف الماسح:", err);
+            isScanning = false;
+            hideReader();
+        });
+    } else {
+        hideReader();
+    }
+}
+
+function stopReader() {
+    const instance = window._qrCodeInstance;
+    if (instance && instance._isScanning) {
+        instance.stop().then(() => {
+            instance.clear();
+            delete window._qrCodeInstance;
             hideReader();
         });
     } else {
@@ -85,23 +113,6 @@ document.querySelector(".Subscribe-btn").addEventListener("click", () => {
 });
 
 input.addEventListener("focus", hideReader);
-
-// Service Worker
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker
-            .register("/sw.js")
-            .then(registration => {
-                console.log(
-                    "Service Worker registered with scope:",
-                    registration.scope
-                );
-            })
-            .catch(error => {
-                console.error("Service Worker registration failed:", error);
-            });
-    });
-}
 
 document.querySelector(".Subscribe-btn").addEventListener("click", function () {
     const searchText = document
@@ -228,6 +239,23 @@ function showModalMessage(msg) {
             modal.style.display = "none";
         }
     };
+}
+
+// Service Worker
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then(registration => {
+                console.log(
+                    "Service Worker registered with scope:",
+                    registration.scope
+                );
+            })
+            .catch(error => {
+                console.error("Service Worker registration failed:", error);
+            });
+    });
 }
 
 // كود تخزين بيانات الموقع داخل كاش

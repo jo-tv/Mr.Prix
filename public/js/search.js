@@ -277,7 +277,7 @@ scanBtn.addEventListener("click", async () => {
         await html5QrCode.stop();
         await html5QrCode.clear();
         reader.style.display = "none";
-        scanBtn.textContent = "Scanner";
+        scanBtn.innerHTML = '<i class="fa fa-qrcode"></i> Scanner';
         isScanning = false;
     } else {
         try {
@@ -299,7 +299,7 @@ scanBtn.addEventListener("click", async () => {
                     html5QrCode.stop().then(() => {
                         html5QrCode.clear();
                         reader.style.display = "none";
-                        scanBtn.textContent = "Scanner";
+                        scanBtn.innerHTML = '<i class="fa fa-qrcode"></i> Scanner';
                         isScanning = false;
                         searchBtn.click();
                     });
@@ -309,7 +309,8 @@ scanBtn.addEventListener("click", async () => {
                 }
             );
 
-            scanBtn.textContent = "Arrêter le scanner";
+            scanBtn.innerHTML =
+                '<i class="fa fa-qrcode"></i> Arrêter le scanner';
             isScanning = true;
         } catch (err) {
             alert("خطأ في تشغيل الكاميرا: " + err.message);

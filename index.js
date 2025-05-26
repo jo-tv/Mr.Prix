@@ -105,11 +105,11 @@ function isVendeur(req, res, next) {
 
 // نموذج ديناميكي لبيانات المنتجات (schema غير محدد)
 const productSchema = new mongoose.Schema(
-  {},
-  {
-    strict: false,
-    timestamps: { createdAt: 'createdAt', updatedAt: false }
-  }
+    {},
+    {
+        strict: false,
+        timestamps: { createdAt: "createdAt", updatedAt: false }
+    }
 );
 const Product = mongoose.model("Product", productSchema);
 
@@ -319,11 +319,6 @@ app.get("/get-role", isAuthenticated, (req, res) => {
     res.json(req.session.user);
 });
 
-// صفحة الأسعار الخاصة بالمسؤول
-app.get("/prix", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/index.html"));
-});
-
 // صفحة تسجيل الدخول (إذا كان مسجلاً يتم منعه من الدخول إليها)
 app.get("/login", (req, res) => {
     // إذا كان مسجلاً بالفعل، أعد توجيهه حسب دوره
@@ -332,7 +327,7 @@ app.get("/login", (req, res) => {
             req.session.user.role === "vendeur" ? "/prixVen" : "/"
         );
     }
-    res.sendFile(path.join(__dirname, "views/login.html"));
+    res.sendFile(path.join(__dirname, "views/login-register/login.html"));
 });
 
 // صفحة التسجيل (نفس منطق صفحة تسجيل الدخول)
@@ -342,11 +337,16 @@ app.get("/tassgile", (req, res) => {
             req.session.user.role === "vendeur" ? "/prixVen" : "/"
         );
     }
-    res.sendFile(path.join(__dirname, "views/register.html"));
+    res.sendFile(path.join(__dirname, "views/login-register/register.html"));
 });
 
 // الصفحة الرئيسية الخاصة بالمسؤول
 app.get("/", isAuthenticated, isResponsable, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/responsable/index.html"));
+});
+
+// صفحة الأسعار الخاصة بالمسؤول
+app.get("/prix", isAuthenticated, isResponsable, (req, res) => {
     res.sendFile(path.join(__dirname, "views/responsable/index.html"));
 });
 
