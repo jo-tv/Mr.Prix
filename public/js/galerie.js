@@ -1,75 +1,46 @@
-/*!
-Swaying photo gallery - scroll event
-Created on AUGUST 29, 2023
-Copyright (c) 2023 by Wakana Y.K. (https://codepen.io/wakana-k/pen/WNLrWMm)
-*/
-/*
-Related works : 
-Portforio design @wakana-k - https://codepen.io/wakana-k/pen/BaxKKvE
-Swaying photo gallery - hover event @wakana-k - https://codepen.io/wakana-k/pen/oNJxbPw
-*/
+// JS - حركة الصور + منع النسخ واللقطات
 "use strict";
-(function () {
-    window.onload = () => {
-        const obj = document.querySelector("#gallery");
-        const time = 10000;
-        function animStart() {
-            if (obj.classList.contains("active") == false) {
-                obj.classList.add("active");
-                setTimeout(() => {
-                    animEnd();
-                }, time);
-            }
-        }
-        function animEnd() {
-            obj.classList.remove("active");
-            obj.offsetWidth;
-        }
-        document.addEventListener("scroll", function () {
-            // scroll or scrollend
-            animStart();
-        });
-        window.addEventListener("resize", animStart);
-        animStart();
-    };
-})();
 
+window.onload = () => {
+    const gallery = document.querySelector("#gallery");
+    const animTime = 3000;
+    let throttle = false;
 
-    // منع مفاتيح النسخ واللقطة
-    function blockKeys(e) {
-      // اختصارات Ctrl+S, Ctrl+U, Ctrl+C, Ctrl+P
-      if ((e.ctrlKey && ['s', 'u', 'c', 'p'].includes(e.key.toLowerCase())) || 
-          e.key === 'PrintScreen') {
-        alert("غير مسموح بذلك!");
-        return false;
-      }
+    function animateGallery() {
+        if (!gallery.classList.contains("active")) {
+            gallery.classList.add("active");
+            setTimeout(() => gallery.classList.remove("active"), animTime);
+        }
     }
 
-    // محاولة حذف لقطة الشاشة بوضع شاشة سوداء مؤقتة
-    document.addEventListener('keyup', function (e) {
-      if (e.key === 'PrintScreen') {
-        navigator.clipboard.writeText('');
-        alert("تم منع لقطة الشاشة!");
-      }
+    document.addEventListener("scroll", () => {
+        if (!throttle) {
+            animateGallery();
+            throttle = true;
+            setTimeout(() => throttle = false, 2000);
+        }
     });
 
-    // إظهار شاشة سوداء مؤقتة أثناء الضغط على PrtSc
-    window.addEventListener('keydown', function (e) {
-      if (e.key === 'PrintScreen') {
-        let black = document.createElement("div");
-        black.style.position = "fixed";
-        black.style.top = "0";
-        black.style.left = "0";
-        black.style.width = "100vw";
-        black.style.height = "100vh";
-        black.style.background = "black";
-        black.style.zIndex = "9999";
+    window.addEventListener("resize", animateGallery);
+    animateGallery();
+};
+
+// منع النسخ واللقطة
+document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey && ["s", "u", "c", "p"].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        alert("غير مسموح بذلك!");
+    }
+
+    if (e.key === "PrintScreen") {
+        navigator.clipboard.writeText("");
+        alert("تم منع لقطة الشاشة!");
+        const black = document.createElement("div");
+        black.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: black; z-index: 9999;
+        `;
         document.body.appendChild(black);
-        setTimeout(() => {
-          document.body.removeChild(black);
-        }, 1000);
-      }
-    });
-    
-    
-   
+        setTimeout(() => document.body.removeChild(black), 800);
+    }
+});

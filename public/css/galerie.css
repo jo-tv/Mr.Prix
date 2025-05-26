@@ -214,6 +214,15 @@ figure > div {
 #info a {
     font-size: 1.1rem;
 }
+/* CSS */
+.gallery.active {
+  animation: sway 3s ease-in-out;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(1deg); }
+}
 /*
 @media (orientation: landscape) {
 	#gallery {
