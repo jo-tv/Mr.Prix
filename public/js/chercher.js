@@ -17,7 +17,6 @@ $(document).ready(function () {
             { data: "GENCOD_P" },
             { data: "ANPF" },
             { data: "FOURNISSEUR_P" },
-            { data: "REFFOUR_P" },
             { data: "STOCK" }
         ],
         scrollX: true,

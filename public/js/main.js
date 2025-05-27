@@ -156,9 +156,6 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
       <div><span class="i1">Fourni</span><span class="i2"><i class="fa-solid fa-user-tie"></i></span><span class="i3">${
           product.FOURNISSEUR_P
       }</span></div>
-      <div><span class="i1">RefFourni</span><span class="i2"><i class="fa-solid fa-user-tie"></i></span><span class="i3">${
-          product.REFFOUR_P
-      }</span></div>
       <div><span class="i1">Stock</span><span class="i2"><i class="fa-solid
       fa-boxes-stacked"></i></span><span id="stk" class="i3">${
           product.STOCK
