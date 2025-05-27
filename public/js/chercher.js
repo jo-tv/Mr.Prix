@@ -42,7 +42,7 @@ $(document).ready(function () {
             },
             {
                 text: '<i class="fa fa-whatsapp"></i> WhatsApp',
-                className: "btn btn-success",
+                className: "btn btn-info",
                 action: function () {
                     var selectedData = table
                         .rows({ selected: true })
@@ -52,8 +52,15 @@ $(document).ready(function () {
                         alert("اختر صفًا أولاً");
                         return;
                     }
+                    // حدد الأعمدة التي تريد نسخها فقط
+                    const desiredColumns = ["LIBELLE", "GENCOD_P"]; // استبدل بأسماء الأعمدة التي تريدها بالضبط
+
                     let message = selectedData
-                        .map(row => Object.values(row).join(" | "))
+                        .map(row =>
+                            desiredColumns
+                                .map(col => row[col] || "")
+                                .join(" 🌟🆔 ")
+                        )
                         .join("\n");
                     let encoded = encodeURIComponent(message);
                     let whatsappUrl = `https://wa.me/?text=${encoded}`;
