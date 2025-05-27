@@ -196,6 +196,63 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     }
 });
 
+// API لخدمة DataTables server-side
+app.post("/api/products", async (req, res) => {
+  const draw = Number(req.body.draw);
+  const start = Number(req.body.start);
+  const length = Number(req.body.length);
+  const searchValue = req.body.search?.value || "";
+  const fournisseurFilter = req.body.fournisseur || "";
+
+  // بناء شرط البحث العام (searchValue) على عدة حقول
+  const searchQuery = searchValue
+    ? {
+        $or: [
+          { LIBELLE: { $regex: searchValue, $options: "i" } },
+          { GENCOD_P: { $regex: searchValue, $options: "i" } },
+          { ANPF: { $regex: searchValue, $options: "i" } },
+          { PV_TTC: { $regex: searchValue, $options: "i" } },
+          { FOURNISSEUR_P: { $regex: searchValue, $options: "i" } },
+          { STOCK: { $regex: searchValue, $options: "i" } },
+        ],
+      }
+    : {};
+
+  // بناء شرط فلترة المورد (fournisseurFilter) — نبحث عنه في حقل المورد فقط
+  const fournisseurQuery = fournisseurFilter
+    ? { FOURNISSEUR_P: { $regex: fournisseurFilter, $options: "i" } }
+    : {};
+
+  // دمج الشرطين معاً (إذا كلاهما موجودان => كلاهما يجب أن يتحقق)
+  const query = {
+    ...searchQuery,
+    ...fournisseurQuery
+  };
+
+  // ملاحظة: دمج الشرطين بهذه الطريقة يعني أن جميع الشروط يجب أن تتحقق (AND)
+  // إذا أردت أن يكون المنطق OR بين الشرطين، يلزم تعديل الكود.
+
+  try {
+    const recordsTotal = await Product.countDocuments({});
+    const recordsFiltered = await Product.countDocuments(query);
+
+    const data = await Product.find(query)
+      .skip(start)
+      .limit(length)
+      .lean();
+
+    res.json({
+      draw: draw,
+      recordsTotal: recordsTotal,
+      recordsFiltered: recordsFiltered,
+      data: data,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "حدث خطأ في الخادم" });
+  }
+});
+
 // نقطة البحث في قاعدة بيانات المنتجات (API)
 app.get("/api/search", async (req, res) => {
     const { q } = req.query;
@@ -377,6 +434,10 @@ app.get("/inventaire", isAuthenticated, isVendeur, (req, res) => {
 
 app.get("/Album", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/Album.html"));
+});
+
+app.get("/chercher", isAuthenticated, isVendeur, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/vendeur/chercher.html"));
 });
 
 // تسجيل الخروج وتدمير الجلسة
