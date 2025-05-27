@@ -160,7 +160,7 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     display: none;
-    zoom: 0.9;
+    zoom: 0.8;
 }
 
 .ticket h4 {
@@ -183,8 +183,15 @@ body {
 
 .ticket .date {
     text-align: center;
+    letter-spacing: 3px;
     font-size: 12px;
     margin: 15px auto;
+}
+
+.ticket .date span {
+    font-size: 15px;
+    color: orange;
+    text-align: center;
 }
 
 .ticket .items {
@@ -264,12 +271,19 @@ body {
     justify-content: space-between;
     align-items: center;
 }
+.ticket .footer span {
+    font-size: 26px;
+    padding: 0 10px;
+    color: orange;
+    text-align: center !important;
+    vertical-align: center !important;
+}
 
 .ticket .footer,
 .ticket .date {
     text-align: center;
     margin: 20px auto;
-    padding: 3px;
+    padding: 10px;
     border-radius: 5px;
     font-size: 12px;
     font-weight: 700;

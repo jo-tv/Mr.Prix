@@ -145,7 +145,7 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
             const ticketDiv = document.querySelector(".ticket");
             ticketDiv.innerHTML = `
     <h4><span>LIBELLE :</span> ${product.LIBELLE}</h4>
-    <div class="date">Date : ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString()}</div>
+    <div class="date">Dernière mise à jour le :<span>${formatDate(product.createdAt)}</span></div>
     <div class="items">
       <div><span class="i1">GenCode</span><span class="i2"><i class="fa-solid fa-barcode"></i></span><span class="i3">${
           product.GENCOD_P
@@ -155,6 +155,9 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
       }</span></div>
       <div><span class="i1">Fourni</span><span class="i2"><i class="fa-solid fa-user-tie"></i></span><span class="i3">${
           product.FOURNISSEUR_P
+      }</span></div>
+      <div><span class="i1">RefFourni</span><span class="i2"><i class="fa-solid fa-user-tie"></i></span><span class="i3">${
+          product.REFFOUR_P
       }</span></div>
       <div><span class="i1">Stock</span><span class="i2"><i class="fa-solid
       fa-boxes-stacked"></i></span><span id="stk" class="i3">${
@@ -167,8 +170,36 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
           product.PV_TTC
       } DH</span>
     </div>
-    <div class="footer">Merci de votre visite !</div>
+    <div class="footer">Dernière mise à jour il y a <span> ${daysSince(
+        product.createdAt
+    )}</span>jours</div>
 `;
+            function daysSince(dateString) {
+                const createdDate = new Date(dateString);
+                const today = new Date();
+
+                // حساب الفرق بالملي ثانية
+                const diffTime = today - createdDate;
+
+                // تحويل إلى أيام
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                return diffDays;
+            }
+
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+
+                const day = String(date.getDate()).padStart(2, "0");
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const year = date.getFullYear();
+
+                const hours = String(date.getHours()).padStart(2, "0");
+                const minutes = String(date.getMinutes()).padStart(2, "0");
+
+                return `${day}/${month}/${year} ${hours}:${minutes}`;
+            }
+
             const etatElement = document.getElementById("etatProduit");
             if (product.LIBELLE.trim().startsWith("[S]")) {
                 etatElement.textContent = "Produit Désactivé";

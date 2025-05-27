@@ -121,7 +121,7 @@ const upload = multer({
 });
 
 // دالة لإدخال البيانات دفعات دفعات (batch insert)
-async function insertInBatches(data, batchSize = 15000) {
+async function insertInBatches(data, batchSize = 20000) {
     for (let i = 0; i < data.length; i += batchSize) {
         const batch = data.slice(i, i + batchSize);
         await Product.insertMany(batch);
