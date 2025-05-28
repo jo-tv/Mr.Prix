@@ -145,7 +145,9 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
             const ticketDiv = document.querySelector(".ticket");
             ticketDiv.innerHTML = `
     <h4><span>LIBELLE :</span> ${product.LIBELLE}</h4>
-    <div class="date">Dernière mise à jour le :<span>${formatDate(product.createdAt)}</span></div>
+    <div class="date">Dernière mise à jour le :<span>${formatDate(
+        product.createdAt
+    )}</span></div>
     <div class="items">
       <div><span class="i1">GenCode</span><span class="i2"><i class="fa-solid fa-barcode"></i></span><span class="i3">${
           product.GENCOD_P
@@ -198,7 +200,7 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
             }
 
             const etatElement = document.getElementById("etatProduit");
-            if (product.LIBELLE.trim().startsWith("[S]")) {
+            if (product.LIBELLE.trim().endsWith("GELET ACHAT")) {
                 etatElement.textContent = "Produit Désactivé";
                 etatElement.style.setProperty(
                     "background-color",
@@ -207,7 +209,7 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
                 );
                 etatElement.style.setProperty("font-size", "16px", "important");
                 etatElement.style.setProperty("color", "red", "important");
-            } else {
+            } else if (product.LIBELLE.trim().endsWith("ACTIF")) {
                 etatElement.textContent = "Produit Active";
                 etatElement.style.setProperty(
                     "background-color",
