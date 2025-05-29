@@ -198,59 +198,56 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
 // API لخدمة DataTables server-side
 app.post("/api/products", async (req, res) => {
-  const draw = Number(req.body.draw);
-  const start = Number(req.body.start);
-  const length = Number(req.body.length);
-  const searchValue = req.body.search?.value || "";
-  const fournisseurFilter = req.body.fournisseur || "";
+    const draw = Number(req.body.draw);
+    const start = Number(req.body.start);
+    const length = Number(req.body.length);
+    const searchValue = req.body.search?.value || "";
+    const fournisseurFilter = req.body.fournisseur || "";
 
-  // بناء شرط البحث العام (searchValue) على عدة حقول
-  const searchQuery = searchValue
-    ? {
-        $or: [
-          { LIBELLE: { $regex: searchValue, $options: "i" } },
-          { GENCOD_P: { $regex: searchValue, $options: "i" } },
-          { ANPF: { $regex: searchValue, $options: "i" } },
-          { PV_TTC: { $regex: searchValue, $options: "i" } },
-          { FOURNISSEUR_P: { $regex: searchValue, $options: "i" } },
-          { STOCK: { $regex: searchValue, $options: "i" } },
-        ],
-      }
-    : {};
+    // بناء شرط البحث العام (searchValue) على عدة حقول
+    const searchQuery = searchValue
+        ? {
+              $or: [
+                  { LIBELLE: { $regex: searchValue, $options: "i" } },
+                  { GENCOD_P: { $regex: searchValue, $options: "i" } },
+                  { ANPF: { $regex: searchValue, $options: "i" } },
+                  { PV_TTC: { $regex: searchValue, $options: "i" } },
+                  { FOURNISSEUR_P: { $regex: searchValue, $options: "i" } },
+                  { STOCK: { $regex: searchValue, $options: "i" } }
+              ]
+          }
+        : {};
 
-  // بناء شرط فلترة المورد (fournisseurFilter) — نبحث عنه في حقل المورد فقط
-  const fournisseurQuery = fournisseurFilter
-    ? { FOURNISSEUR_P: { $regex: fournisseurFilter, $options: "i" } }
-    : {};
+    // بناء شرط فلترة المورد (fournisseurFilter) — نبحث عنه في حقل المورد فقط
+    const fournisseurQuery = fournisseurFilter
+        ? { FOURNISSEUR_P: { $regex: fournisseurFilter, $options: "i" } }
+        : {};
 
-  // دمج الشرطين معاً (إذا كلاهما موجودان => كلاهما يجب أن يتحقق)
-  const query = {
-    ...searchQuery,
-    ...fournisseurQuery
-  };
+    // دمج الشرطين معاً (إذا كلاهما موجودان => كلاهما يجب أن يتحقق)
+    const query = {
+        ...searchQuery,
+        ...fournisseurQuery
+    };
 
-  // ملاحظة: دمج الشرطين بهذه الطريقة يعني أن جميع الشروط يجب أن تتحقق (AND)
-  // إذا أردت أن يكون المنطق OR بين الشرطين، يلزم تعديل الكود.
+    // ملاحظة: دمج الشرطين بهذه الطريقة يعني أن جميع الشروط يجب أن تتحقق (AND)
+    // إذا أردت أن يكون المنطق OR بين الشرطين، يلزم تعديل الكود.
 
-  try {
-    const recordsTotal = await Product.countDocuments({});
-    const recordsFiltered = await Product.countDocuments(query);
+    try {
+        const recordsTotal = await Product.countDocuments({});
+        const recordsFiltered = await Product.countDocuments(query);
 
-    const data = await Product.find(query)
-      .skip(start)
-      .limit(length)
-      .lean();
+        const data = await Product.find(query).skip(start).limit(length).lean();
 
-    res.json({
-      draw: draw,
-      recordsTotal: recordsTotal,
-      recordsFiltered: recordsFiltered,
-      data: data,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "حدث خطأ في الخادم" });
-  }
+        res.json({
+            draw: draw,
+            recordsTotal: recordsTotal,
+            recordsFiltered: recordsFiltered,
+            data: data
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "حدث خطأ في الخادم" });
+    }
 });
 
 // نقطة البحث في قاعدة بيانات المنتجات (API)
@@ -330,38 +327,97 @@ app.post("/register", async (req, res) => {
 });
 
 // معالجة بيانات تسجيل الدخول
+const loginAttempts = {}; // تخزين مؤقت للمحاولات
+
+const MAX_ATTEMPTS = 4;
+const BLOCK_DURATION = 15 * 60 * 1000; // 15 دقيقة
+
+// Middleware: الحد من المحاولات
+const loginRateLimiter = (req, res, next) => {
+    const { username } = req.body;
+    if (!username) {
+        return res.status(400).send("الرجاء إدخال اسم المستخدم");
+    }
+
+    const attempts = loginAttempts[username];
+
+    if (attempts) {
+        const timeSinceLastAttempt = Date.now() - attempts.lastAttempt;
+
+        if (attempts.count >= MAX_ATTEMPTS) {
+            if (timeSinceLastAttempt < BLOCK_DURATION) {
+                const minutesLeft = Math.ceil(
+                    (BLOCK_DURATION - timeSinceLastAttempt) / 60000
+                );
+                return res
+                    .status(429)
+                    .send(
+                        `لقد تجاوزت عدد المحاولات المسموح بها. يرجى المحاولة بعد ${minutesLeft} دقيقة.`
+                    );
+            } else {
+                // إعادة التعيين بعد انتهاء المدة
+                delete loginAttempts[username];
+            }
+        }
+    }
+
+    next();
+};
+
+// زيادة المحاولات عند الفشل
+const registerFailedAttempt = username => {
+    const now = Date.now();
+    if (!loginAttempts[username]) {
+        loginAttempts[username] = { count: 1, lastAttempt: now };
+    } else {
+        loginAttempts[username].count += 1;
+        loginAttempts[username].lastAttempt = now;
+    }
+};
+
+// إعادة تعيين المحاولات عند النجاح
+const resetAttempts = username => {
+    delete loginAttempts[username];
+};
+
+// مسار تسجيل الدخول
+// مسار تسجيل الدخول
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
-        return res.status(400).send("الرجاء إدخال اسم المستخدم وكلمة المرور");
+        return res.status(400).json({ message: "الرجاء إدخال اسم المستخدم وكلمة المرور" });
     }
 
     try {
         const user = await User.findOne({ username });
         if (!user) {
-            return res
-                .status(401)
-                .send("اسم المستخدم أو كلمة المرور غير صحيحة");
+            return res.status(401).json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
         }
 
         const passwordMatch = bcrypt.compareSync(password, user.password);
         if (!passwordMatch) {
-            return res
-                .status(401)
-                .send("اسم المستخدم أو كلمة المرور غير صحيحة");
+            return res.status(401).json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
         }
 
-        // تخزين بيانات المستخدم في الجلسة
+        // حفظ بيانات المستخدم في الجلسة
         req.session.user = {
             username: user.username,
-            role: user.role // يجب أن يكون موجودًا في قاعدة البيانات
+            role: user.role
         };
 
-        return res.status(200).send("success");
+        return res.status(200).json({ message: "success" });
     } catch (err) {
         console.error(err);
-        return res.status(500).send("حدث خطأ أثناء تسجيل الدخول");
+        return res.status(500).json({ message: "حدث خطأ أثناء تسجيل الدخول" });
     }
+});
+
+// مسار لجلب الدور
+app.get("/get-role", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: "غير مصرح" });
+    }
+    res.json({ role: req.session.user.role });
 });
 
 app.use(express.static("public"));

@@ -385,18 +385,24 @@ const resetAttempts = username => {
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
-        return res.status(400).json({ message: "الرجاء إدخال اسم المستخدم وكلمة المرور" });
+        return res
+            .status(400)
+            .json({ message: "الرجاء إدخال اسم المستخدم وكلمة المرور" });
     }
 
     try {
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(401).json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
+            return res
+                .status(401)
+                .json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
         }
 
         const passwordMatch = bcrypt.compareSync(password, user.password);
         if (!passwordMatch) {
-            return res.status(401).json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
+            return res
+                .status(401)
+                .json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
         }
 
         // حفظ بيانات المستخدم في الجلسة
@@ -476,6 +482,10 @@ app.get("/cmd", isAuthenticated, isResponsable, (req, res) => {
     res.sendFile(path.join(__dirname, "views/responsable/search.html"));
 });
 
+app.get("/CHERCHER", isAuthenticated, isResponsable, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/responsable/CHERCHER.html"));
+});
+
 app.get("/galerie", isAuthenticated, isResponsable, (req, res) => {
     res.sendFile(path.join(__dirname, "views/responsable/galerie.html"));
 });
@@ -493,6 +503,10 @@ app.get("/Album", isAuthenticated, isVendeur, (req, res) => {
 });
 
 app.get("/chercher", isAuthenticated, isVendeur, (req, res) => {
+    res.sendFile(path.join(__dirname, "views/vendeur/chercher.html"));
+});
+
+app.get("/chart", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/chercher.html"));
 });
 
