@@ -90,111 +90,164 @@
         </div>
 
         <script>
-            // فتح وإغلاق صندوق المعلومات
-            const infoDiv = document.getElementById("infoBox");
-            const messageBox = document.getElementById("messageBox");
-            const closeBtn = document.getElementById("infoCloseBtn");
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.getElementById("loginForm");
+                const usernameInput = form.elements["username"];
+                const passwordInput = form.elements["password"];
+                const submitButton = form.querySelector('input[type="submit"]');
 
-            document.getElementById("forgetPasswordLink").onclick = e => {
-                e.preventDefault();
-                infoDiv.style.opacity = "1";
-                messageBox.textContent = "هذه الخاصية غير مفعلة حالياً.";
-                infoDiv.style.backgroundColor = "#2196F3"; // أزرق معلومات
-                infoDiv.style.color = "white";
-            };
+                const infoDiv = document.getElementById("infoBox");
+                const messageBox = document.getElementById("messageBox");
+                const closeBtn = document.getElementById("infoCloseBtn");
 
-            document.getElementById("signupLink").onclick = e => {
-                e.preventDefault();
-                infoDiv.style.opacity = "1";
-                messageBox.textContent = " لا يمكنك تسجيل المرجوا تواصل معنا  ";
-                infoDiv.style.backgroundColor = "#2196F3";
-                infoDiv.style.color = "white";
-            };
+                const MAX_ATTEMPTS = 4;
+                const BLOCK_MINUTES = 15;
 
-            closeBtn.onclick = () => {
-                infoDiv.style.opacity = "0";
-            };
+                // عرض رسالة
+                const showMessage = (message, color = "#f44336") => {
+                    messageBox.textContent = message;
+                    infoDiv.style.backgroundColor = color;
+                    infoDiv.style.color = "white";
+                    infoDiv.style.opacity = "1";
+                };
 
-            // التعامل مع إرسال نموذج تسجيل الدخول
-            document
-                .getElementById("loginForm")
-                .addEventListener("submit", async e => {
+                // إخفاء الرسالة
+                const hideMessage = () => {
+                    infoDiv.style.opacity = "0";
+                };
+
+                closeBtn.onclick = hideMessage;
+
+                const disableForm = () => {
+                    usernameInput.disabled = true;
+                    passwordInput.disabled = true;
+                    submitButton.disabled = true;
+                };
+
+                const enableForm = () => {
+                    usernameInput.disabled = false;
+                    passwordInput.disabled = false;
+                    submitButton.disabled = false;
+                };
+
+                const getLoginState = () => {
+                    const state = localStorage.getItem("loginState");
+                    return state
+                        ? JSON.parse(state)
+                        : { attempts: 0, blockUntil: 0 };
+                };
+
+                const setLoginState = (attempts, blockUntil = 0) => {
+                    localStorage.setItem(
+                        "loginState",
+                        JSON.stringify({ attempts, blockUntil })
+                    );
+                };
+
+                const checkBlockStatus = () => {
+                    const { attempts, blockUntil } = getLoginState();
+                    const now = Date.now();
+
+                    if (blockUntil && now < blockUntil) {
+                        const remaining = Math.ceil((blockUntil - now) / 60000);
+                        showMessage(
+                            `تم حظرك مؤقتاً. الرجاء الانتظار ${remaining} دقيقة.`,
+                            "#ff9800"
+                        );
+                        disableForm();
+                        setTimeout(checkBlockStatus, 60000); // إعادة التحقق كل دقيقة
+                    } else {
+                        enableForm();
+                        hideMessage();
+                        setLoginState(0); // إعادة المحاولات
+                    }
+                };
+
+                form.addEventListener("submit", async e => {
                     e.preventDefault();
 
-                    const form = e.target;
-                    const data = {
-                        username: form.username.value.trim(),
-                        password: form.password.value.trim()
-                    };
+                    const { attempts, blockUntil } = getLoginState();
+                    const now = Date.now();
 
-                    try {
-                        const response = await fetch("/login", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(data)
-                        });
-
-                        const text = await response.text();
-
-                        if (response.ok && text === "success") {
-                            messageBox.textContent = "تم تسجيل الدخول بنجاح";
-                            infoDiv.style.backgroundColor = "#4CAF50";
-                            infoDiv.style.color = "white";
-                            infoDiv.style.opacity = "1";
-
-                            // جلب الدور وتوجيه المستخدم
-                            const roleRes = await fetch("/get-role");
-                            if (!roleRes.ok) {
-                                const err = await roleRes.json();
-                                messageBox.textContent = err.error || "حدث خطأ";
-                                infoDiv.style.backgroundColor = "#f44336";
-                                infoDiv.style.color = "white";
-                                infoDiv.style.opacity = "1";
-                                return;
-                            }
-                            const user = await roleRes.json();
-
-                            if (user.role === "vendeur") {
-                                window.location.href = "/prixVen";
-                            } else if (user.role === "responsable") {
-                                window.location.href = "/prix";
-                            }
-                        } else {
-                            messageBox.textContent = text;
-                            infoDiv.style.backgroundColor = "#f44336";
-                            infoDiv.style.color = "white";
-                            infoDiv.style.opacity = "1";
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        messageBox.textContent = "حدث خطأ في الاتصال بالخادم.";
-                        infoDiv.style.backgroundColor = "#f44336";
-                        infoDiv.style.color = "white";
-                        infoDiv.style.opacity = "1";
+                    if (blockUntil && now < blockUntil) {
+                        showMessage(
+                            `أنت محظور مؤقتًا. الرجاء الانتظار.`,
+                            "#ff9800"
+                        );
+                        return;
                     }
 
-                    setTimeout(() => {
-                        infoDiv.style.opacity = "0";
-                    }, 4000);
-                });
-            self.addEventListener("install", event => {
-                console.log("Service Worker installing.");
-            });
+                    const username = usernameInput.value.trim();
+                    const password = passwordInput.value.trim();
 
-            self.addEventListener("fetch", event => {
-                // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
-            });
-            if ("serviceWorker" in navigator) {
-                navigator.serviceWorker
-                    .register("/sw.js")
-                    .then(() => console.log("Service Worker Registered"))
-                    .catch(err =>
-                        console.error(
-                            "Service Worker registration failed:",
-                            err
-                        )
+                    try {
+                        const res = await fetch("/login", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ username, password })
+                        });
+
+                        if (res.ok) {
+                            localStorage.removeItem("loginState");
+                            const result = await res.json();
+
+                            showMessage("تم تسجيل الدخول بنجاح", "#4CAF50");
+
+                            // إعادة التوجيه حسب الدور
+                            const roleRes = await fetch("/get-role");
+                            const user = await roleRes.json();
+
+                            setTimeout(() => {
+                                if (user.role === "vendeur") {
+                                    window.location.href = "/prixVen";
+                                } else if (user.role === "responsable") {
+                                    window.location.href = "/prix";
+                                }
+                            }, 1000);
+                        } else {
+                            const message = await res.text();
+                            const newAttempts = attempts + 1;
+
+                            if (newAttempts >= MAX_ATTEMPTS) {
+                                const newBlockUntil =
+                                    Date.now() + BLOCK_MINUTES * 60 * 1000;
+                                setLoginState(newAttempts, newBlockUntil);
+                                showMessage(
+                                    `تم تجاوز عدد المحاولات. الرجاء الانتظار ${BLOCK_MINUTES} دقيقة.`,
+                                    "#ff9800"
+                                );
+                                disableForm();
+                                setTimeout(checkBlockStatus, 60000);
+                            } else {
+                                setLoginState(newAttempts);
+                                showMessage(
+                                    `بيانات غير صحيحة. المحاولة (${newAttempts}/${MAX_ATTEMPTS})`
+                                );
+                            }
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        showMessage("فشل الاتصال بالخادم. حاول لاحقاً.");
+                    }
+                });
+
+                // رسالة منع التسجيل
+                document.getElementById("signupLink").onclick = e => {
+                    e.preventDefault();
+                    showMessage(
+                        "لا يمكنك التسجيل حالياً، المرجو التواصل معنا",
+                        "#2196F3"
                     );
-            }
+                };
+
+                // رسالة كلمة المرور غير مفعلة
+                document.getElementById("forgetPasswordLink").onclick = e => {
+                    e.preventDefault();
+                    showMessage("هذه الخاصية غير مفعلة حالياً.", "#2196F3");
+                };
+
+                checkBlockStatus();
+            });
         </script>
     </body>
 </html>
