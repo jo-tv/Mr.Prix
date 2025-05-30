@@ -428,11 +428,6 @@ app.get("/get-role", (req, res) => {
 
 app.use(express.static("public"));
 
-// هذا السطر يسمح بتحميل sw.js مباشرة
-app.get("/sw.js", (req, res) => {
-    res.sendFile(path.join(__dirname, "sw.js"));
-});
-
 app.get("/offline.html", (req, res) => {
     res.sendFile(path.join(__dirname, "views/login-register/offline.html"));
 });
@@ -502,7 +497,7 @@ app.get("/Album", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/Album.html"));
 });
 
-app.get("/chercher", isAuthenticated, isVendeur, (req, res) => {
+app.get("/table", isAuthenticated, isVendeur, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/chercher.html"));
 });
 
