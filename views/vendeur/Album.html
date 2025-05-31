@@ -8,14 +8,8 @@
         <meta name="theme-color" content="#007bff" />
         <title>photo gallery</title>
         <link rel="stylesheet" href="css/galerie.css" />
-        <link
-            href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css"
-            rel="stylesheet"
-        />
-        <script
-            src="https://kit.fontawesome.com/fb67a05d46.js"
-            crossorigin="anonymous"
-        ></script>
+        <link rel="stylesheet" href="css/styleGalerie.css" />
+        
     </head>
     <body>
         <main>
@@ -174,21 +168,20 @@
         </div>
 
         <!-- Loader -->
-<!-- From Uiverse.io by paesjr --> 
-<div id="wifi-loader">
-  <svg viewBox="0 0 86 86" class="circle-outer">
-    <circle r="40" cy="43" cx="43" class="back"></circle>
-    <circle r="40" cy="43" cx="43" class="front"></circle>
-    <circle r="40" cy="43" cx="43" class="new"></circle>
-  </svg>
-  <svg viewBox="0 0 60 60" class="circle-middle">
-    <circle r="27" cy="30" cx="30" class="back"></circle>
-    <circle r="27" cy="30" cx="30" class="front"></circle>
-  </svg>
+        <!-- From Uiverse.io by paesjr -->
+        <div id="wifi-loader">
+            <svg viewBox="0 0 86 86" class="circle-outer">
+                <circle r="40" cy="43" cx="43" class="back"></circle>
+                <circle r="40" cy="43" cx="43" class="front"></circle>
+                <circle r="40" cy="43" cx="43" class="new"></circle>
+            </svg>
+            <svg viewBox="0 0 60 60" class="circle-middle">
+                <circle r="27" cy="30" cx="30" class="back"></circle>
+                <circle r="27" cy="30" cx="30" class="front"></circle>
+            </svg>
 
-  <div data-text="Loading..." class="text"></div>
-</div>
-
+            <div data-text="Loading..." class="text"></div>
+        </div>
 
         <footer id="info">
             DZ by
@@ -196,6 +189,7 @@
         </footer>
         <!-- partial -->
         <script src="js/galerie.js"></script>
+        <script src="js/mainGalerie.js"></script>
         <script
             defer
             src="https://speed.vercel.dev/script.js"
