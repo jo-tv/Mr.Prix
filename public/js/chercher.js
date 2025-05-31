@@ -96,3 +96,11 @@ $(document).ready(function () {
             clearTimeout(typingTimerFournisseur);
         });
 });
+
+// عندما تكتمل الصفحة وكل العناصر
+window.addEventListener("load", function () {
+    const loader = document.getElementById("wifi-loader");
+
+    // إخفاء الـ Loader
+    loader.style.display = "none";
+});
