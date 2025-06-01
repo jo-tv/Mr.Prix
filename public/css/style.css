@@ -140,13 +140,10 @@ body {
 
 .ticket {
     width: 85%;
-    background-image: radial-gradient(73% 147%, #eadfdf 59%, #ece2df 100%),
-        radial-gradient(
-            91% 146%,
-            rgba(255, 255, 255, 0.5) 47%,
-            rgba(0, 0, 0, 0.5) 100%
-        );
-    background-blend-mode: screen;
+    background-color: rgba(255, 255, 255, 0.367);
+    -webkit-box-shadow: 0px 2px 1px rgba(50, 50, 50, 0.22);
+    -moz-box-shadow: 0px 2px 1px rgba(50, 50, 50, 0.22);
+
     padding: 20px;
     font-family: "Merriweather", serif;
     color: var(--text-color);
@@ -155,12 +152,42 @@ body {
         rgba(14, 30, 37, 0.12) 0px 2px 4px 0px,
         rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
     z-index: 10;
-    position: absolute;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin: 200px auto;
     display: none;
     zoom: 0.8;
+    -webkit-animation: scale-in-ver-center 0.5s
+        cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    animation: scale-in-ver-center 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+        both;
+}
+/**
+ * ----------------------------------------
+ * animation scale-in-ver-center
+ * ----------------------------------------
+ */
+@-webkit-keyframes scale-in-ver-center {
+    0% {
+        -webkit-transform: scaleY(0);
+        transform: scaleY(0);
+        opacity: 1;
+    }
+    100% {
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+        opacity: 1;
+    }
+}
+@keyframes scale-in-ver-center {
+    0% {
+        -webkit-transform: scaleY(0);
+        transform: scaleY(0);
+        opacity: 1;
+    }
+    100% {
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+        opacity: 1;
+    }
 }
 
 .ticket h4 {
@@ -209,6 +236,7 @@ body {
 
 .i1 {
     background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+    backdrop-filter: blur(10px);
     width: 30%;
     text-align: center;
     color: #001;
@@ -222,6 +250,7 @@ body {
 
 .i2 {
     background: #404040;
+    backdrop-filter: blur(10px);
     width: 15%;
     text-align: center;
     align-items: center;
@@ -244,6 +273,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    backdrop-filter: blur(10px);
 }
 .i1,
 .i2,
@@ -252,18 +282,81 @@ body {
     font-weight: 700;
 }
 .ticket .i4 {
-    background: #0000cd !important;
+    background: rgba(230, 227, 227, 0.67) !important;
+    backdrop-filter: blur(10px);
+    color: #6c3ce4;
+    text-shadow: 4px 4px 6px rgba(66, 68, 90, 1);
     box-shadow:
-        #e6ce76 0px 2px 4px,
-        #e6ce76 0px 7px 13px -3px,
-        #e6ce76 0px -3px 0px inset;
-    color: red;
-    font-size: 23px;
+        rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
+        rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
+        rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+    font-size: 25px;
+    font-weight: 900;
     margin: 10px auto;
     width: 40%;
     padding: 10px;
     letter-spacing: 2px;
+    -webkit-animation: vibrate-1 0.3s linear infinite both;
+    animation: vibrate-1 0.3s linear infinite both;
 }
+
+/* ----------------------------------------
+ * animation vibrate-1
+ * ----------------------------------------
+ */
+@-webkit-keyframes vibrate-1 {
+    0% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+    20% {
+        -webkit-transform: translate(-2px, 2px);
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        -webkit-transform: translate(-2px, -2px);
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        -webkit-transform: translate(2px, 2px);
+        transform: translate(2px, 2px);
+    }
+    80% {
+        -webkit-transform: translate(2px, -2px);
+        transform: translate(2px, -2px);
+    }
+    100% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+}
+@keyframes vibrate-1 {
+    0% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+    20% {
+        -webkit-transform: translate(-2px, 2px);
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        -webkit-transform: translate(-2px, -2px);
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        -webkit-transform: translate(2px, 2px);
+        transform: translate(2px, 2px);
+    }
+    80% {
+        -webkit-transform: translate(2px, -2px);
+        transform: translate(2px, -2px);
+    }
+    100% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+}
+
 .ticket .total {
     margin-top: 10px;
     font-weight: bold;
@@ -485,7 +578,6 @@ img {
 #modalCloseBtn:hover {
     background-color: #3a5a8a;
 }
-
 
 /* تغطية الشاشة كاملة */
 /* From Uiverse.io by paesjr */
