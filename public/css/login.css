@@ -363,3 +363,15 @@ body {
         clip-path: inset(0 0 0 100%);
     }
 }
+/* تنسيق بسيط لظهور الرسائل */
+.info {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    padding: 15px;
+    margin: 20px auto;
+    max-width: 300px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    direction: rtl;
+}
