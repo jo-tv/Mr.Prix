@@ -19,50 +19,55 @@ function showReader() {
 
     isScanning = true;
 
-    Html5Qrcode.getCameras()
-        .then(devices => {
-            if (devices && devices.length) {
-                const backCamera =
-                    devices.find(device =>
-                        device.label.toLowerCase().includes("back")
-                    ) || devices[0];
+    const beepSound = new Audio("/sounds/beep.mp3"); // ضع المسار الصحيح لملف الصوت
 
-                html5QrCode
-                    .start(
-                        { deviceId: { exact: backCamera.id } },
-                        { fps: 3, qrbox: 300 },
-                        qrCodeMessage => {
-                            html5QrCode.stop().then(() => {
-                                html5QrCode.clear();
-                                input.value = qrCodeMessage;
-                                isScanning = false;
-                                hideReader();
+Html5Qrcode.getCameras()
+    .then(devices => {
+        if (devices && devices.length) {
+            const backCamera =
+                devices.find(device =>
+                    device.label.toLowerCase().includes("back")
+                ) || devices[0];
 
-                                const searchButton =
-                                    document.querySelector(".Subscribe-btn");
-                                if (searchButton) searchButton.click();
-                            });
-                        },
-                        errorMessage => {
-                            // تجاهل الأخطاء المؤقتة
-                        }
-                    )
-                    .catch(err => {
-                        console.error("فشل بدء الكاميرا:", err);
-                        isScanning = false;
-                        hideReader();
-                    });
-            } else {
-                console.error("لا توجد كاميرات متاحة.");
-                isScanning = false;
-                hideReader();
-            }
-        })
-        .catch(err => {
-            console.error("خطأ في الحصول على الكاميرات:", err);
+            html5QrCode
+                .start(
+                    { deviceId: { exact: backCamera.id } },
+                    { fps: 3, qrbox: 300 },
+                    qrCodeMessage => {
+                        // ✅ تشغيل الصوت عند نجاح المسح
+                        beepSound.play();
+
+                        html5QrCode.stop().then(() => {
+                            html5QrCode.clear();
+                            input.value = qrCodeMessage;
+                            isScanning = false;
+                            hideReader();
+
+                            const searchButton =
+                                document.querySelector(".Subscribe-btn");
+                            if (searchButton) searchButton.click();
+                        });
+                    },
+                    errorMessage => {
+                        // تجاهل الأخطاء المؤقتة
+                    }
+                )
+                .catch(err => {
+                    console.error("فشل بدء الكاميرا:", err);
+                    isScanning = false;
+                    hideReader();
+                });
+        } else {
+            console.error("لا توجد كاميرات متاحة.");
             isScanning = false;
             hideReader();
-        });
+        }
+    })
+    .catch(err => {
+        console.error("خطأ في الحصول على الكاميرات:", err);
+        isScanning = false;
+        hideReader();
+    });
 }
 
 function stopReader() {
