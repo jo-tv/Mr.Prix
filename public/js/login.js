@@ -1,6 +1,4 @@
-
-        
-            document.addEventListener("DOMContentLoaded", () => {
+ document.addEventListener("DOMContentLoaded", () => {
                 const form = document.getElementById("loginForm");
                 const usernameInput = form.elements["username"];
                 const passwordInput = form.elements["password"];

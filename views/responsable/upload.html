@@ -6,9 +6,9 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#007bff" />
+        <meta name="theme-color" content="#007bff" />
         <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#007bff" />
+        <meta name="theme-color" content="#007bff" />
 
         <!-- ===== CSS ===== -->
         <link rel="stylesheet" href="css/style.css" />
@@ -204,8 +204,8 @@
         >
             ⏳ جاري رفع الملف... <span id="countdown">3</span>
         </div>
-        
-         <!-- Loader -->
+
+        <!-- Loader -->
         <!-- From Uiverse.io by paesjr -->
         <div id="wifi-loader">
             <svg viewBox="0 0 86 86" class="circle-outer">
@@ -271,26 +271,23 @@
                         loadingOverlay.style.display = "none";
                     });
             });
-            self.addEventListener('install', event => {
-  console.log('Service Worker installing.');
-});
+            self.addEventListener("install", event => {
+                console.log("Service Worker installing.");
+            });
 
-self.addEventListener('fetch', event => {
-  // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
-});
+            self.addEventListener("fetch", event => {
+                // هنا يمكن وضع كود الكاش لتحميل الموقع بدون إنترنت
+            });
 
+            // عندما تكتمل الصفحة وكل العناصر
+            window.addEventListener("load", function () {
+                const loader = document.getElementById("wifi-loader");
 
-// عندما تكتمل الصفحة وكل العناصر
-window.addEventListener("load", function () {
-    const loader = document.getElementById("wifi-loader");
-
-    // إخفاء الـ Loader
-    loader.style.display = "none";
-});
+                // إخفاء الـ Loader
+                loader.style.display = "none";
+            });
         </script>
 
         <script src="js/main.js"></script>
-        <script src="js/codebar.min.js"></script>
-        <script defer src="https://speed.vercel.dev/script.js" data-sdkn="@vercel/speed-insights"></script>
     </body>
 </html>
