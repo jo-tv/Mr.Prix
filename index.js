@@ -418,7 +418,7 @@ app.post("/login", async (req, res) => {
     }
 });
 
-// مسار لجلب الدور
+// جلب بيانات الدور الحالي للمستخدم
 app.get("/get-role", (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: "غير مصرح" });
@@ -430,11 +430,6 @@ app.use(express.static("public"));
 
 app.get("/offline.html", (req, res) => {
     res.sendFile(path.join(__dirname, "views/login-register/offline.html"));
-});
-
-// جلب بيانات الدور الحالي للمستخدم
-app.get("/get-role", isAuthenticated, (req, res) => {
-    res.json(req.session.user);
 });
 
 // صفحة تسجيل الدخول (إذا كان مسجلاً يتم منعه من الدخول إليها)
