@@ -8,73 +8,60 @@ let html5QrCode = null;
 let isScanning = false;
 
 function showReader() {
-  const readerDiv = document.getElementById('reader');
-  const btnFermer = document.querySelector('.fermer');
-  const input = document.querySelector('.input');
-  const beepSound = new Audio('/sounds/beep.mp3');
-
   readerDiv.style.display = 'block';
   btnFermer.style.display = 'block';
 
   if (!html5QrCode) {
-    html5QrCode = new Html5Qrcode('reader', {
-      verbose: false,
-    });
+    html5QrCode = new Html5Qrcode('reader');
   }
 
-  if (isScanning) return;
+  if (isScanning) return; // لا تعيد التشغيل إذا كان يعمل
+
   isScanning = true;
+
+  const beepSound = new Audio('/sounds/beep.mp3'); // ضع المسار الصحيح لملف الصوت
 
   Html5Qrcode.getCameras()
     .then((devices) => {
-      if (!devices || devices.length === 0) {
-        alert('🚫 لا توجد كاميرات متاحة. تأكد من منح الإذن!');
+      if (devices && devices.length) {
+        const backCamera =
+          devices.find((device) => device.label.toLowerCase().includes('back')) || devices[0];
+
+        html5QrCode
+          .start(
+            { deviceId: { exact: backCamera.id } },
+            { fps: 3, qrbox: 300 },
+            (qrCodeMessage) => {
+              // ✅ تشغيل الصوت عند نجاح المسح
+              beepSound.play();
+
+              html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+                input.value = qrCodeMessage;
+                isScanning = false;
+                hideReader();
+
+                const searchButton = document.querySelector('.Subscribe-btn');
+                if (searchButton) searchButton.click();
+              });
+            },
+            (errorMessage) => {
+              // تجاهل الأخطاء المؤقتة
+            }
+          )
+          .catch((err) => {
+            console.error('فشل بدء الكاميرا:', err);
+            isScanning = false;
+            hideReader();
+          });
+      } else {
+        console.error('لا توجد كاميرات متاحة.');
         isScanning = false;
         hideReader();
-        return;
       }
-
-      const backCamera =
-        devices.find((device) => device.label.toLowerCase().includes('back')) || devices[0];
-
-      const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.7778, // 16:9 مثالي للآيفون
-        facingMode: { exact: 'environment' },
-      };
-
-      html5QrCode
-        .start(
-          { deviceId: { exact: backCamera.id } },
-          config,
-          (decodedText, decodedResult) => {
-            beepSound.play();
-
-            html5QrCode.stop().then(() => {
-              html5QrCode.clear();
-              input.value = decodedText;
-              isScanning = false;
-              hideReader();
-
-              const searchButton = document.querySelector('.Subscribe-btn');
-              if (searchButton) searchButton.click();
-            });
-          },
-          (errorMessage) => {
-            // يمكن تجاهل أخطاء القراءة المؤقتة
-          }
-        )
-        .catch((err) => {
-          console.error('📷 فشل بدء الكاميرا:', err);
-          alert('📵 تعذر فتح الكاميرا. تأكد من منح الصلاحيات أو استخدام متصفح يدعم الكاميرا.');
-          isScanning = false;
-          hideReader();
-        });
     })
     .catch((err) => {
-      console.error('⚠️ خطأ في الحصول على الكاميرات:', err);
-      alert('⚠️ تعذر الوصول إلى الكاميرات. قد تحتاج إلى تغيير المتصفح أو السماح بالوصول.');
+      console.error('خطأ في الحصول على الكاميرات:', err);
       isScanning = false;
       hideReader();
     });
