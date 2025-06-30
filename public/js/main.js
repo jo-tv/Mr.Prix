@@ -187,17 +187,22 @@ document.querySelector('.Subscribe-btn').addEventListener('click', function () {
       }
 
       const etatElement = document.getElementById('etatProduit');
-      if (product.LIBELLE.trim().endsWith('[ GA ]')) {
-        etatElement.textContent = 'Produit Désactivé';
-        etatElement.style.setProperty('background-color', 'orange', 'important');
-        etatElement.style.setProperty('font-size', '16px', 'important');
-        etatElement.style.setProperty('color', 'red', 'important');
-      } else if (product.LIBELLE.trim().endsWith('[ A ]')) {
-        etatElement.textContent = 'Produit Active';
-        etatElement.style.setProperty('background-color', '#fff', 'important');
-        etatElement.style.setProperty('font-size', '16px', 'important');
-        etatElement.style.setProperty('color', 'green', 'important');
-      }
+const libelle = product?.LIBELLE?.trim();
+
+if (etatElement && libelle) {
+  if (/\[\s*GA\s*\]$/.test(libelle)) {
+    etatElement.textContent = 'Produit Désactivé';
+    etatElement.style.setProperty('background-color', 'orange', 'important');
+    etatElement.style.setProperty('font-size', '16px', 'important');
+    etatElement.style.setProperty('color', 'red', 'important');
+  } else if (/\[\s*A\s*\]$/.test(libelle)) {
+    etatElement.textContent = 'Produit Active';
+    etatElement.style.setProperty('background-color', '#fff', 'important');
+    etatElement.style.setProperty('font-size', '16px', 'important');
+    etatElement.style.setProperty('color', 'green', 'important');
+  }
+}
+      console.log('LIBELLE:', product.LIBELLE);
 
       const stockValue = parseInt(product.STOCK);
       const stockElement = document.getElementById('stk');
