@@ -187,7 +187,7 @@ document.querySelector('.Subscribe-btn').addEventListener('click', function () {
       }
 
       const etatElement = document.getElementById('etatProduit');
-      if (product.LIBELLE.trim().endsWith('[ G ]')) {
+      if (product.LIBELLE.trim().endsWith('[ GA ]')) {
         etatElement.textContent = 'Produit Désactivé';
         etatElement.style.setProperty('background-color', 'orange', 'important');
         etatElement.style.setProperty('font-size', '16px', 'important');
