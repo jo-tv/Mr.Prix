@@ -202,7 +202,7 @@ if (etatElement && libelle) {
     etatElement.style.setProperty('color', 'green', 'important');
   }
 }
-      console.log('LIBELLE:', product.LIBELLE);
+      
 
       const stockValue = parseInt(product.STOCK);
       const stockElement = document.getElementById('stk');
