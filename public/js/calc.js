@@ -107,26 +107,3 @@ function downloadPDF() {
         });
 }
 
-function downloadPNG() {
-    const seller = document.getElementById("seller").value.trim();
-    const invoice = document.getElementById("invoice");
-
-    if (!seller || invoice.style.display === "none") {
-        alert("يرجى إدخال اسم البائع وحساب الفاتورة أولاً.");
-        return;
-    }
-
-    html2canvas(invoice, {
-        useCORS: true, // مهم لظهور الصورة الخارجية
-        scale: 2
-    }).then(canvas => {
-        const link = document.createElement("a");
-        link.download = `فاتورة_${seller.replace(/\s+/g, "_")}.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-
-        alert(
-            "✔️ تم حفظ الصورة بنجاح، يمكنك الآن إرسالها عبر WhatsApp من جهازك."
-        );
-    });
-}
