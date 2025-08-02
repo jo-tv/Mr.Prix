@@ -1,0 +1,230 @@
+<!doctype html>
+<html
+  lang="ar"
+  dir="rtl"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>فاتورة حساب المساحة</title>
+    <link
+      rel="stylesheet"
+      href="css/calc.css"
+      type="text/css"
+      media="all"
+    />
+    <link rel="stylesheet" href="css/navb.css" type="text/css" media="all" />
+    <!-- مكتبات PDF و PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="a4-wrapper">
+      <div
+        class="container"
+        dir="ltr"
+      >
+        <h2>Calcul de la surface et du coût</h2>
+
+        <label for="seller"><i class="fas fa-user"></i> Nom du vendeur :</label>
+        <input
+          type="text"
+          id="seller"
+          placeholder="Entrez votre nom (obligatoire)"
+        />
+
+        <label for="code"><i class="fas fa-barcode"></i> Code produit :</label>
+        <input
+          type="number"
+          id="code"
+          placeholder="Entrez le code du produit"
+          step="0.01"
+        />
+
+        <label for="length"><i class="fas fa-ruler-horizontal"></i> Longueur (en mètres) :</label>
+        <input
+          type="number"
+          id="length"
+          placeholder="Entrez la longueur"
+          step="0.01"
+        />
+
+        <label for="width"><i class="fas fa-ruler-vertical"></i> Largeur (en mètres) :</label>
+        <input
+          type="number"
+          id="width"
+          placeholder="Entrez la largeur"
+          step="0.01"
+        />
+
+        <label for="price"><i class="fas fa-tag"></i> Prix par mètre carré :</label>
+        <input
+          type="number"
+          id="price"
+          placeholder="Entrez le prix en dirhams"
+          step="0.01"
+        />
+
+        <button
+          onclick="calculate()"
+          class="calc"
+        >
+          <i class="fas fa-calculator"></i> Calculer
+        </button>
+        <button onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Télécharger PDF</button>
+        <button onclick="downloadPNG()">
+          <i class="fas fa-image"></i> Enregistrer en image PNG
+        </button>
+
+        <div
+          id="invoice"
+          class="invoice"
+          style="display: none"
+        >
+          <!-- Logo -->
+          <div style="text-align: center">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Mr_Bricolage_logo.png"
+              crossorigin="anonymous"
+              class="logo"
+              alt="Logo"
+            />
+          </div>
+
+          <!-- Date -->
+          <div
+            class="datetime"
+            id="invoice-datetime"
+          ></div>
+
+          <h3>📄 Facture de calcul de coût</h3>
+
+          <!-- جدول المعلومات -->
+          <table
+            class="info-table"
+            dir="ltr"
+          >
+            <tr>
+              <th>👤 Vendeur</th>
+              <td id="inv-seller"></td>
+            </tr>
+            <tr>
+              <th>🛍️ Code produit</th>
+              <td id="inv-code"></td>
+            </tr>
+            <tr>
+              <th>📏 Longueur</th>
+              <td><span id="inv-length"></span> m²</td>
+            </tr>
+            <tr>
+              <th>📐 Largeur</th>
+              <td><span id="inv-width"></span> m²</td>
+            </tr>
+            <tr>
+              <th>🔲 Surface</th>
+              <td><span id="inv-area"></span> m²</td>
+            </tr>
+            <tr>
+              <th>💸 Prix au mètre carré</th>
+              <td><span id="inv-price"></span> DH</td>
+            </tr>
+            <tr class="total-row">
+              <th>💰 Total</th>
+              <td id="inv-total"></td>
+            </tr>
+          </table>
+
+          <!-- توقيعات -->
+          <table class="signature-table">
+            <thead>
+              <tr>
+                <th>Signature</th>
+                <th>Le Nom</th>
+                <th>Nom de la personne</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="input-line"></div></td>
+                <td><div class="signature-line"></div></td>
+                <td>Vendeur</td>
+              </tr>
+              <tr>
+                <td><div class="input-line"></div></td>
+                <td><div class="signature-line"></div></td>
+                <td>Client</td>
+              </tr>
+              <tr>
+                <td><div class="input-line"></div></td>
+                <td><div class="signature-line"></div></td>
+                <td>Responsable</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!--- ______code nav bar_________  -->
+    <div class="wrapper">
+      <input type="checkbox" />
+      <div class="fab"></div>
+      <div class="fac">
+        <a href="prixVen"
+          ><i
+            class="fas fa-cash-register"
+            style="font-size: 20px; color: green"
+          ></i>
+        </a>
+        <a href="serchCode"
+          ><i
+            class="fas fa-question-circle"
+            style="font-size: 24px; color: #007bff"
+          ></i>
+        </a>
+        <a href="inventaire"
+          ><i
+            class="far fa-file-excel"
+            style="font-size: 20px; color: #da70d6"
+          ></i
+        ></a>
+        <a href="table"
+          ><i
+            class="fas fa-search"
+            style="font-size: 20px; color: #000"
+          ></i
+        ></a>
+        <a href="calc"
+          ><i
+            class="fas fa-calculator"
+            style="font-size: 20px; color: #00fff7a5"
+          ></i
+        ></a>
+        <a href="Album"
+          ><i
+            class="fas fa-file-image"
+            style="font-size: 20px; color: #7100ffa5"
+          ></i
+        ></a>
+        <a href="logout"
+          ><i
+            class="fas fa-sign-out-alt"
+            style="font-size: 20px; color: red"
+          ></i
+        ></a>
+      </div>
+    </div>
+    <script
+      src="js/calc.js"
+      type="text/javascript"
+      charset="utf-8"
+    ></script>
+  </body>
+</html>

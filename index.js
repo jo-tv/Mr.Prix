@@ -481,6 +481,10 @@ app.get('/chart', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/chercher.html'));
 });
 
+app.get('/calc', isAuthenticated, isVendeur, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/calc.html'));
+});
+
 // تسجيل الخروج وتدمير الجلسة
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
