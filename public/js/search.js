@@ -54,7 +54,7 @@ document.getElementById('ajouterBtn').addEventListener('click', function () {
   const fournisseur = document.getElementById('fournisseur').value.trim();
   const stock = document.getElementById('stock').value.trim();
   const prix = document.getElementById('prix').value.trim();
-  const qte = document.getElementById('qte').value.trim() || '0';
+  const qteInven = document.getElementById('qteInven').value.trim() || '0';
   const adresse = document.getElementById('adresse').value.trim();
   document.querySelector('#textSearch').value = '';
 
@@ -63,15 +63,15 @@ document.getElementById('ajouterBtn').addEventListener('click', function () {
   if (!anpf) return alert('Champ manquant : ANPF');
 
   const product = {
-    id: Date.now(), // معرف فريد لكل منتج
-    libelle,
+    adresse,
+    fournisseur,
     gencode,
     anpf,
-    fournisseur,
+    libelle,
     stock,
     prix,
-    qte,
-    adresse,
+    qteInven,
+    id: Date.now(), // معرف فريد لكل منتج
   };
 
   const rows = document.querySelectorAll('#produitTable tbody tr');
@@ -85,7 +85,7 @@ document.getElementById('ajouterBtn').addEventListener('click', function () {
   document.getElementById('fournisseur').value = '';
   document.getElementById('stock').value = '';
   document.getElementById('prix').value = '';
-  document.getElementById('qte').value = '';
+  document.getElementById('qteInven').value = '';
   document.getElementById('adresse').value = '';
 
   document.querySelector('.form-container').style.display = 'none';
@@ -123,7 +123,7 @@ function addProductToTable(product) {
     <td><label class="cell-label">Prix</label>
         <div class="cell-content" contenteditable="false">${product.prix} <span class="spa">DH/TTC</span></div></td>
     <td><label class="cell-label">Stock Physique</label>
-        <div class="cell-content" contenteditable="true">${product.qte}</div></td>
+        <div class="cell-content" contenteditable="true">${product.qteInven}</div></td>
     <td><label class="cell-label">Adresse</label>
         <div class="cell-content" contenteditable="true">${product.adresse}</div></td>
     <td class="actions" style="text-align:center;">
@@ -142,7 +142,7 @@ function addProductToTable(product) {
       anpf: row.children[2].querySelector('.cell-content').textContent.trim(),
       fournisseur: row.children[3].querySelector('.cell-content').textContent.trim(),
       prix: row.children[4].querySelector('.cell-content').textContent.replace('DH/TTC', '').trim(),
-      qte: row.children[5].querySelector('.cell-content').textContent.trim(),
+      qteInven: row.children[5].querySelector('.cell-content').textContent.trim(),
       adresse: row.children[6].querySelector('.cell-content').textContent.trim(),
       stock: product.stock, // احتفظ بالقيمة الأصلية
     };
@@ -336,7 +336,8 @@ function exportToExcel() {
     return;
   }
 
-  const header = Object.keys(produits[0]);
+  // إزالة عمود id
+  const header = Object.keys(produits[0]).filter((key) => key.toLowerCase() !== 'id');
   const data = [header];
 
   produits.forEach((prod) => {
@@ -349,48 +350,51 @@ function exportToExcel() {
   // تنسيق وتوسيط جميع الخلايا
   const range = XLSX.utils.decode_range(ws['!ref']);
   for (let R = range.s.r; R <= range.e.r; ++R) {
+    const isHeader = R === 0;
     for (let C = range.s.c; C <= range.e.c; ++C) {
       const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
       const cell = ws[cell_address];
+      if (!cell) continue;
 
-      if (cell) {
-        // تنسيق الرأس
-        if (R === 0) {
-          cell.s = {
-            font: {
-              bold: true,
-              name: 'Arial',
-              sz: 12,
-              color: { rgb: 'FFFFFF' },
-            },
-            fill: { fgColor: { rgb: '4F81BD' } },
-            alignment: { horizontal: 'center', vertical: 'center' },
-            border: {
-              top: { style: 'thin', color: { rgb: '000000' } },
-              bottom: { style: 'thin', color: { rgb: '000000' } },
-              left: { style: 'thin', color: { rgb: '000000' } },
-              right: { style: 'thin', color: { rgb: '000000' } },
-            },
-          };
-        } else {
-          // تنسيق باقي الخلايا
-          cell.s = {
-            font: { name: 'Calibri', sz: 11 },
-            alignment: { horizontal: 'center', vertical: 'center' },
-            border: {
-              top: { style: 'thin', color: { rgb: 'CCCCCC' } },
-              bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
-              left: { style: 'thin', color: { rgb: 'CCCCCC' } },
-              right: { style: 'thin', color: { rgb: 'CCCCCC' } },
-            },
-          };
+      if (isHeader) {
+        // رأس الجدول
+        cell.s = {
+          font: {
+            bold: true,
+            name: 'Arial',
+            sz: 14,
+            color: { rgb: 'FFFFFF' },
+          },
+          fill: { fgColor: { rgb: '1F4E78' } }, // لون أزرق داكن أنيق
+          alignment: { horizontal: 'center', vertical: 'center' },
+          border: {
+            top: { style: 'thin', color: { rgb: '000000' } },
+            bottom: { style: 'thin', color: { rgb: '000000' } },
+            left: { style: 'thin', color: { rgb: '000000' } },
+            right: { style: 'thin', color: { rgb: '000000' } },
+          },
+        };
+      } else {
+        // الصفوف
+        const isEven = R % 2 === 0;
+        cell.s = {
+          font: { name: 'Calibri', sz: 11, color: { rgb: '000000' } },
+          fill: {
+            fgColor: { rgb: isEven ? 'FFFFFF' : 'F2F2F2' }, // صفوف متناوبة
+          },
+          alignment: { horizontal: 'center', vertical: 'center' },
+          border: {
+            top: { style: 'thin', color: { rgb: 'CCCCCC' } },
+            bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
+            left: { style: 'thin', color: { rgb: 'CCCCCC' } },
+            right: { style: 'thin', color: { rgb: 'CCCCCC' } },
+          },
+        };
 
-          // تحويل الرقم إذا كان قابلًا للتحويل
-          const val = cell.v;
-          if (!isNaN(val) && val !== '') {
-            cell.t = 'n';
-            cell.v = Number(val);
-          }
+        const val = cell.v;
+        if (!isNaN(val) && val !== '') {
+          cell.t = 'n';
+          cell.v = Number(val);
         }
       }
     }
@@ -398,7 +402,7 @@ function exportToExcel() {
 
   // تحديد عرض الأعمدة تلقائيًا
   const colWidths = header.map((h) => ({
-    wch: Math.max(10, h.length + 5),
+    wch: Math.max(12, h.length + 5),
   }));
   ws['!cols'] = colWidths;
 
