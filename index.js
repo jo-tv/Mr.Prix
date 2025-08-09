@@ -469,6 +469,10 @@ app.get('/inventaire', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/inventaire.html'));
 });
 
+app.get('/inventaire2', isAuthenticated, isVendeur, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/inventaire2.html'));
+});
+
 app.get('/Album', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/Album.html'));
 });

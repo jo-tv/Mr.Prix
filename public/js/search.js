@@ -54,7 +54,7 @@ document.getElementById('ajouterBtn').addEventListener('click', function () {
   const fournisseur = document.getElementById('fournisseur').value.trim();
   const stock = document.getElementById('stock').value.trim();
   const prix = document.getElementById('prix').value.trim();
-  const qteInven = document.getElementById('qteInven').value.trim() || '0';
+  const qteInven = document.getElementById('qteInven').value.trim() || '1';
   const adresse = document.getElementById('adresse').value.trim();
   document.querySelector('#textSearch').value = '';
 
@@ -99,11 +99,18 @@ function addProductToTable(product) {
   let isDuplicate = false;
 
   existingRows.forEach((row) => {
-    const libelleCell = row.querySelector('td:first-child .cell-content');
-    if (libelleCell && libelleCell.textContent.trim() === product.libelle) {
+    const gencodeCell = row.children[1]?.querySelector('.cell-content');
+    const anpfCell = row.children[2]?.querySelector('.cell-content');
+
+    if (
+      gencodeCell &&
+      gencodeCell.textContent.trim() === product.gencode ||
+      anpfCell &&
+      anpfCell.textContent.trim() === product.anpf
+    ) {
       row.classList.add('duplicate');
       isDuplicate = true;
-      showDuplicateAlert('هذا المنتج موجود بالفعل!');
+      showDuplicateAlert('هذا المنتج موجود بالفعل بناءً على Gencode و ANPF!');
     }
   });
 
@@ -133,10 +140,10 @@ function addProductToTable(product) {
     </td>
     `;
 
-  // عند الخروج من الخلية: تحديث المنتج
+  // تحديث عند تعديل الخلايا
   const updateOnBlur = () => {
     const updatedProduct = {
-      id: Number(product.id), // مهم
+      id: Number(product.id),
       libelle: row.children[0].querySelector('.cell-content').textContent.trim(),
       gencode: row.children[1].querySelector('.cell-content').textContent.trim(),
       anpf: row.children[2].querySelector('.cell-content').textContent.trim(),
@@ -144,7 +151,7 @@ function addProductToTable(product) {
       prix: row.children[4].querySelector('.cell-content').textContent.replace('DH/TTC', '').trim(),
       qteInven: row.children[5].querySelector('.cell-content').textContent.trim(),
       adresse: row.children[6].querySelector('.cell-content').textContent.trim(),
-      stock: product.stock, // احتفظ بالقيمة الأصلية
+      stock: product.stock,
     };
 
     updateProductInStorage(updatedProduct);
