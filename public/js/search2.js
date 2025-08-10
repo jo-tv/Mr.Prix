@@ -30,7 +30,6 @@ document.getElementById('searchBtn').addEventListener('click', function () {
     .catch(() => showModalMessage('المنتج غير موجود'));
 });
 
-// عرض رسالة منبثقة مؤقتة (Modal) مع إخفاء وإظهار عناصر داخلها
 function showModalMessage(message) {
   const modal = document.getElementById('confirmModal');
   const msgEl = modal.querySelector('.modal-content p');
@@ -163,40 +162,6 @@ function addProductToTable(product) {
   document.querySelector('#produitTable tbody').appendChild(row);
 }
 
-// دالة البحث التفاعلي في المنتجات المخزنة وعرض النتائج في الجدول
-document.getElementById('searchLocalStorage').addEventListener('input', function () {
-  const query = this.value.trim().toLowerCase();
-  const tbody = document.querySelector('#produitTable tbody');
-  let produits = JSON.parse(localStorage.getItem('produits') || '[]');
-
-  if (!query) {
-    // إذا حقل البحث فارغ: عرض كل المنتجات
-    tbody.innerHTML = '';
-    produits.forEach((product) => addProductToTable(product));
-    return;
-  }
-
-  // فلترة المنتجات بحسب anpf أو gencode أو libelle أو fournisseur أو adresse
-  const filtered = produits.filter((product) => {
-    return (
-      (product.anpf && product.anpf.toLowerCase().includes(query)) ||
-      (product.gencode && product.gencode.toLowerCase().includes(query)) ||
-      (product.libelle && product.libelle.toLowerCase().includes(query)) ||
-      (product.fournisseur && product.fournisseur.toLowerCase().includes(query)) ||
-      (product.adresse && product.adresse.toLowerCase().includes(query))
-    );
-  });
-
-  // تحديث عرض الجدول
-  tbody.innerHTML = '';
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:red;">لا توجد نتائج</td></tr>`;
-  } else {
-    filtered.forEach((product) => addProductToTable(product));
-  }
-});
-
-// عرض رسالة منبثقة مؤقتة (Modal) مع إخفاء وإظهار عناصر داخلها
 function showDuplicateAlert(message) {
   // إزالة أي تنبيه قديم
   const existingAlert = document.querySelector('.duplicate-alert');
@@ -341,8 +306,6 @@ scanBtn.addEventListener('click', async () => {
   }
 });
 
-
-// عرض رسالة منبثقة مؤقتة (Modal) مع إخفاء وإظهار عناصر داخلها
 function showModalMessage(message) {
   const modal = document.getElementById('confirmModal');
   const msgEl = modal.querySelector('.modal-content p');
@@ -359,8 +322,6 @@ function showModalMessage(message) {
   }, 3000);
 }
 
-
-//تحويل بيانات الى ملف اكسيل 
 function exportToExcel() {
   const nom = document.getElementById('nomFichier').value.trim();
   if (!nom) {
@@ -478,7 +439,6 @@ function exportToExcel() {
   document.body.removeChild(link);
 }
 
-//مسح جميع المنتجات من جدول 
 function clearTable() {
   const modal = document.getElementById('confirmModal');
   const message = modal.querySelector('.modal-content p');
@@ -516,7 +476,6 @@ function clearTable() {
     modal.style.display = 'none';
   };
 }
-
 // داله لتفريغ حقول ادخال عنصر غير موجود
 function checkAndUnlockFields() {
   const inputs = document.querySelectorAll('#productForm input');
@@ -535,8 +494,6 @@ function checkAndUnlockFields() {
   }
 }
 
-
-//دالة اضافة منتج جديد غير موجود في قاعدة بيانات 
 document.querySelector('#plus').addEventListener('click', () => {
   const formContainer = document.querySelector('.form-container');
 
