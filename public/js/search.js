@@ -55,7 +55,7 @@ document.getElementById('ajouterBtn').addEventListener('click', function () {
   const fournisseur = document.getElementById('fournisseur').value.trim();
   const stock = document.getElementById('stock').value.trim();
   const prix = document.getElementById('prix').value.trim();
-  const qteInven = document.getElementById('qteInven').value.trim() || '1';
+  const qteInven = document.getElementById('qteInven').value.trim();
   const adresse = document.getElementById('adresse').value.trim();
   document.querySelector('#textSearch').value = '';
 
