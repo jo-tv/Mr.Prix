@@ -127,9 +127,12 @@ function addProductToTable(product) {
     <td><label class="cell-label">Fournisseur</label>
         <div class="cell-content" contenteditable="false">${product.fournisseur}</div></td>
     <td><label class="cell-label">Prix</label>
-        <div class="cell-content" contenteditable="false">${product.prix} <span class="spa">DH/TTC</span></div></td>
+        <div class="cell-content" contenteditable="false">${
+          product.prix
+        } <span class="spa">DH/TTC</span></div></td>
     <td><label class="cell-label">Stock Physique</label>
-        <div class="cell-content" contenteditable="true">${product.qteInven}</div></td>
+        <div class="cell-content" contenteditable="true">${product.qteInven ||
+        '0'}</div></td>
     <td><label class="cell-label">Adresse</label>
         <div class="cell-content" contenteditable="true">${product.adresse}</div></td>
     <td class="actions" style="text-align:center;">
@@ -341,7 +344,6 @@ scanBtn.addEventListener('click', async () => {
   }
 });
 
-
 // عرض رسالة منبثقة مؤقتة (Modal) مع إخفاء وإظهار عناصر داخلها
 function showModalMessage(message) {
   const modal = document.getElementById('confirmModal');
@@ -359,8 +361,7 @@ function showModalMessage(message) {
   }, 3000);
 }
 
-
-//تحويل بيانات الى ملف اكسيل 
+//تحويل بيانات الى ملف اكسيل
 function exportToExcel() {
   const nom = document.getElementById('nomFichier').value.trim();
   if (!nom) {
@@ -478,7 +479,7 @@ function exportToExcel() {
   document.body.removeChild(link);
 }
 
-//مسح جميع المنتجات من جدول 
+//مسح جميع المنتجات من جدول
 function clearTable() {
   const modal = document.getElementById('confirmModal');
   const message = modal.querySelector('.modal-content p');
@@ -535,8 +536,7 @@ function checkAndUnlockFields() {
   }
 }
 
-
-//دالة اضافة منتج جديد غير موجود في قاعدة بيانات 
+//دالة اضافة منتج جديد غير موجود في قاعدة بيانات
 document.querySelector('#plus').addEventListener('click', () => {
   const formContainer = document.querySelector('.form-container');
 
