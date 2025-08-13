@@ -12,18 +12,13 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlxROjU-Kg9pPtIr05RTUHw4-mBcShDfo_qw&amp;s');
-  background-size: contain; /* لتغطية الشاشة كاملة */
-  background-position: center; /* وضع الصورة في المنتصف */
-  background-repeat: no-repeat; /* منع التكرار */
-  background-attachment: fixed; /* الصورة ثابتة أثناء التمرير */
 }
-/* .cover {
+.cover {
   width: 70%;
   height: 80%;
   position: absolute;
   z-index: -10;
-} */
+}
 .login {
   width: 100%;
   height: 100%;
