@@ -43,6 +43,7 @@ body {
 @media (min-width: 1025px) {
   body {
     background-position: center;
+    background-size: contain;
     zoom: 0.6;
   }
 }
