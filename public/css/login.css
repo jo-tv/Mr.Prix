@@ -1,377 +1,303 @@
-@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap');
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Quicksand", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Quicksand', sans-serif;
 }
 body {
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlxROjU-Kg9pPtIr05RTUHw4-mBcShDfo_qw&amp;s');
+  background-size: contain; /* لتغطية الشاشة كاملة */
+  background-position: center; /* وضع الصورة في المنتصف */
+  background-repeat: no-repeat; /* منع التكرار */
+  background-attachment: fixed; /* الصورة ثابتة أثناء التمرير */
 }
-.cover {
-    width: 80%;
-    height: 80vh;
-    position: absolute;
-    z-index: -10;
-}
+/* .cover {
+  width: 70%;
+  height: 80%;
+  position: absolute;
+  z-index: -10;
+} */
 .login {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin: 0 auto;
-    padding: 30px;
-    gap: 40px;
-    box-shadow:
-        rgba(0, 0, 0, 0.25) 0px 54px 55px,
-        rgba(0, 0, 0, 0.12) 0px -12px 30px,
-        rgba(0, 0, 0, 0.12) 0px 4px 6px,
-        rgba(0, 0, 0, 0.17) 0px 12px 13px,
-        rgba(0, 0, 0, 0.09) 0px -3px 5px;
-    border-radius: 10px;
-    background-color: rgba(29, 28, 28, 0.25);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: 30px;
+  gap: 40px;
+  box-shadow:
+    rgba(0, 0, 0, 0.25) 0px 54px 55px,
+    rgba(0, 0, 0, 0.12) 0px -12px 30px,
+    rgba(0, 0, 0, 0.12) 0px 4px 6px,
+    rgba(0, 0, 0, 0.17) 0px 12px 13px,
+    rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  border-radius: 10px;
+  background-color: rgba(29, 28, 28, 0.25);
 }
 .login h2 {
-    font-size: 2em;
-    color: #fff;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-shadow: 4px 4px 6px rgba(58, 69, 157, 1);
+  font-size: 2em;
+  color: #fff;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 4px 4px 6px rgba(58, 69, 157, 1);
 }
 .login .inputBx {
-    position: relative;
-    width: 100%;
+  position: relative;
+  width: 100%;
 }
 .login .inputBx input {
-    position: relative;
-    width: 100%;
-    padding: 12px 20px;
-    background: transparent;
-    border: 2px solid #fff;
-    border-radius: 40px;
-    font-size: 1.2em;
-    color: #fff;
-    box-shadow: none;
-    outline: none;
+  position: relative;
+  width: 100%;
+  padding: 12px 20px;
+  background: transparent;
+  border: 2px solid #fff;
+  border-radius: 40px;
+  font-size: 1.2em;
+  color: #fff;
+  box-shadow: none;
+  outline: none;
 }
-.login .inputBx input[type="submit"] {
-    width: 100%;
-    background: #0078ff;
-    background: linear-gradient(45deg, #ff357a, #fff172);
-    border: none;
-    cursor: pointer;
+.login .inputBx input[type='submit'] {
+  width: 100%;
+  background: #0078ff;
+  background: linear-gradient(45deg, #ff357a, #fff172);
+  border: none;
+  cursor: pointer;
 }
 .login .inputBx input::placeholder {
-    color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 .login .links {
-    position: relative;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
 }
 .login .links a {
-    color: #000000;
-    text-decoration: none;
+  color: #000000;
+  text-decoration: none;
 }
 
 /* From Uiverse.io by andrew-demchenk0 */
 .info {
-    font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Oxygen,
-        Ubuntu,
-        Cantarell,
-        "Open Sans",
-        "Helvetica Neue",
-        sans-serif;
-    width: 320px;
-    padding: 12px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: start;
-    background: #509af8;
-    border-radius: 8px;
-    box-shadow: 0px 0px 5px -3px #111;
-    position: absolute;
-    top: 10%;
-    z-index: 10;
-    box-shadow:
-        rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
-        rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-    opacity: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif;
+  width: 320px;
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+  background: #509af8;
+  border-radius: 8px;
+  box-shadow: 0px 0px 5px -3px #111;
+  position: absolute;
+  top: 10%;
+  z-index: 10;
+  box-shadow:
+    rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+    rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  opacity: 0;
 }
 
 .info__icon {
-    width: 25px;
-    height: 25px;
-    transform: translateY(-2px);
-    margin-right: 8px;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-2px);
+  margin-right: 8px;
 }
 
 .info__icon path {
-    fill: #fff;
+  fill: #fff;
 }
 
 .info__title {
-    font-weight: 500;
-    font-size: 14px;
-    color: #fff;
-    padding: 10px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #fff;
+  padding: 10px;
 }
 
 .info__close {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    margin-left: auto;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin-left: auto;
 }
 
 .info__close path {
-    fill: #fff;
+  fill: #fff;
 }
 
 @media (min-width: 768px) {
-    .login {
-        zoom: 2;
-    }
-    .info {
-        zoom: 1.5;
-        position: absolute;
-        top: 3%;
-    }
+  .login {
+    zoom: 2;
+  }
+  .info {
+    zoom: 1.5;
+    position: absolute;
+    top: 3%;
+  }
 }
 
 /* تغطية الشاشة كاملة */
 /* From Uiverse.io by paesjr */
 #wifi-loader {
-    --background: #62abff;
-    --front-color: #ef4d86;
-    --front-color-in: #fbb216;
-    --back-color: #c3c8de;
-    --text-color: #414856;
-    width: 64px;
-    height: 64px;
-    border-radius: 50px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 999999999999;
+  --background: #62abff;
+  --front-color: #ef4d86;
+  --front-color-in: #fbb216;
+  --back-color: #c3c8de;
+  --text-color: #414856;
+  width: 64px;
+  height: 64px;
+  border-radius: 50px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999999999999;
 }
 
 #wifi-loader svg {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #wifi-loader svg circle {
-    position: absolute;
-    fill: none;
-    stroke-width: 6px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transform: rotate(-100deg);
-    transform-origin: center;
+  position: absolute;
+  fill: none;
+  stroke-width: 6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: rotate(-100deg);
+  transform-origin: center;
 }
 
 #wifi-loader svg circle.back {
-    stroke: var(--back-color);
+  stroke: var(--back-color);
 }
 
 #wifi-loader svg circle.front {
-    stroke: var(--front-color);
+  stroke: var(--front-color);
 }
 
 #wifi-loader svg.circle-outer {
-    height: 86px;
-    width: 86px;
+  height: 86px;
+  width: 86px;
 }
 
 #wifi-loader svg.circle-outer circle {
-    stroke-dasharray: 62.75 188.25;
+  stroke-dasharray: 62.75 188.25;
 }
 
 #wifi-loader svg.circle-outer circle.back {
-    animation: circle-outer135 1.8s ease infinite 0.3s;
+  animation: circle-outer135 1.8s ease infinite 0.3s;
 }
 
 #wifi-loader svg.circle-outer circle.front {
-    animation: circle-outer135 1.8s ease infinite 0.15s;
+  animation: circle-outer135 1.8s ease infinite 0.15s;
 }
 
 #wifi-loader svg.circle-middle {
-    height: 60px;
-    width: 60px;
+  height: 60px;
+  width: 60px;
 }
 
 #wifi-loader svg.circle-middle circle {
-    stroke: var(--front-color-in);
-    stroke-dasharray: 42.5 127.5;
+  stroke: var(--front-color-in);
+  stroke-dasharray: 42.5 127.5;
 }
 
 #wifi-loader svg.circle-middle circle.back {
-    animation: circle-middle6123 1.8s ease infinite 0.25s;
+  animation: circle-middle6123 1.8s ease infinite 0.25s;
 }
 
 #wifi-loader svg.circle-middle circle.front {
-    animation: circle-middle6123 1.8s ease infinite 0.1s;
+  animation: circle-middle6123 1.8s ease infinite 0.1s;
 }
 
 #wifi-loader svg.circle-inner {
-    height: 34px;
-    width: 34px;
+  height: 34px;
+  width: 34px;
 }
 
 #wifi-loader svg.circle-inner circle {
-    stroke-dasharray: 22 66;
+  stroke-dasharray: 22 66;
 }
 
 #wifi-loader svg.circle-inner circle.back {
-    animation: circle-inner162 1.8s ease infinite 0.2s;
+  animation: circle-inner162 1.8s ease infinite 0.2s;
 }
 
 #wifi-loader svg.circle-inner circle.front {
-    animation: circle-inner162 1.8s ease infinite 0.05s;
+  animation: circle-inner162 1.8s ease infinite 0.05s;
 }
 
 #wifi-loader .text {
-    position: absolute;
-    bottom: -40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-transform: lowercase;
-    font-weight: 500;
-    font-size: 14px;
-    letter-spacing: 0.2px;
+  position: absolute;
+  bottom: -40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: lowercase;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.2px;
 }
 
 #wifi-loader .text::before,
 #wifi-loader .text::after {
-    content: attr(data-text);
+  content: attr(data-text);
 }
 
 #wifi-loader .text::before {
-    color: var(--text-color);
+  color: var(--text-color);
 }
 
 #wifi-loader .text::after {
-    color: var(--front-color-in);
-    animation: text-animation76 3.6s ease infinite;
-    position: absolute;
-    left: 0;
+  color: var(--front-color-in);
+  animation: text-animation76 3.6s ease infinite;
+  position: absolute;
+  left: 0;
 }
 
-@keyframes circle-outer135 {
-    0% {
-        stroke-dashoffset: 25;
-    }
-
-    25% {
-        stroke-dashoffset: 0;
-    }
-
-    65% {
-        stroke-dashoffset: 301;
-    }
-
-    80% {
-        stroke-dashoffset: 276;
-    }
-
-    100% {
-        stroke-dashoffset: 276;
-    }
-}
-
-@keyframes circle-middle6123 {
-    0% {
-        stroke-dashoffset: 17;
-    }
-
-    25% {
-        stroke-dashoffset: 0;
-    }
-
-    65% {
-        stroke-dashoffset: 204;
-    }
-
-    80% {
-        stroke-dashoffset: 187;
-    }
-
-    100% {
-        stroke-dashoffset: 187;
-    }
-}
-
-@keyframes circle-inner162 {
-    0% {
-        stroke-dashoffset: 9;
-    }
-
-    25% {
-        stroke-dashoffset: 0;
-    }
-
-    65% {
-        stroke-dashoffset: 106;
-    }
-
-    80% {
-        stroke-dashoffset: 97;
-    }
-
-    100% {
-        stroke-dashoffset: 97;
-    }
-}
-
-@keyframes text-animation76 {
-    0% {
-        clip-path: inset(0 100% 0 0);
-    }
-
-    50% {
-        clip-path: inset(0);
-    }
-
-    100% {
-        clip-path: inset(0 0 0 100%);
-    }
-}
 /* تنسيق بسيط لظهور الرسائل */
 .info {
-    transition: opacity 0.3s ease;
-    opacity: 0;
-    padding: 15px;
-    margin: 20px auto;
-    max-width: 300px;
-    border-radius: 5px;
-    text-align: center;
-    font-weight: bold;
-    direction: rtl;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  padding: 15px;
+  margin: 20px auto;
+  max-width: 300px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+  direction: rtl;
 }
