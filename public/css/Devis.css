@@ -1,0 +1,16 @@
+
+    body { font-family: Arial, sans-serif; margin: 40px; background: #fdfdfd; }
+    h2 { text-align: left; color: #333; }
+    .header { margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #444; padding: 8px; text-align: center; font-size: 14px; }
+    th { background: #eaeaea; }
+    input { width: 90%; padding: 3px; text-align: center; border: none; outline: none; }
+    .footer { margin-top: 20px; font-size: 14px; }
+    .net { text-align: right; margin-top: 15px; font-weight: bold; }
+    .btn { padding: 8px 15px; margin: 5px 8px 15px 0; cursor: pointer; border: none; border-radius: 6px; color: #fff; }
+    .btn-print { background: #28a745; }
+    .btn-pdf { background: #dc3545; }
+    select { border: none; background: transparent; outline: none; }
+    @media print { button, .no-print { display: none !important; } }
+  

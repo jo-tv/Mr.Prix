@@ -269,6 +269,22 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
+// GET /api/produit/:code → جلب السعر حسب GENCOD_P
+
+app.get('/api/Produit/:code', async (req, res) => {
+  try {
+    const code = req.params.code;
+    const produit = await Product.findOne({ GENCOD_P: code });
+    
+    if (!produit) return res.status(404).json({ message: 'Produit non trouvé' });
+
+    res.json({ prix: produit.PV_TTC, libelle: produit.LIBELLE });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
 // نقطة بحث أخرى (معادلة لنقطة /api/search) إن أردت
 app.get('/search', async (req, res) => {
   const { q } = req.query;
@@ -487,6 +503,10 @@ app.get('/chart', isAuthenticated, isVendeur, (req, res) => {
 
 app.get('/calc', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/calc.html'));
+});
+
+app.get('/devis', isAuthenticated, isVendeur, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/Devis.html'));
 });
 
 // تسجيل الخروج وتدمير الجلسة
