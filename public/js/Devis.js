@@ -74,7 +74,7 @@ updateTotals();
 
 // تحميل PDF
 function downloadPDF() {
-  const buttons = document.querySelectorAll('button, .no-print');
+  const buttons = document.querySelectorAll('button, .no-print, .containeer');
   buttons.forEach((btn) => (btn.style.display = 'none'));
 
   const element = document.body;

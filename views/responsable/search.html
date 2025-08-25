@@ -20,13 +20,19 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <!-- ===== Boxicons CSS ===== -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/fb67a05d46.js"
+      crossorigin="anonymous"
+    ></script>
 
     <!-- ===== CSS ===== -->
     <link
       rel="stylesheet"
       href="css/search.css"
     />
-        <link
+    <link
       rel="stylesheet"
       href="css/navb.css"
     />
@@ -137,7 +143,6 @@
           type="number"
           id="qteInven"
           placeholder="Quantité"
-          value="0"
           class="infor"
         />
       </div>
@@ -177,55 +182,92 @@
         <i class="fa fa-trash"></i> Vider
       </button>
     </div>
+    <div class="search-bar">
+      <input
+        id="searchLocalStorage"
+        type="text"
+        name="text"
+        placeholder="Rechercher un produit..."
+      />
+    </div>
     <table id="produitTable">
       <thead></thead>
       <tbody></tbody>
     </table>
 
-    <!--- ______code nav bar_________  -->
-    <div class="wrapper">
-      <input type="checkbox" />
-      <div class="fab"></div>
-      <div class="fac">
-        <a href="prix"
-          ><i
-            class="fas fa-cash-register"
-            style="font-size: 20px; color: green"
-          ></i>
-        </a>
-        <a href="cmd"
-          ><i
-            class="far fa-file-excel"
-            style="font-size: 20px; color: #da70d6"
-          ></i
-        ></a>
-        <a href="CHERCHER"
-          ><i
-            class="fas fa-search"
-            style="font-size: 20px; color: #000"
-          ></i
-        ></a>
-        <a href="galerie"
-          ><i
-            class="fas fa-file-image"
-            style="font-size: 20px; color: #7100ffa5"
-          ></i
-        ></a>
-        <a href="upload"
-          ><i
-            class="fas fa-file-arrow-up"
-            style="font-size: 20px; color: #0000ff"
-          ></i
-        ></a>
-        <a href="logout"
-          ><i
-            class="fas fa-sign-out-alt"
-            style="font-size: 20px; color: red"
-          ></i
-        ></a>
+    <!--nav FAB Button -->
+    <div class="containeer">
+      <div class="menu-toggle">
+        <span class="fa fa-plus"></span>
+      </div>
+
+      <div class="menu-round">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="galerie"
+              ><i
+                class="fas fa-file-image"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="upload"
+              ><i
+                class="fas fa-file-arrow-up"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="logout"
+              ><i
+                class="fas fa-sign-out-alt"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-line">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="CHERCHER"
+              ><i
+                class="fas fa-search"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="cmd"
+              ><i
+                class="far fa-file-excel"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="prix"
+              ><i
+                class="fas fa-cash-register"
+                style="color: white"
+              ></i>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
-
+    <!--fin FAB Button -->
     <div
       id="confirmModal"
       class="modal"
@@ -303,8 +345,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-    <script src="js/search.js"></script>
     <script src="js/codebar.min.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/main2.js"></script>
   </body>
 </html>

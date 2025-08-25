@@ -16,7 +16,12 @@
       type="text/css"
       media="all"
     />
-    <link rel="stylesheet" href="css/navb.css" type="text/css" media="all" />
+    <link
+      rel="stylesheet"
+      href="css/navb.css"
+      type="text/css"
+      media="all"
+    />
     <!-- مكتبات PDF و PNG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -24,6 +29,12 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <!-- ===== Boxicons CSS ===== -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/fb67a05d46.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
     <div class="a4-wrapper">
@@ -168,66 +179,101 @@
         </div>
       </div>
     </div>
+    <!--nav FAB Button -->
+    <div class="containeer">
+      <div class="menu-toggle">
+        <span class="fa fa-plus"></span>
+      </div>
 
-    <!--- ______code nav bar_________  -->
-    <div
-      class="wrapper"
-      
-    >
-      <input type="checkbox" />
-      <div class="fab"></div>
-      <div class="fac">
-        <a href="prixVen"
-          ><i
-            class="fas fa-cash-register"
-            style="font-size: 20px; color: green"
-          ></i>
-        </a>
-        <a href="serchCode"
-          ><i
-            class="fas fa-question-circle"
-            style="font-size: 24px; color: #007bff"
-          ></i>
-        </a>
-        <a href="inventaire"
-          ><i
-            class="far fa-file-excel"
-            style="font-size: 20px; color: #da70d6"
-          ></i
-        ></a>
-        <a href="table"
-          ><i
-            class="fas fa-search"
-            style="font-size: 20px; color: #000"
-          ></i
-        ></a>
-        <a href="devis"
-          ><i
-            i
-            class="fas fa-file-invoice"
-            style="font-size: 20px; color: #ff00b4a5"
-          ></i
-        ></a>
-        <a href="calc"
-          ><i
-            class="fas fa-calculator"
-            style="font-size: 20px; color: #00fff7a5"
-          ></i
-        ></a>
-        <a href="Album"
-          ><i
-            class="fas fa-file-image"
-            style="font-size: 20px; color: #7100ffa5"
-          ></i
-        ></a>
-        <a href="logout"
-          ><i
-            class="fas fa-sign-out-alt"
-            style="font-size: 20px; color: red"
-          ></i
-        ></a>
+      <div class="menu-round">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="calc"
+              ><i
+                class="fas fa-calculator"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="Album"
+              ><i
+                class="fas fa-file-image"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="logout"
+              ><i
+                class="fas fa-sign-out-alt"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-line">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="devis"
+              ><i
+                class="fas fa-file-invoice"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="table"
+              ><i
+                class="fas fa-search"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="inventaire"
+              ><i
+                class="far fa-file-excel"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="serchCode"
+              ><i
+                class="fas fa-question-circle"
+                style="color: white"
+              ></i>
+            </a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="prixVen"
+              ><i
+                class="fas fa-cash-register"
+                style="color: white"
+              ></i>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
+    <!--fin FAB Button -->
+    <script src="js/main2.js"></script>
+
     <script
       src="js/calc.js"
       type="text/javascript"
