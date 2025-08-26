@@ -15,7 +15,7 @@ document.querySelectorAll('.copy-btn').forEach((button) => {
     const title = productCard.querySelector('.title-product h3').textContent.trim();
     const barcode = productCard.querySelector('.barcode').getAttribute('jsbarcode-value');
 
-    const message = `📦 *Produit:* ${title}\n🔢 *Code:* ${barcode}`;
+    const message = `🛍️ *Produit:* ${title}\n🆔 *Code:* ${barcode}`;
     const whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
 
     window.open(whatsappURL, '_blank');
