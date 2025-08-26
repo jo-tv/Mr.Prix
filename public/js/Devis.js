@@ -30,15 +30,15 @@ function updateTotals() {
     const tvaValue = net - htValue;
 
     // عرض النتائج
-    document.getElementById('net').textContent = 'Net à payer TTC : ' + net.toFixed(2) + ' DH';
+    document.getElementById('net').textContent = net.toFixed(2) ;
 
-    document.getElementById('ht').textContent = 'TOTAL H.T : ' + htValue.toFixed(2);
+    document.getElementById('ht').textContent = htValue.toFixed(2);
 
-    document.getElementById('tva').textContent = 'T.V.A 20% : ' + tvaValue.toFixed(2);
+    document.getElementById('tva').textContent = tvaValue.toFixed(2);
   } else {
-    document.getElementById('net').textContent = 'Net à payer TTC : __________';
-    document.getElementById('ht').textContent = 'TOTAL H.T : __________';
-    document.getElementById('tva').textContent = 'T.V.A 20% : __________';
+    document.getElementById('net').textContent = '';
+    document.getElementById('ht').textContent = '';
+    document.getElementById('tva').textContent = '';
   }
 
   saveToLocalStorage(); // 🟢 حفظ عند كل تحديث

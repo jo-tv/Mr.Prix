@@ -25,6 +25,16 @@ td {
 th {
   background: #eaeaea;
 }
+#devisTable tfoot td {
+  border-top: 2px solid #333;
+  padding: 8px;
+  font-size: 1.1em;
+}
+
+#devisTable tfoot td:last-child {
+  text-align: center;
+  font-weight: bold;
+}
 input {
   width: 90%;
   padding: 3px;
@@ -73,8 +83,21 @@ select {
   align-items: center;
 }
 .info input {
-  width: 30%;
+  width: 40%;
+  padding: 0;
+  margin-left: -10%;
   text-align: left;
+}
+.info label {
+  width: 90px;
+  padding: 0;
+  margin: 0;
+  font-size: 14;
+  font-weight: 900;
+}
+#date {
+  font-size: 14px;
+  font-weight: 900;
 }
 .logo {
   width: 350px;

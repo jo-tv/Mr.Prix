@@ -48,10 +48,10 @@
         crossorigin="anonymous"
       />
       <div class="info">
+        <label for="devi">Nom Devis :</label>
         <input
           type="text"
-          id=""
-          value="Nom De Devis : "
+          placeholder="Entre Le Nom De Devis"
         />
         <p id="date">MARRAKECH LE :</p>
       </div>
@@ -325,26 +325,36 @@
           <td class="total"></td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr>
+          <td
+            colspan="4"
+            style="text-align: center; font-weight: bold"
+          >
+            TOTAL H.T
+          </td>
+          <td id="ht">__________</td>
+        </tr>
+        <tr>
+          <td
+            colspan="4"
+            style="text-align: center; font-weight: bold"
+          >
+            T.V.A 20%
+          </td>
+          <td id="tva">__________</td>
+        </tr>
+        <tr>
+          <td
+            colspan="4"
+            style="text-align: center; font-weight: bold"
+          >
+            TOTAL T.T.C
+          </td>
+          <td id="net">__________</td>
+        </tr>
+      </tfoot>
     </table>
-
-    <p
-      class="net"
-      id="ht"
-    >
-      TOTAL H.T : __________
-    </p>
-    <p
-      class="net"
-      id="tva"
-    >
-      T.V.A 20% : __________
-    </p>
-    <p
-      class="net"
-      id="net"
-    >
-      TOTA T.T.C : __________
-    </p>
 
     <div class="footer">
       <p>Vous en souhaitant bonne réception, et dans l’attente ...</p>
