@@ -10,15 +10,13 @@ body {
   width: 21cm; /* تعادل تقريبًا 21cm */
   min-height: 29.7cm; /* تعادل تقريبًا 29.7cm */
   background-color: white;
-  padding: auto;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
 }
 .container {
   max-width: 550px;
-  margin: auto;
   background-color: white;
-  padding: 25px;
+  padding: 0 25px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -56,10 +54,6 @@ button:hover {
 }
 .invoice {
   background-color: #f9f9f9;
-  border: 1px dashed #ccc;
-  padding: 20px;
-  margin-top: 20px;
-  border-radius: 6px;
   position: relative;
   text-align: center;
 }
