@@ -18,27 +18,30 @@ function updateRow(row) {
 // تحديث المجموع الكلي
 function updateTotals() {
   let net = 0;
+
+  // جمع قيمة كل الأسطر
   document.querySelectorAll('#devisTable tbody tr').forEach((row) => {
     net += updateRow(row);
   });
 
-  document.getElementById('net').textContent =
-    net > 0 ? 'Net à payer TTC : ' + net.toFixed(2) + ' DH' : 'Net à payer TTC : __________';
+  if (net > 0) {
+    // حساب HT و TVA من net (TTC)
+    const htValue = net / 1.2;
+    const tvaValue = net - htValue;
+
+    // عرض النتائج
+    document.getElementById('net').textContent = 'Net à payer TTC : ' + net.toFixed(2) + ' DH';
+
+    document.getElementById('ht').textContent = 'TOTAL H.T : ' + htValue.toFixed(2);
+
+    document.getElementById('tva').textContent = 'T.V.A 20% : ' + tvaValue.toFixed(2);
+  } else {
+    document.getElementById('net').textContent = 'Net à payer TTC : __________';
+    document.getElementById('ht').textContent = 'TOTAL H.T : __________';
+    document.getElementById('tva').textContent = 'T.V.A 20% : __________';
+  }
 
   saveToLocalStorage(); // 🟢 حفظ عند كل تحديث
-}
-
-// حفظ البيانات في localStorage
-function saveToLocalStorage() {
-  const rowsData = [];
-  document.querySelectorAll('#devisTable tbody tr').forEach((row) => {
-    rowsData.push({
-      code: row.querySelector('.codeProduit').value,
-      qte: row.querySelector('.qte').value,
-      prix: row.querySelector('.prixProduit').value,
-    });
-  });
-  localStorage.setItem('devisData', JSON.stringify(rowsData));
 }
 
 // حفظ البيانات في localStorage
@@ -126,14 +129,25 @@ function downloadPDF() {
   buttons.forEach((btn) => (btn.style.display = 'none'));
 
   const element = document.body;
+
   const opt = {
     margin: 0.5,
     filename: 'devis.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
+    image: { type: 'png', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
   };
 
+  // 🟢 انتظر حتى يتحمل اللوجو
+  const logo = document.querySelector('.logo');
+  if (logo && !logo.complete) {
+    logo.onload = () => generatePDF(element, opt, buttons);
+  } else {
+    generatePDF(element, opt, buttons);
+  }
+}
+
+function generatePDF(element, opt, buttons) {
   html2pdf()
     .set(opt)
     .from(element)
@@ -145,7 +159,7 @@ function downloadPDF() {
 
 // 🟢 زر لمسح البيانات
 function clearLocalStorage() {
-  if (confirm("هل أنت متأكد أنك تريد مسح جميع البيانات؟")) {
+  if (confirm('هل أنت متأكد أنك تريد مسح جميع البيانات؟')) {
     localStorage.removeItem('devisData');
     location.reload(); // إعادة تحميل الصفحة
   }
@@ -155,3 +169,17 @@ function clearLocalStorage() {
 document.addEventListener('DOMContentLoaded', () => {
   loadFromLocalStorage();
 });
+
+// دالة استخراج تاريخ اليوم
+function getFormattedDate() {
+  const today = new Date();
+
+  const day = String(today.getDate()).padStart(2, '0'); // 25
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // 08 (الأشهر تبدأ من 0)
+  const year = today.getFullYear(); // 2025
+
+  return `${day}/${month}/${year}`;
+}
+
+// مثال استخدام
+document.querySelector('#date').textContent = 'MARRAKECH LE : ' + getFormattedDate();

@@ -63,7 +63,19 @@ select {
 @media print {
   button,
   .containeer,
-  .no-print{
+  .no-print {
     display: none !important;
   }
+}
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.info input {
+  width: 30%;
+  text-align: left;
+}
+.logo {
+  width: 350px;
 }
