@@ -274,11 +274,16 @@ app.get('/api/search', async (req, res) => {
 app.get('/api/Produit/:code', async (req, res) => {
   try {
     const code = req.params.code;
-    const produit = await Product.findOne({ GENCOD_P: code });
-    
+    const produit = await Product.findOne({
+  $or: [
+    { GENCOD_P: code },
+    { ANPF: code }
+  ]
+});
+
     if (!produit) return res.status(404).json({ message: 'Produit non trouvé' });
 
-    res.json({ prix: produit.PV_TTC, libelle: produit.LIBELLE });
+    res.json({ prix: produit.PV_TTC, libelle: produit.LIBELLE, anpf: produit.ANPF });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Erreur serveur' });
@@ -507,6 +512,10 @@ app.get('/calc', isAuthenticated, isVendeur, (req, res) => {
 
 app.get('/devis', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/Devis.html'));
+});
+
+app.get('/affiche', isAuthenticated, isVendeur, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/affiche.html'));
 });
 
 // تسجيل الخروج وتدمير الجلسة
