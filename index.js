@@ -6,6 +6,7 @@ const compression = require('compression');
 const path = require('path');
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
+const serverless = require('serverless-http');
 
 // استدعاء نموذج المستخدم - تأكد من المسار الصحيح
 const User = require('./models/user.js');
@@ -110,10 +111,7 @@ function isVendeur(req, res, next) {
   return res.status(403).json({ error: 'هذه الصفحة مخصصة للبائع فقط' });
 }
 
-
 const { v2: cloudinary } = require('cloudinary');
-
-
 
 // ===================
 // نموذج ديناميكي لبيانات المنتجات
@@ -160,21 +158,20 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: '❌ لم يتم رفع أي ملف' });
 
-    // 🔹 حذف آخر ملف من Cloudinary إذا وجد
+    // حذف آخر ملف من Cloudinary إذا وجد
     const list = await cloudinary.api.resources({
       type: 'upload',
       prefix: 'excel_uploads/products_',
       resource_type: 'raw',
       max_results: 1,
     });
-
     if (list.resources.length > 0) {
       const oldPublicId = list.resources[0].public_id;
       await cloudinary.uploader.destroy(oldPublicId, { resource_type: 'raw' });
       console.log('✅ تم حذف الملف القديم من Cloudinary');
     }
 
-    // 🔹 رفع الملف الجديد عبر Base64 (متوافق مع Vercel)
+    // رفع الملف الجديد عبر Base64 (متوافق مع Vercel)
     const fileBase64 = req.file.buffer.toString('base64');
     const result = await cloudinary.uploader.upload(
       `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${fileBase64}`,
@@ -185,10 +182,9 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         public_id: `products_${Date.now()}`,
       }
     );
-
     console.log('✅ تم رفع الملف الجديد إلى Cloudinary');
 
-    // 🔹 قراءة البيانات من البوفر مباشرة
+    // قراءة البيانات من البوفر مباشرة
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(req.file.buffer);
     const worksheet = workbook.worksheets[0];
@@ -196,12 +192,10 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     const jsonData = [];
     const columns = [];
 
-    // قراءة رؤوس الأعمدة
     worksheet.getRow(1).eachCell((cell, colNumber) => {
       columns[colNumber] = cell.value;
     });
 
-    // قراءة باقي الصفوف
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       if (rowNumber === 1) return;
       const rowData = {};
@@ -216,11 +210,11 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: '❌ لا توجد بيانات داخل الملف' });
     }
 
-    // 🔹 حذف البيانات القديمة من MongoDB
+    // حذف البيانات القديمة من MongoDB
     await Product.deleteMany({});
     console.log('✅ تم حذف البيانات القديمة من MongoDB');
 
-    // 🔹 إدخال البيانات دفعات
+    // إدخال البيانات دفعات
     await insertInBatches(jsonData);
 
     console.log(`✅ تم حفظ ${jsonData.length} منتج في MongoDB`);
@@ -238,8 +232,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     });
   }
 });
-
-
 
 // API لخدمة DataTables server-side
 app.post('/api/products', async (req, res) => {
