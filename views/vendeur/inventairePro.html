@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <link
+      rel="manifest"
+      href="/manifest.json"
+    />
+    <meta
+      name="theme-color"
+      content="#007bff"
+    />
+    <title>Gestion des Produits</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <!-- ===== Boxicons CSS ===== -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/fb67a05d46.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- ===== CSS ===== -->
+    <link
+      rel="stylesheet"
+      href="/css/search.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/navb.css"
+    />
+    <style>
+      /* نافذة تعديل المنتج */
+      #editModal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+      }
+
+      #editModal .modal-content {
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        width: 90%;
+        max-width: 450px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.3s ease;
+      }
+
+      #editModal .form-group {
+        margin-bottom: 10px;
+      }
+
+      #editModal label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      #editModal input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+
+      #editModal .bb {
+        background: #27ae60;
+        color: #fff;
+      }
+
+      #editModal .btnRed {
+        background: #e74c3c;
+        color: #fff;
+      }
+      .text-blue {
+        color: #007bff;
+      }
+      .text-gray {
+        color: #6c757d;
+      }
+      .text-purple {
+        color: #6f42c1;
+      }
+      .text-orange {
+        color: #fd7e14;
+      }
+      .text-green {
+        color: #198754;
+      }
+      .text-teal {
+        color: #20c997;
+      }
+      .text-red {
+        color: #dc3545;
+      }
+
+      #produitTable td {
+        vertical-align: middle;
+        padding: 8px 10px;
+      }
+
+      #produitTable td i {
+        margin-right: 6px;
+      }
+
+      .actions button {
+        border: none;
+        border-radius: 8px;
+        padding: 6px 10px;
+        margin: 0 3px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .actions .btnRed {
+        background-color: #e74c3c;
+        color: white;
+      }
+      .actions .btnRed:hover {
+        background-color: #c0392b;
+      }
+
+      .actions .btnBlue {
+        background-color: #3498db;
+        color: white;
+      }
+      .actions .btnBlue:hover {
+        background-color: #2c80b4;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Gestion des Produits</h1>
+    <div class="search-bar">
+      <input
+        id="textSearch"
+        type="number"
+        name="text"
+        placeholder="Rechercher un produit..."
+      />
+      <button
+        class="bb"
+        id="searchBtn"
+      >
+        <i class="fa fa-search"></i> Rechercher
+      </button>
+      <button
+        class="bb"
+        id="scanBtn"
+      >
+        <i class="fa fa-qrcode"></i> Scanner
+      </button>
+      <button
+        class="bb"
+        id="plus"
+      >
+        <i class="fa fa-plus"></i> new produit
+      </button>
+    </div>
+    <div
+      id="reader"
+      style="width: 300px; height: 300px; display: none; margin-top: 15px"
+    ></div>
+    <div
+      class="form-container"
+      id="productForm"
+      style="display: none"
+    >
+      <div class="form-group">
+        <label for="libelle">Libellé</label>
+        <input
+          readonly
+          type="text"
+          id="libelle"
+          placeholder="Libellé"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="gencode">GenCode</label>
+        <input
+          readonly
+          type="number"
+          id="gencode"
+          placeholder="GenCode"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="anpf">ANPF</label>
+        <input
+          readonly
+          type="number"
+          id="anpf"
+          placeholder="ANPF"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="fournisseur">Fournisseur</label>
+        <input
+          readonly
+          type="text"
+          id="fournisseur"
+          placeholder="Fournisseur"
+          required
+        />
+      </div>
+      <div
+        class="form-group"
+        style="display: none"
+      >
+        <label for="stock">Stock</label>
+        <input
+          readonly
+          type="text"
+          id="stock"
+          placeholder="Stock"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="prix">Prix TTC</label>
+        <input
+          readonly
+          type="text"
+          id="prix"
+          placeholder="Prix TTC"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="qteInven">Quantité</label>
+        <input
+          type="number"
+          id="qteInven"
+          placeholder="Quantité"
+          class="infor"
+        />
+      </div>
+      <div class="form-group">
+        <label for="adresse">Adresse</label>
+        <input
+          type="text"
+          id="adresse"
+          placeholder="Adresse"
+          class="infor"
+        />
+      </div>
+      <div class="form-group">
+        <label for="adresse">Name Du Vendeur</label>
+        <input
+          type="text"
+          id="nameVendeur"
+          placeholder="Name Du...."
+          class="infor"
+          required
+        />
+      </div>
+      <button id="ajouterBtn"><i class="fa fa-plus"></i> Ajouter au tableau</button>
+    </div>
+    <div class="form-container">
+      <label for="nomFichier">Name Du Vendeur</label>
+      <input
+        type="text"
+        id="nomFichier"
+        placeholder="Nom du fichier..."
+        readonly
+      />
+      <button
+        class="bb"
+        onclick="exportToExcel()"
+      >
+        <i class="fa fa-file-excel"></i> Exporter en Excel
+      </button>
+      <button
+        class="bb"
+        onclick="window.print()"
+      >
+        <i class="fa fa-print"></i> Imprimer
+      </button>
+      <button
+        class="btnRed"
+        onclick="clearTableVendeur()"
+      >
+        <i class="fa fa-trash"></i> Vider
+      </button>
+    </div>
+    <div class="search-bar">
+      <input
+        id="searchLocalStorage"
+        type="text"
+        name="text"
+        placeholder="Rechercher un produit..."
+      />
+    </div>
+    <table id="produitTable">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+
+    <!--nav FAB Button -->
+    <div class="containeer">
+      <div class="menu-toggle">
+        <span class="fa fa-plus"></span>
+      </div>
+
+      <div class="menu-round">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="calc"
+              ><i
+                class="fas fa-calculator"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="Album"
+              ><i
+                class="fas fa-file-image"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="logout"
+              ><i
+                class="fas fa-sign-out-alt"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-line">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="devis"
+              ><i
+                class="fas fa-file-invoice"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="table"
+              ><i
+                class="fas fa-search"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="inventaire"
+              ><i
+                class="far fa-file-excel"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="serchCode"
+              ><i
+                class="fas fa-question-circle"
+                style="color: white"
+              ></i>
+            </a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="prixVen"
+              ><i
+                class="fas fa-cash-register"
+                style="color: white"
+              ></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--fin FAB Button -->
+    <div
+      id="confirmModal"
+      class="modal"
+    >
+      <div class="modal-content">
+        <p>هل أنت متأكد أنك تريد حذف هذا المنتج؟</p>
+        <div class="modal-actions">
+          <button
+            id="confirmYes"
+            class="btn btn-danger"
+          >
+            نعم
+          </button>
+          <button
+            id="confirmNo"
+            class="btn btn-secondary"
+          >
+            إلغاء
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loader -->
+    <!-- From Uiverse.io by paesjr -->
+
+    <!-- 🧾 نافذة تعديل المنتج -->
+    <div
+      id="editModal"
+      class="modal"
+    >
+      <div
+        class="modal-content"
+        style="max-width: 450px; text-align: left"
+      >
+        <h3 style="text-align: center; color: #007bff">تعديل المنتج</h3>
+        <div class="form-group">
+          <label>Libellé</label>
+          <input
+            type="text"
+            id="editName"
+            class="edit-input"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label>GenCode</label>
+          <input
+            type="text"
+            id="editBarcode"
+            class="edit-input"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label>Anpf</label>
+          <input
+            type="text"
+            id="editAnpf"
+            class="edit-input"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label>Prix TTC</label>
+          <input
+            type="number"
+            id="editPrice"
+            class="edit-input"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label>Quantité Inventaire</label>
+          <input
+            type="number"
+            id="editQteInven"
+            class="edit-input"
+          />
+        </div>
+        <div class="form-group">
+          <label>Adresse</label>
+          <input
+            type="text"
+            id="editAdresse"
+            class="edit-input"
+          />
+        </div>
+
+        <input
+          type="hidden"
+          id="editId"
+        />
+
+        <div
+          class="modal-actions"
+          style="text-align: center; margin-top: 15px"
+        >
+          <button
+            onclick="saveProductChanges()"
+            class="bb"
+          >
+            <i class="fa fa-save"></i> حفظ التغييرات
+          </button>
+          <button
+            onclick="closeEditModal()"
+            class="btnRed"
+          >
+            <i class="fa fa-times"></i> إلغاء
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="confirmModal"
+      class="modal"
+    >
+      <div class="modal-content">
+        <p>هل أنت متأكد أنك تريد حذف هذا المنتج؟</p>
+        <div class="modal-actions">
+          <button
+            id="confirmYes"
+            class="btn btn-danger"
+          >
+            نعم
+          </button>
+          <button
+            id="confirmNo"
+            class="btn btn-secondary"
+          >
+            إلغاء
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!--- ______fin code nav bar_________  -->
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/codebar.min.js"></script>
+    <script src="js/searchPro.js"></script>
+    <script src="js/main2.js"></script>
+  </body>
+</html>

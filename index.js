@@ -9,9 +9,16 @@ const bcrypt = require('bcryptjs');
 
 // استدعاء نموذج المستخدم - تأكد من المسار الصحيح
 const User = require('./models/user.js');
+const Inventaire = require('./models/Inventaire.js');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
+
+// إعداد EJS كـ view engine
+app.set('view engine', 'ejs');
+
+// إعداد مسار الـ views
+app.set('views', path.join(__dirname, 'views'));
 
 // الاتصال بقاعدة بيانات MongoDB
 mongoose
@@ -103,24 +110,42 @@ function isVendeur(req, res, next) {
   return res.status(403).json({ error: 'هذه الصفحة مخصصة للبائع فقط' });
 }
 
-// نموذج ديناميكي لبيانات المنتجات (schema غير محدد)
+
+const { v2: cloudinary } = require('cloudinary');
+
+// ===================
+// 1️⃣ نموذج المنتجات ديناميكي
+// ===================
 const productSchema = new mongoose.Schema(
   {},
   {
-    strict: false,
+    strict: false, // أي حقل إضافي يتم قبوله
     timestamps: { createdAt: 'createdAt', updatedAt: false },
   }
 );
 const Product = mongoose.model('Product', productSchema);
 
-// إعداد multer لتخزين الملفات في الذاكرة (memory)
+// ===================
+// 2️⃣ إعداد multer للرفع في الذاكرة
+// ===================
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // حد 10 ميجابايت
 });
 
-// دالة لإدخال البيانات دفعات دفعات (batch insert)
+// ===================
+// 3️⃣ إعداد Cloudinary
+// ===================
+cloudinary.config({
+  cloud_name: 'dvvknaxx6',
+  api_key: '955798727236253',
+  api_secret: 'Art43qa10C8-3pOliHqiV92JbHw',
+});
+
+// ===================
+// 4️⃣ دالة الإدخال دفعات
+// ===================
 async function insertInBatches(data, batchSize = 20000) {
   for (let i = 0; i < data.length; i += batchSize) {
     const batch = data.slice(i, i + batchSize);
@@ -128,6 +153,180 @@ async function insertInBatches(data, batchSize = 20000) {
     console.log(`✅ إدخال الدفعة من ${i + 1} إلى ${i + batch.length}`);
   }
 }
+
+// ===================
+// 5️⃣ مسار رفع الملفات
+// ===================
+
+
+app.post('/upload', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: '❌ لم يتم رفع أي ملف' });
+
+    // 🔹 حذف آخر ملف من Cloudinary (إن وجد)
+    const list = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'excel_uploads/products_',
+      resource_type: 'raw',
+      max_results: 1,
+    });
+
+    if (list.resources.length > 0) {
+      const oldPublicId = list.resources[0].public_id;
+      await cloudinary.uploader.destroy(oldPublicId, { resource_type: 'raw' });
+      console.log('✅ تم حذف الملف القديم من Cloudinary');
+    }
+
+    // 🔹 رفع الملف الجديد إلى Cloudinary
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: 'raw',
+        folder: 'excel_uploads',
+        format: 'xlsx',
+        public_id: `products_${Date.now()}`,
+      },
+      async (error, result) => {
+        if (error) {
+          console.error('❌ خطأ أثناء رفع الملف إلى Cloudinary:', error);
+          return res.status(500).json({ error: '❌ فشل رفع الملف إلى Cloudinary' });
+        }
+
+        console.log('✅ تم رفع الملف الجديد إلى Cloudinary');
+
+        // 🔹 قراءة الملف مباشرة من البوفر بدون fetch
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(req.file.buffer);
+
+        const worksheet = workbook.worksheets[0];
+        const jsonData = [];
+        const columns = [];
+
+        // قراءة رؤوس الأعمدة
+        worksheet.getRow(1).eachCell((cell, colNumber) => {
+          columns[colNumber] = cell.value;
+        });
+
+        // قراءة باقي الصفوف
+        worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+          if (rowNumber === 1) return; // تجاهل الصف الأول
+          const rowData = {};
+          row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            const key = columns[colNumber];
+            if (key) rowData[key] = cell.value?.toString() || '';
+          });
+          jsonData.push(rowData);
+        });
+
+        if (jsonData.length === 0) {
+          return res.status(400).json({ error: '❌ لا توجد بيانات داخل الملف' });
+        }
+
+        // 🔹 حذف البيانات القديمة من MongoDB
+        await Product.deleteMany({});
+        console.log('✅ تم حذف البيانات القديمة من MongoDB');
+
+        // 🔹 إدخال البيانات دفعات
+        await insertInBatches(jsonData);
+
+        console.log(`✅ تم حفظ ${jsonData.length} منتج في MongoDB`);
+
+        return res.json({
+          message: '✅ تم رفع الملف ومعالجة البيانات بنجاح!',
+          count: jsonData.length,
+          cloudinaryUrl: result.secure_url,
+        });
+      }
+    );
+
+    // تمرير البوفر إلى Cloudinary
+    uploadStream.end(req.file.buffer);
+  } catch (err) {
+    console.error('❌ خطأ أثناء المعالجة:', err);
+    res.status(500).json({
+      error: '❌ حدث خطأ أثناء معالجة الملف',
+      details: err.message,
+    });
+  }
+});
+
+// ===================
+// 5️⃣ مسار رفع الملفات + معالجة
+// ===================
+
+app.post('/upload', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: '❌ لم يتم رفع أي ملف' });
+
+    // رفع الملف إلى Cloudinary
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: 'raw',
+        folder: 'excel_uploads',
+        format: 'xlsx',
+        public_id: `products_${Date.now()}`,
+      },
+      async (error, result) => {
+        if (error) {
+          console.error('❌ خطأ أثناء رفع الملف إلى Cloudinary:', error);
+          return res.status(500).json({ error: '❌ فشل رفع الملف إلى Cloudinary' });
+        }
+
+        // قراءة الملف من Cloudinary URL
+        const workbook = new ExcelJS.Workbook();
+        const response = await fetch(result.secure_url);
+        const buffer = await response.arrayBuffer();
+        await workbook.xlsx.load(buffer);
+
+        const worksheet = workbook.worksheets[0]; // أول ورقة
+        const jsonData = [];
+        const columns = [];
+
+        // قراءة رؤوس الأعمدة (الصف الأول)
+        worksheet.getRow(1).eachCell((cell, colNumber) => {
+          columns[colNumber] = cell.value;
+        });
+
+        // قراءة باقي الصفوف
+        worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+          if (rowNumber === 1) return;
+          const rowData = {};
+          row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            const key = columns[colNumber];
+            if (key) rowData[key] = cell.value?.toString() || '';
+          });
+          jsonData.push(rowData);
+        });
+
+        if (jsonData.length === 0) {
+          return res.status(400).json({ error: '❌ لا توجد بيانات داخل الملف' });
+        }
+
+        // حذف القديم قبل الإدخال الجديد
+        await Product.deleteMany({});
+        console.log('✅ تم حذف البيانات القديمة');
+
+        // إدخال البيانات دفعات
+        await insertInBatches(jsonData);
+
+        console.log(`✅ تم حفظ ${jsonData.length} منتج`);
+        return res.json({
+          message: '✅ تم رفع الملف ومعالجته بنجاح!',
+          count: jsonData.length,
+          cloudinaryUrl: result.secure_url,
+        });
+      }
+    );
+
+    // تمرير الملف إلى Cloudinary
+    uploadStream.end(req.file.buffer);
+  } catch (err) {
+    console.error('❌ خطأ أثناء المعالجة:', err);
+    res.status(500).json({
+      error: '❌ حدث خطأ أثناء معالجة الملف',
+      details: err.message,
+    });
+  }
+});
 
 // نقطة رفع ملف Excel وتحويله إلى JSON وحفظه في قاعدة البيانات
 app.post('/upload', upload.single('file'), async (req, res) => {
@@ -275,11 +474,8 @@ app.get('/api/Produit/:code', async (req, res) => {
   try {
     const code = req.params.code;
     const produit = await Product.findOne({
-  $or: [
-    { GENCOD_P: code },
-    { ANPF: code }
-  ]
-});
+      $or: [{ GENCOD_P: code }, { ANPF: code }],
+    });
 
     if (!produit) return res.status(404).json({ message: 'Produit non trouvé' });
 
@@ -531,6 +727,65 @@ app.use((req, res, next) => {
     return res.status(403).json({ error: 'هذه الصفحة مخصصة للمسؤول فقط' });
   }
   next();
+});
+
+// API لاستقبال المنتجات وحفظها في قاعدة البيانات
+app.post('/api/inventairePro', async (req, res) => {
+  try {
+    const productData = req.body;
+    const product = new Inventaire(productData);
+    await product.save();
+    res.status(201).send(product);
+  } catch (error) {
+    res.status(500).send({ message: 'Error saving product', error });
+  }
+});
+
+// إضافة نقطة GET لعرض البيانات في صفحة HTML
+app.get('/inventairePro', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/inventairePro.html')); // ✅ صفحة فارغة مؤقتاً
+});
+
+app.get('/api/inventairePro', async (req, res) => {
+  try {
+    const { nameVendeur } = req.query;
+    let filter = {};
+
+    // إذا تم إرسال اسم بائع، نبحث فقط عن منتجاته
+    if (nameVendeur) {
+      filter.nameVendeur = nameVendeur;
+    }
+
+    const products = await Inventaire.find(filter);
+    res.json(products);
+  } catch (error) {
+    console.error('Error loading products:', error);
+    res.status(500).send({ message: 'Error loading products', error });
+  }
+});
+
+// API لتحديث منتج
+app.put('/api/inventairePro/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedProduct = await Inventaire.findByIdAndUpdate(id, req.body, { new: true });
+    if (!updatedProduct) return res.status(404).json({ message: 'Product not found' });
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating product', error });
+  }
+});
+
+// حذف منتج
+app.delete('/api/inventairePro/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedProduct = await Inventaire.findByIdAndDelete(id);
+    if (!deletedProduct) return res.status(404).json({ message: 'Product not found' });
+    res.status(200).json({ success: true, message: 'Product deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting product', error });
+  }
 });
 
 app.listen(PORT, () => {

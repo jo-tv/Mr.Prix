@@ -9,9 +9,17 @@ const bcrypt = require('bcryptjs');
 
 // استدعاء نموذج المستخدم - تأكد من المسار الصحيح
 const User = require('./models/user.js');
+const Inventaire = require('./models/Inventaire.js');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
+
+// إعداد EJS كـ view engine
+app.set('view engine', 'ejs');
+
+// إعداد مسار الـ views
+app.set('views', path.join(__dirname, 'views'));
+
 
 // الاتصال بقاعدة بيانات MongoDB
 mongoose
@@ -269,6 +277,24 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
+// GET /api/produit/:code → جلب السعر حسب GENCOD_P
+
+app.get('/api/Produit/:code', async (req, res) => {
+  try {
+    const code = req.params.code;
+    const produit = await Product.findOne({
+      $or: [{ GENCOD_P: code }, { ANPF: code }],
+    });
+
+    if (!produit) return res.status(404).json({ message: 'Produit non trouvé' });
+
+    res.json({ prix: produit.PV_TTC, libelle: produit.LIBELLE, anpf: produit.ANPF });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
 // نقطة بحث أخرى (معادلة لنقطة /api/search) إن أردت
 app.get('/search', async (req, res) => {
   const { q } = req.query;
@@ -489,6 +515,14 @@ app.get('/calc', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/calc.html'));
 });
 
+app.get('/devis', isAuthenticated, isVendeur, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/Devis.html'));
+});
+
+app.get('/affiche', isAuthenticated, isVendeur, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/affiche.html'));
+});
+
 // تسجيل الخروج وتدمير الجلسة
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
@@ -502,6 +536,66 @@ app.use((req, res, next) => {
     return res.status(403).json({ error: 'هذه الصفحة مخصصة للمسؤول فقط' });
   }
   next();
+});
+
+// API لاستقبال المنتجات وحفظها في قاعدة البيانات
+app.post('/api/inventairePro', async (req, res) => {
+  try {
+    const productData = req.body;
+    const product = new Inventaire(productData);
+    await product.save();
+    res.status(201).send(product);
+  } catch (error) {
+    res.status(500).send({ message: 'Error saving product', error });
+  }
+});
+
+
+// إضافة نقطة GET لعرض البيانات في صفحة HTML
+app.get('/inventairePro', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/inventairePro.html')); // ✅ صفحة فارغة مؤقتاً
+});
+
+app.get('/api/inventairePro', async (req, res) => {
+  try {
+    const { nameVendeur } = req.query;
+    let filter = {};
+
+    // إذا تم إرسال اسم بائع، نبحث فقط عن منتجاته
+    if (nameVendeur) {
+      filter.nameVendeur = nameVendeur;
+    }
+
+    const products = await Inventaire.find(filter);
+    res.json(products);
+  } catch (error) {
+    console.error('Error loading products:', error);
+    res.status(500).send({ message: 'Error loading products', error });
+  }
+});
+
+// API لتحديث منتج
+app.put('/api/inventairePro/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedProduct = await Inventaire.findByIdAndUpdate(id, req.body, { new: true });
+    if (!updatedProduct) return res.status(404).json({ message: 'Product not found' });
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating product', error });
+  }
+});
+
+// حذف منتج
+app.delete('/api/inventairePro/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedProduct = await Inventaire.findByIdAndDelete(id);
+    if (!deletedProduct) return res.status(404).json({ message: 'Product not found' });
+    res.status(200).json({ success: true, message: 'Product deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting product', error });
+  }
 });
 
 app.listen(PORT, () => {
