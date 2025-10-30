@@ -110,8 +110,22 @@ function isVendeur(req, res, next) {
   return res.status(403).json({ error: 'هذه الصفحة مخصصة للبائع فقط' });
 }
 
+
 const { v2: cloudinary } = require('cloudinary');
 
+
+
+// ===================
+// نموذج ديناميكي لبيانات المنتجات
+// ===================
+const productSchema = new mongoose.Schema(
+  {},
+  {
+    strict: false,
+    timestamps: { createdAt: 'createdAt', updatedAt: false },
+  }
+);
+const Product = mongoose.model('Product', productSchema);
 
 // ===================
 // إعداد multer للرفع في الذاكرة
@@ -128,6 +142,9 @@ cloudinary.config({
   api_secret: 'Art43qa10C8-3pOliHqiV92JbHw',
 });
 
+// ===================
+// دالة إدخال البيانات دفعات
+// ===================
 async function insertInBatches(data, batchSize = 20000) {
   for (let i = 0; i < data.length; i += batchSize) {
     const batch = data.slice(i, i + batchSize);
@@ -135,16 +152,6 @@ async function insertInBatches(data, batchSize = 20000) {
     console.log(`✅ إدخال الدفعة من ${i + 1} إلى ${i + batch.length}`);
   }
 }
-
-// نموذج ديناميكي لبيانات المنتجات (schema غير محدد)
-const productSchema = new mongoose.Schema(
-  {},
-  {
-    strict: false,
-    timestamps: { createdAt: 'createdAt', updatedAt: false },
-  }
-);
-const Product = mongoose.model('Product', productSchema);
 
 // ===================
 // مسار رفع الملفات
@@ -231,6 +238,8 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     });
   }
 });
+
+
 
 // API لخدمة DataTables server-side
 app.post('/api/products', async (req, res) => {
