@@ -137,6 +137,12 @@ document.querySelector('.Subscribe-btn').addEventListener('click', function () {
 
       const ticketDiv = document.querySelector('.ticket');
       ticketDiv.innerHTML = `
+       <div class="imgPromo">
+      <img
+        src="https://cdn.pixabay.com/photo/2022/09/23/09/13/promotion-7474039_1280.png"
+        alt="promo"
+      />
+    </div>
     <h4><span>LIBELLE :</span> ${product.LIBELLE}</h4>
     <div class="date">Dernière mise à jour le :<span>${formatDate(product.createdAt)}</span></div>
     <div class="items">
@@ -149,17 +155,36 @@ document.querySelector('.Subscribe-btn').addEventListener('click', function () {
       <div><span class="i1">Fourni</span><span class="i2"><i class="fa-solid fa-user-tie"></i></span><span class="i3">${
         product.FOURNISSEUR_P
       }</span></div>
+      <div><span class="i1">ReF-Four</span><span class="i2"><i class="bi bi-upc-scan"></i></span><span class="i3">${
+        product.REFFOUR_P
+      }</span></div>
       <div><span class="i1">Stock</span><span class="i2"><i class="fa-solid
       fa-boxes-stacked"></i></span><span id="stk" class="i3">${product.STOCK}</span></div>
       <div><span class="i1">Status</span><span class="i2"><i class="fas fa-exclamation-triangle"></i></span><span class="i3" id="etatProduit" ></span></div>
     </div>
     <div class="total">
-      <span class="i1">prix</span><span class="i3 i4">${product.PV_TTC} DH</span>
+      <span class="i1">prix</span><span class="i3 i4"id="prixTotal">${product.PV_TTC} DH</span>
+    </div>
+    <div class="PrixPromo">
+      <span class="i3 i4" id="promo">${product.PRIXVT} DH <i class="bi bi-tags-fill"></i></span>
     </div>
     <div class="footer">Dernière mise à jour il y a <span> ${daysSince(
       product.createdAt
     )}</span>jours</div>
 `;
+      let divPromo = document.querySelector('.PrixPromo');
+      let prixPromo = document.querySelector('#promo');
+      let prixTotal = document.querySelector('#prixTotal');
+      let imgPromo = document.querySelector('.imgPromo');
+      console.log(prixPromo.textContent);
+      if (parseInt(prixPromo.textContent) === 0) {
+        imgPromo.style.display = 'none';
+        divPromo.style.display = 'none';
+      } else {
+        divPromo.style.display = 'block';
+        imgPromo.style.display = 'block';
+        prixTotal.classList.add('activePromo');
+      }
       function daysSince(dateString) {
         const createdDate = new Date(dateString);
         const today = new Date();
@@ -187,22 +212,21 @@ document.querySelector('.Subscribe-btn').addEventListener('click', function () {
       }
 
       const etatElement = document.getElementById('etatProduit');
-const libelle = product?.LIBELLE?.trim();
+      const libelle = product?.LIBELLE?.trim();
 
-if (etatElement && libelle) {
-  if (/\[\s*GA\s*\]$/.test(libelle)) {
-    etatElement.textContent = 'Produit Désactivé';
-    etatElement.style.setProperty('background-color', 'orange', 'important');
-    etatElement.style.setProperty('font-size', '16px', 'important');
-    etatElement.style.setProperty('color', 'red', 'important');
-  } else if (/\[\s*A\s*\]$/.test(libelle)) {
-    etatElement.textContent = 'Produit Active';
-    etatElement.style.setProperty('background-color', '#fff', 'important');
-    etatElement.style.setProperty('font-size', '16px', 'important');
-    etatElement.style.setProperty('color', 'green', 'important');
-  }
-}
-      
+      if (etatElement && libelle) {
+        if (/\[\s*GA\s*\]$/.test(libelle)) {
+          etatElement.textContent = 'Produit Désactivé';
+          etatElement.style.setProperty('background-color', 'orange', 'important');
+          etatElement.style.setProperty('font-size', '16px', 'important');
+          etatElement.style.setProperty('color', 'red', 'important');
+        } else if (/\[\s*A\s*\]$/.test(libelle)) {
+          etatElement.textContent = 'Produit Active';
+          etatElement.style.setProperty('background-color', '#fff', 'important');
+          etatElement.style.setProperty('font-size', '16px', 'important');
+          etatElement.style.setProperty('color', 'green', 'important');
+        }
+      }
 
       const stockValue = parseInt(product.STOCK);
       const stockElement = document.getElementById('stk');
@@ -253,9 +277,8 @@ window.addEventListener('load', function () {
   loader.style.display = 'none';
 });
 
-
-$(".menu-toggle").click(function () {
-    $(".menu-toggle").toggleClass("open");
-    $(".menu-round").toggleClass("open");
-    $(".menu-line").toggleClass("open");
+$('.menu-toggle').click(function () {
+  $('.menu-toggle').toggleClass('open');
+  $('.menu-round').toggleClass('open');
+  $('.menu-line').toggleClass('open');
 });
