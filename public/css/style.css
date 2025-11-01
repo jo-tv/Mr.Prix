@@ -246,7 +246,7 @@ body {
   background: palegreen !important;
   color: #000 !important;
   position: relative !important;
-  left: 80px;
+  left: 70px;
 }
 #promo i {
   color: #5d7ed7 !important;
@@ -259,8 +259,8 @@ body {
   text-decoration: line-through !important;
 }
 .imgPromo img {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   position: absolute;
   bottom: 38px;
   left: 0;
