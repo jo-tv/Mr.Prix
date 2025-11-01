@@ -246,7 +246,7 @@ body {
   background: palegreen !important;
   color: #000 !important;
   position: relative !important;
-  left: 70px;
+  left: 80px;
 }
 #promo i {
   color: #5d7ed7 !important;
@@ -259,10 +259,10 @@ body {
   text-decoration: line-through !important;
 }
 .imgPromo img {
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
   position: absolute;
-  bottom: 38px;
+  bottom: 68px;
   left: 0;
   opacity: 2;
   -webkit-animation: heartbeat 1.5s ease-in-out infinite alternate backwards;
