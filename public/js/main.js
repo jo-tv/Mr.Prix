@@ -155,7 +155,7 @@ document.querySelector('.Subscribe-btn').addEventListener('click', function () {
       <div><span class="i1">Fourni</span><span class="i2"><i class="fa-solid fa-user-tie"></i></span><span class="i3">${
         product.FOURNISSEUR_P
       }</span></div>
-      <div><span class="i1">ReF-Four</span><span class="i2"><i class="bi bi-upc-scan"></i></span><span class="i3">${
+      <div><span class="i1">ReF-Four</span><span class="i2"><i class="fa-solid fa-users-gear"></i></span><span class="i3">${
         product.REFFOUR_P
       }</span></div>
       <div><span class="i1">Stock</span><span class="i2"><i class="fa-solid
@@ -166,7 +166,7 @@ document.querySelector('.Subscribe-btn').addEventListener('click', function () {
       <span class="i1">prix</span><span class="i3 i4"id="prixTotal">${product.PV_TTC} DH</span>
     </div>
     <div class="PrixPromo">
-      <span class="i3 i4" id="promo">${product.PRIXVT} DH <i class="bi bi-tags-fill"></i></span>
+      <span class="i3 i4" id="promo">${product.PRIXVT} DH<i class="fa-solid fa-tag"></i></span>
     </div>
     <div class="footer">Dernière mise à jour il y a <span> ${daysSince(
       product.createdAt
