@@ -224,7 +224,7 @@ app.post('/clear-old-files', async (req, res) => {
   try {
     // استدعاء Cloudinary API لحذف الملفات القديمة
     const resources = await cloudinary.api.resources({ type: 'upload', prefix: 'excel_files/' });
-    const publicIds = resources.resources.map(r => r.public_id);
+    const publicIds = resources.resources.map((r) => r.public_id);
 
     if (publicIds.length > 0) {
       await cloudinary.api.delete_resources(publicIds);
@@ -593,6 +593,13 @@ app.get('/inventairePro', (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/inventairePro.html')); // ✅ صفحة فارغة مؤقتاً
 });
 
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/dashboard.html')); // ✅ صفحة فارغة مؤقتاً
+});
+app.get('/listVendeurs', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/List-Vendeurs.html')); // ✅ صفحة فارغة مؤقتاً
+});
+
 app.get('/api/inventairePro', async (req, res) => {
   try {
     const { nameVendeur } = req.query;
@@ -603,13 +610,17 @@ app.get('/api/inventairePro', async (req, res) => {
       filter.nameVendeur = nameVendeur;
     }
 
-    const products = await Inventaire.find(filter);
+    // 🔽 ترتيب تنازلي حسب تاريخ الإنشاء (الأحدث أولاً)
+    const products = await Inventaire.find(filter).sort({ createdAt: -1 });
+
     res.json(products);
   } catch (error) {
     console.error('Error loading products:', error);
     res.status(500).send({ message: 'Error loading products', error });
   }
 });
+
+
 
 // API لتحديث منتج
 app.put('/api/inventairePro/:id', async (req, res) => {
@@ -632,6 +643,20 @@ app.delete('/api/inventairePro/:id', async (req, res) => {
     res.status(200).json({ success: true, message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting product', error });
+  }
+});
+
+// ✅ مسح كل المنتجات من جميع المستخدمين
+app.delete('/api/inventairePro', async (req, res) => {
+  try {
+    const result = await Inventaire.deleteMany({});
+    res.status(200).json({
+      success: true,
+      message: `🧹 ${result.deletedCount} produits supprimés avec succès.`,
+    });
+  } catch (error) {
+    console.error('Erreur lors de la suppression globale:', error);
+    res.status(500).json({ message: 'Erreur lors de la suppression globale', error });
   }
 });
 

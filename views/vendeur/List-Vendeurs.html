@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <link
+      rel="manifest"
+      href="/manifest.json"
+    />
+    <meta
+      name="theme-color"
+      content="#007bff"
+    />
+    <title>Gestion des Produits Vendeurs</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <!-- ===== Boxicons CSS ===== -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/fb67a05d46.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- ✅ Bootstrap 5.3.3 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+
+    <!-- ===== CSS ===== -->
+    <link
+      rel="stylesheet"
+      href="/css/navb.css"
+    />
+    <style>
+      /* جعل الـ Modal أكبر ويمتد عرضياً */
+      .modal-dialog {
+        max-width: 95%; /* عرض 95% من الشاشة */
+        margin: 1.5rem auto; /* مسافة علوية وسفلية */
+      }
+
+      /* إذا كان Modal قابلاً للتمرير عمودياً */
+      .modal-dialog-scrollable {
+        max-height: 90vh; /* ارتفاع 90% من الشاشة */
+      }
+
+      /* اختيارياً: تكبير حجم المحتوى داخل body */
+      .modal-body {
+        padding: 1rem 1.5rem;
+      }
+      .cards {
+        box-shadow:
+          rgba(0, 0, 0, 0.25) 0px 54px 55px,
+          rgba(0, 0, 0, 0.12) 0px -12px 30px,
+          rgba(0, 0, 0, 0.12) 0px 4px 6px,
+          rgba(0, 0, 0, 0.17) 0px 12px 13px,
+          rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        margin: 20px auto;
+      }
+      .card img {
+        width: 90%;
+        heigth: 90%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+      }
+      .card {
+        background: #d1d3af83;
+      }
+      #searchVendeur {
+        border-radius: 50px;
+        border: 2px solid #0d6efd;
+        transition: all 0.3s ease;
+        margin: 20px auto;
+      }
+
+      #searchVendeur:focus {
+        border-color: #198754;
+        box-shadow: 0 0 10px rgba(25, 135, 84, 0.4);
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <!-- ✅ Navbar صغيرة -->
+    <nav class="navbar navbar-dark bg-dark mb-4">
+      <div class="container-fluid d-flex justify-content-between align-items-center">
+        <span class="navbar-brand mb-0 h1"> <i class="fas fa-users"></i> Liste des vendeurs </span>
+        <button
+          class="btn btn-sm btn-danger"
+          onclick="deleteAllProducts()"
+        >
+          <i class="fas fa-trash-alt"></i> Supprimer tout
+        </button>
+      </div>
+    </nav>
+    <div class="container my-4">
+      <div class="row mb-3">
+        <div class="col-md-6 mx-auto">
+          <input
+            type="text"
+            id="searchVendeur"
+            class="form-control form-control-lg shadow-sm"
+            placeholder="🔍 Rechercher un vendeur..."
+            onkeyup="filterVendeurs()"
+          />
+        </div>
+      </div>
+
+      <div
+        id="vendeursContainer"
+        class="row g-4"
+      ></div>
+    </div>
+
+    <!-- ✅ منطقة عرض الكروت -->
+    <div class="container">
+      <div
+        id="vendeursContainer"
+        class="row g-4"
+      >
+        <!-- الكروت ستُضاف هنا ديناميكيًا -->
+      </div>
+    </div>
+
+    <!-- ✅ زر القائمة العائم -->
+    <div class="containeer">
+      <div class="menu-toggle">
+        <span class="fa fa-plus"></span>
+      </div>
+
+      <div class="menu-round">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="calc"
+              ><i
+                class="fas fa-calculator"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="Album"
+              ><i
+                class="fas fa-file-image"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="logout"
+              ><i
+                class="fas fa-sign-out-alt"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-line">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="devis"
+              ><i
+                class="fas fa-file-invoice"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="table"
+              ><i
+                class="fas fa-search"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="inventaire"
+              ><i
+                class="far fa-file-excel"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="serchCode"
+              ><i
+                class="fas fa-question-circle"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="prixVen"
+              ><i
+                class="fas fa-cash-register"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal لعرض منتجات البائع -->
+    <div
+      class="modal fade"
+      id="productsModal"
+      tabindex="-1"
+      aria-labelledby="productsModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5
+              class="modal-title"
+              id="productsModalLabel"
+            >
+              <i class="fas fa-boxes"></i> Produits de <span id="modalVendeurName"></span>
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Fermer"
+            ></button>
+          </div>
+          <div class="modal-body w-100">
+            <!-- حقل التحكم في الأعمدة -->
+            <div class="mb-3 d-flex flex-wrap align-items-center">
+              <span class="me-2 fw-bold">Colonnes:</span>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="0"
+                  checked
+                  id="col1"
+                />
+                <label
+                  class="form-check-label"
+                  for="col1"
+                  >#</label
+                >
+              </div>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="1"
+                  checked
+                  id="col2"
+                />
+                <label
+                  class="form-check-label"
+                  for="col2"
+                  >Libelle</label
+                >
+              </div>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="2"
+                  checked
+                  id="col3"
+                />
+                <label
+                  class="form-check-label"
+                  for="col3"
+                  >Gencode</label
+                >
+              </div>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="3"
+                  checked
+                  id="col4"
+                />
+                <label
+                  class="form-check-label"
+                  for="col4"
+                  >Prix</label
+                >
+              </div>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="4"
+                  checked
+                  id="col5"
+                />
+                <label
+                  class="form-check-label"
+                  for="col5"
+                  >Quantité</label
+                >
+              </div>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="5"
+                  checked
+                  id="col6"
+                />
+                <label
+                  class="form-check-label"
+                  for="col6"
+                  >Fournisseur</label
+                >
+              </div>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="6"
+                  checked
+                  id="col7"
+                />
+                <label
+                  class="form-check-label"
+                  for="col7"
+                  >Adresse</label
+                >
+              </div>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="7"
+                  checked
+                  id="col8"
+                />
+                <label
+                  class="form-check-label"
+                  for="col8"
+                  >Date</label
+                >
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table
+                id="modalProductsTable"
+                class="table table-striped table-bordered table-hover table-responsive"
+                style="width: 100%"
+              >
+                <thead class="table-dark">
+                  <tr>
+                    <th>Libelle</th>
+                    <th>Gencode</th>
+                    <th>Anpf</th>
+                    <th>Prix</th>
+                    <th>Quantité</th>
+                    <th>Fournisseur</th>
+                    <th>Adresse</th>
+                    <th>Date d'ajout</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        const container = document.getElementById('vendeursContainer');
+
+        try {
+          const res = await fetch('/api/inventairePro');
+          const produits = await res.json();
+
+          // 🔹 تجميع المنتجات حسب البائع
+          const vendeurs = {};
+          produits.forEach((prod) => {
+            if (!vendeurs[prod.nameVendeur]) {
+              vendeurs[prod.nameVendeur] = { produits: [], lastProduit: null };
+            }
+            vendeurs[prod.nameVendeur].produits.push(prod);
+
+            // 🔹 تحديد آخر منتج تمت إضافته (بناءً على تاريخ أو ID)
+            if (
+              !vendeurs[prod.nameVendeur].lastProduit ||
+              new Date(prod.createdAt) > new Date(vendeurs[prod.nameVendeur].lastProduit?.createdAt)
+            ) {
+              vendeurs[prod.nameVendeur].lastProduit = prod;
+            }
+          });
+
+          // 🔹 إنشاء الكروت
+          Object.entries(vendeurs).forEach(([nameVendeur, data]) => {
+            const card = document.createElement('div');
+            card.className = 'col-md-4 col-sm-6 cards';
+
+            const imageURL =
+              data.lastProduit?.photoVendeur ||
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKY2EVmhPJeKsUaiw1T8DLuaWz5fKNPGIEaiWivCeJUDpIdsKP0-BOAb0&amp;s=10';
+
+            card.innerHTML = `
+<div class="card shadow-sm border-0 rounded-4 h-100">
+  <div class="position-relative">
+    <img src="${imageURL}" class="card-img-top rounded-top-4" alt="${nameVendeur}" 
+         style="height: 220px; object-fit: cover;">
+    <span class="badge bg-primary position-absolute top-0 start-0 m-2 shadow-sm
+    fs-4">
+      <i class="fas fa-user-circle"></i> ${nameVendeur}
+    </span>
+  </div>
+
+  <div class="card-body d-flex flex-column justify-content-between">
+    <div>
+      <p class="card-text mb-2">
+        <i class="fas fa-boxes text-success"></i> Produits: <b>${data.produits.length}</b>
+      </p>
+
+      <p class="card-text text-muted small mb-0">
+        <i class="far fa-clock"></i> Dernier produit: 
+        <b>${data.lastProduit?.libelle.split(' ').slice(0, 4).join(' ') || '—'}</b>
+      </p>
+      <small class="text-secondary d-block mt-1">
+        <i class="far fa-calendar-alt"></i> 
+        ${
+          data.lastProduit?.createdAt
+            ? new Date(data.lastProduit.createdAt).toLocaleString('fr-FR')
+            : ''
+        }
+      </small>
+    </div>
+
+    <!-- الأزرار -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between mt-3 gap-2">
+      <button class="btn btn-primary btn-sm flex-fill" onclick="showUserProducts('${nameVendeur}')">
+        <i class="fas fa-eye"></i> Voir
+      </button>
+      <button class="btn btn-danger btn-sm flex-fill" onclick="deleteUserProducts('${nameVendeur}')">
+        <i class="fas fa-trash"></i> Supprimer
+      </button>
+    </div>
+  </div>
+</div>
+`;
+            container.appendChild(card);
+          });
+
+          if (Object.keys(vendeurs).length === 0) {
+            container.innerHTML = `
+        <div class="col-12 text-center text-muted mt-4">
+          <i class="fas fa-info-circle"></i> Aucun vendeur trouvé.
+        </div>`;
+          }
+        } catch (err) {
+          console.error('Erreur:', err);
+          container.innerHTML = `<div class="alert alert-danger text-center">Erreur lors du chargement des données</div>`;
+        }
+      });
+
+      // ✅ عرض منتجات بائع معيّن
+      async function showUserProducts(nameVendeur) {
+        try {
+          const res = await fetch(
+            `/api/inventairePro?nameVendeur=${encodeURIComponent(nameVendeur)}`
+          );
+          const produits = await res.json();
+          if (!produits.length) {
+            alert(`Aucun produit trouvé pour ${nameVendeur}`);
+            return;
+          }
+
+          document.getElementById('modalVendeurName').textContent = nameVendeur;
+
+          const tbody = $('#modalProductsTable tbody');
+          tbody.empty();
+
+          produits.forEach((p, i) => {
+            tbody.append(`
+        <tr>
+          <td>${p.libelle.split(' ').slice(0, 4).join(' ')}</td>
+          <td>${p.gencode}</td>
+          <td>${p.anpf}</td>
+          <td>${p.prix || '—'}</td>
+          <td>${p.qteInven || '—'}</td>
+          <td>${p.fournisseur || '—'}</td>
+          <td>${p.adresse || '—'}</td>
+          <td>${p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : ''}</td>
+        </tr>
+      `);
+          });
+
+          // 🌟 تهيئة DataTable
+          if ($.fn.dataTable && $.fn.dataTable.isDataTable('#modalProductsTable')) {
+            $('#modalProductsTable').DataTable().clear().destroy();
+          }
+
+          const table = $('#modalProductsTable').DataTable({
+            paging: true,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50, 100],
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+              {
+                extend: 'excelHtml5',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-success btn-sm',
+              },
+              {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Imprimer',
+                className: 'btn btn-secondary btn-sm',
+              },
+              {
+                extend: 'csvHtml5',
+                text: '<i class="fas fa-file-csv"></i> CSV',
+                className: 'btn btn-info btn-sm',
+              },
+            ],
+            columnDefs: [{ targets: '_all', className: 'text-center' }],
+          });
+
+          // 🌟 التحكم في الأعمدة ديناميكيًا
+          $('.column-toggle')
+            .off('change')
+            .on('change', function () {
+              const col = table.column($(this).data('column'));
+              col.visible($(this).is(':checked'));
+            });
+
+          // 🌟 فتح الـ Modal
+          const modal = new bootstrap.Modal(document.getElementById('productsModal'));
+          modal.show();
+        } catch (err) {
+          console.error('Erreur lors du fetch:', err);
+          alert('Erreur lors du chargement des produits');
+        }
+      }
+
+      // ✅ حذف جميع منتجات بائع محدد
+      async function deleteUserProducts(nameVendeur) {
+        if (!confirm(`⚠️ Voulez-vous vraiment supprimer tous les produits de ${nameVendeur} ?`))
+          return;
+
+        try {
+          // 🔹 أولاً: جلب جميع منتجات هذا البائع
+          const res = await fetch(
+            `/api/inventairePro?nameVendeur=${encodeURIComponent(nameVendeur)}`
+          );
+          const produits = await res.json();
+
+          if (!produits.length) {
+            alert(`Aucun produit trouvé pour ${nameVendeur}`);
+            return;
+          }
+
+          // 🔹 ثانياً: حذف كل منتج حسب الـ id
+          for (const prod of produits) {
+            await fetch(`/api/inventairePro/${prod._id}`, { method: 'DELETE' });
+          }
+
+          alert(`✅ Tous les produits de ${nameVendeur} ont été supprimés (${produits.length})`);
+          location.reload();
+        } catch (err) {
+          console.error(err);
+          alert('❌ Erreur lors de la suppression des produits');
+        }
+      }
+
+      // ✅ حذف جميع المنتجات من جميع المستخدمين
+      async function deleteAllProducts() {
+        if (!confirm('⚠️ Voulez-vous vraiment supprimer toutes les données de tous les vendeurs ?'))
+          return;
+
+        try {
+          const res = await fetch('/api/inventairePro', { method: 'DELETE' });
+          const result = await res.json();
+
+          if (result.success) {
+            alert(result.message || 'Toutes les données ont été supprimées');
+            location.reload();
+          } else {
+            alert('Aucune donnée supprimée');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('❌ Erreur lors de la suppression globale');
+        }
+      }
+      function filterVendeurs() {
+        const input = document.getElementById('searchVendeur').value.toLowerCase().trim();
+        const cards = document.querySelectorAll('#vendeursContainer .cards');
+
+        cards.forEach((card) => {
+          const name = card.querySelector('.badge').textContent.toLowerCase();
+          if (name.includes(input)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+    <!-- ✅ Scripts -->
+    <!-- ✅ Bootstrap 5.3.3 JS Bundle (مع Popper) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/main2.js"></script>
+  </body>
+</html>
