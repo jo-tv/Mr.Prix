@@ -589,15 +589,15 @@ app.post('/api/inventairePro', async (req, res) => {
 });
 
 // إضافة نقطة GET لعرض البيانات في صفحة HTML
-app.get('/inventairePro', (req, res) => {
+app.get('/inventairePro', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/inventairePro.html')); // ✅ صفحة فارغة مؤقتاً
 });
 
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/vendeur/dashboard.html')); // ✅ صفحة فارغة مؤقتاً
+app.get('/dashboard', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/dashboard.html')); // ✅ صفحة فارغة مؤقتاً
 });
-app.get('/listVendeurs', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/vendeur/List-Vendeurs.html')); // ✅ صفحة فارغة مؤقتاً
+app.get('/listVendeurs', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/List-Vendeurs.html')); // ✅ صفحة فارغة مؤقتاً
 });
 
 app.get('/api/inventairePro', async (req, res) => {
@@ -619,8 +619,23 @@ app.get('/api/inventairePro', async (req, res) => {
     res.status(500).send({ message: 'Error loading products', error });
   }
 });
+//جلب جميع بيانات products 
+app.get('/api/Produits', async (req, res) => {
+  try {
+    // جلب جميع المنتجات من قاعدة البيانات
+    const produits = await Product.find(); // إذا كنت تحتاج إلى تحديد بعض الحقول فقط يمكنك استخدام .select()
 
+    if (produits.length === 0) {
+      return res.status(404).json({ message: 'لا توجد منتجات في قاعدة البيانات' });
+    }
 
+    // إعادة جميع المنتجات
+    res.json(produits.length);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'حدث خطأ في الخادم' });
+  }
+});
 
 // API لتحديث منتج
 app.put('/api/inventairePro/:id', async (req, res) => {

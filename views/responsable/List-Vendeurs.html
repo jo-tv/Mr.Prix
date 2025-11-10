@@ -59,14 +59,13 @@
       .modal-body {
         padding: 1rem 1.5rem;
       }
-      .cards {
-        box-shadow:
-          rgba(0, 0, 0, 0.25) 0px 54px 55px,
-          rgba(0, 0, 0, 0.12) 0px -12px 30px,
-          rgba(0, 0, 0, 0.12) 0px 4px 6px,
-          rgba(0, 0, 0, 0.17) 0px 12px 13px,
-          rgba(0, 0, 0, 0.09) 0px -3px 5px;
+      .card {
+        background: #d1d3af83;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
         margin: 20px auto;
+        font-weight: 600;
+        font-size: 22px;
+        line-height: 35px;
       }
       .card img {
         width: 90%;
@@ -74,9 +73,6 @@
         margin: 0 auto;
         display: flex;
         justify-content: center;
-      }
-      .card {
-        background: #d1d3af83;
       }
       #searchVendeur {
         border-radius: 50px;
@@ -89,9 +85,59 @@
         border-color: #198754;
         box-shadow: 0 0 10px rgba(25, 135, 84, 0.4);
       }
+      .badge {
+        letter-spacing: 1px;
+        color: #ffff;
+      }
+    </style>
+    <style>
+      /* تصميم نافذة منبثقة */
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        min-width: 200px;
+        max-width: 550px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: bold;
+        font-size: 33px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(20px);
+        transition: all 0.4s ease;
+        z-index: 9999;
+      }
+
+      /* أنواع الرسائل */
+      .toast.success {
+        background-color: #4caf50;
+      }
+      .toast.error {
+        background-color: #f44336;
+      }
+      .toast.info {
+        background-color: #2196f3;
+      }
+      .toast.warning {
+        background-color: #eaa641;
+      }
+      /* عند الظهور */
+      .toast.show {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
     </style>
   </head>
   <body class="bg-light">
+    <!-- مكان الرسائل -->
+    <div
+      id="toast"
+      class="toast"
+    ></div>
     <!-- ✅ Navbar صغيرة -->
     <nav class="navbar navbar-dark bg-dark mb-4">
       <div class="container-fluid d-flex justify-content-between align-items-center">
@@ -116,15 +162,10 @@
           />
         </div>
       </div>
-
-      <div
-        id="vendeursContainer"
-        class="row g-4"
-      ></div>
     </div>
 
     <!-- ✅ منطقة عرض الكروت -->
-    <div class="container">
+    <div class="container-fluid">
       <div
         id="vendeursContainer"
         class="row g-4"
@@ -133,99 +174,6 @@
       </div>
     </div>
 
-    <!-- ✅ زر القائمة العائم -->
-    <div class="containeer">
-      <div class="menu-toggle">
-        <span class="fa fa-plus"></span>
-      </div>
-
-      <div class="menu-round">
-        <div class="btn-app">
-          <div class="fa">
-            <a href="calc"
-              ><i
-                class="fas fa-calculator"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div>
-        <div class="btn-app">
-          <div class="fa">
-            <a href="Album"
-              ><i
-                class="fas fa-file-image"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div>
-        <div class="btn-app">
-          <div class="fa">
-            <a href="logout"
-              ><i
-                class="fas fa-sign-out-alt"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div>
-      </div>
-
-      <div class="menu-line">
-        <div class="btn-app">
-          <div class="fa">
-            <a href="devis"
-              ><i
-                class="fas fa-file-invoice"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div>
-        <div class="btn-app">
-          <div class="fa">
-            <a href="table"
-              ><i
-                class="fas fa-search"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div>
-        <div class="btn-app">
-          <div class="fa">
-            <a href="inventaire"
-              ><i
-                class="far fa-file-excel"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div>
-        <div class="btn-app">
-          <div class="fa">
-            <a href="serchCode"
-              ><i
-                class="fas fa-question-circle"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div>
-        <div class="btn-app">
-          <div class="fa">
-            <a href="prixVen"
-              ><i
-                class="fas fa-cash-register"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Modal لعرض منتجات البائع -->
     <div
       class="modal fade"
       id="productsModal"
@@ -264,7 +212,7 @@
                 <label
                   class="form-check-label"
                   for="col1"
-                  >#</label
+                  >Libelle</label
                 >
               </div>
               <div class="form-check me-2">
@@ -278,7 +226,7 @@
                 <label
                   class="form-check-label"
                   for="col2"
-                  >Libelle</label
+                  >Gencode</label
                 >
               </div>
               <div class="form-check me-2">
@@ -287,12 +235,12 @@
                   type="checkbox"
                   data-column="2"
                   checked
-                  id="col3"
+                  id="col4"
                 />
                 <label
                   class="form-check-label"
-                  for="col3"
-                  >Gencode</label
+                  for="col4"
+                  >Anpf</label
                 >
               </div>
               <div class="form-check me-2">
@@ -400,6 +348,27 @@
         </div>
       </div>
     </div>
+
+    <!--nav FAB Button -->
+    <div class="containeer">
+      <div class="menu-toggle">
+        <span class="fa fa-plus"></span>
+      </div>
+      <div class="menu-round">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="/dashboard"
+              ><i
+                class="fa-solid fa-circle-left"
+                style="color: white"
+              ></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--fin FAB Button -->
+
     <script>
       document.addEventListener('DOMContentLoaded', async () => {
         const container = document.getElementById('vendeursContainer');
@@ -428,55 +397,61 @@
           // 🔹 إنشاء الكروت
           Object.entries(vendeurs).forEach(([nameVendeur, data]) => {
             const card = document.createElement('div');
-            card.className = 'col-md-4 col-sm-6 cards';
+            card.className = 'col-md-4 col-sm- cards';
 
             const imageURL =
               data.lastProduit?.photoVendeur ||
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKY2EVmhPJeKsUaiw1T8DLuaWz5fKNPGIEaiWivCeJUDpIdsKP0-BOAb0&amp;s=10';
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIiT2kxAd1XT1sRmBpF6UkaiTNQFnQ4LJ0-2TnCePddw&amp;s=10';
 
             card.innerHTML = `
-<div class="card shadow-sm border-0 rounded-4 h-100">
-  <div class="position-relative">
-    <img src="${imageURL}" class="card-img-top rounded-top-4" alt="${nameVendeur}" 
-         style="height: 220px; object-fit: cover;">
-    <span class="badge bg-primary position-absolute top-0 start-0 m-2 shadow-sm
-    fs-4">
-      <i class="fas fa-user-circle"></i> ${nameVendeur}
-    </span>
-  </div>
-
-  <div class="card-body d-flex flex-column justify-content-between">
-    <div>
-      <p class="card-text mb-2">
-        <i class="fas fa-boxes text-success"></i> Produits: <b>${data.produits.length}</b>
-      </p>
-
-      <p class="card-text text-muted small mb-0">
-        <i class="far fa-clock"></i> Dernier produit: 
-        <b>${data.lastProduit?.libelle.split(' ').slice(0, 4).join(' ') || '—'}</b>
-      </p>
-      <small class="text-secondary d-block mt-1">
-        <i class="far fa-calendar-alt"></i> 
-        ${
-          data.lastProduit?.createdAt
-            ? new Date(data.lastProduit.createdAt).toLocaleString('fr-FR')
-            : ''
-        }
-      </small>
-    </div>
-
-    <!-- الأزرار -->
-    <div class="d-flex flex-column flex-sm-row justify-content-between mt-3 gap-2">
-      <button class="btn btn-primary btn-sm flex-fill" onclick="showUserProducts('${nameVendeur}')">
-        <i class="fas fa-eye"></i> Voir
-      </button>
-      <button class="btn btn-danger btn-sm flex-fill" onclick="deleteUserProducts('${nameVendeur}')">
-        <i class="fas fa-trash"></i> Supprimer
-      </button>
-    </div>
-  </div>
-</div>
-`;
+        <div class="card   rounded-4 h-100">
+          <div class="position-relative">
+            <img src="${imageURL}" class="card-img-top rounded-top-4" alt="${nameVendeur}" 
+                 style="height: 220px; object-fit: cover;">
+            <span class="badge bg-primary position-absolute top-0 start-0 m-2 shadow-sm
+            fs-3">
+              <i class="fas fa-user-circle"></i> ${nameVendeur.toUpperCase()}
+            </span>
+          </div>
+        
+          <div class="card-body d-flex flex-column justify-content-between">
+            <div>
+              <p class="card-text mb-2">
+                <i class="fas fa-boxes text-success"></i> Produits: <b>${data.produits.length}</b>
+              </p>
+        
+              <p class="card-text text-muted small mb-0">
+                <i class="far fa-clock text-danger-emphasis"></i> Dernier produit: 
+                <b >${data.lastProduit?.libelle.split(' ').slice(0, 4).join(' ') || '—'}</b>
+              </p>
+              <p class="card-text text-muted small mb-0">
+                <i class="fa-solid fa-location-dot text-warning"></i> Dernier produit: 
+                <b class="text-primary fs-6">${
+                  data.lastProduit?.adresse.split(' ').slice(0, 4).join(' ') || '—'
+                }</b>
+              </p>
+              <small class="text-secondary-emphasis d-block mt-1">
+                <i class="far fa-calendar-alt text-danger"></i> 
+                ${
+                  data.lastProduit?.createdAt
+                    ? new Date(data.lastProduit.createdAt).toLocaleString('fr-FR')
+                    : ''
+                }
+              </small>
+            </div>
+        
+            <!-- الأزرار -->
+            <div class="d-flex flex-column flex-sm-row justify-content-between mt-3 gap-2">
+              <button class="btn btn-primary btn-sm flex-fill" onclick="showUserProducts('${nameVendeur}')">
+                <i class="fas fa-eye"></i> Voir
+              </button>
+              <button class="btn btn-danger btn-sm flex-fill" onclick="deleteUserProducts('${nameVendeur}')">
+                <i class="fas fa-trash"></i> Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+        `;
             container.appendChild(card);
           });
 
@@ -494,30 +469,32 @@
 
       // ✅ عرض منتجات بائع معيّن
       async function showUserProducts(nameVendeur) {
-  try {
-    const res = await fetch(`/api/inventairePro?nameVendeur=${encodeURIComponent(nameVendeur)}`);
-    const produits = await res.json();
+        try {
+          const res = await fetch(
+            `/api/inventairePro?nameVendeur=${encodeURIComponent(nameVendeur)}`
+          );
+          const produits = await res.json();
 
-    if (!produits.length) {
-      alert(`Aucun produit trouvé pour ${nameVendeur}`);
-      return;
-    }
+          if (!produits.length) {
+            showToast(`Aucun produit trouvé pour ${nameVendeur}`, 'info');
+            return;
+          }
 
-    document.getElementById('modalVendeurName').textContent = nameVendeur;
+          document.getElementById('modalVendeurName').textContent = nameVendeur;
 
-    const tbody = $('#modalProductsTable tbody');
+          const tbody = $('#modalProductsTable tbody');
 
-    // ✅ تدمير الجدول القديم إذا كان موجود
-    if ($.fn.dataTable.isDataTable('#modalProductsTable')) {
-      $('#modalProductsTable').DataTable().clear().destroy();
-    }
+          // ✅ تدمير الجدول القديم إذا كان موجود
+          if ($.fn.dataTable.isDataTable('#modalProductsTable')) {
+            $('#modalProductsTable').DataTable().clear().destroy();
+          }
 
-    // ✅ مسح المحتوى القديم
-    tbody.empty();
+          // ✅ مسح المحتوى القديم
+          tbody.empty();
 
-    // ✅ إضافة الصفوف الجديدة
-    produits.forEach((p, i) => {
-      tbody.append(`
+          // ✅ إضافة الصفوف الجديدة
+          produits.forEach((p) => {
+            tbody.append(`
         <tr>
           <td>${p.libelle.split(' ').slice(0, 4).join(' ')}</td>
           <td>${p.gencode}</td>
@@ -529,35 +506,55 @@
           <td>${p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : ''}</td>
         </tr>
       `);
-    });
+          });
 
-    // ✅ إعادة تهيئة DataTable
-    const table = $('#modalProductsTable').DataTable({
-      paging: true,
-      pageLength: 10,
-      lengthMenu: [5, 10, 25, 50, 100],
-      searching: true,
-      ordering: true,
-      info: true,
-      responsive: true,
-      dom: 'Bfrtip',
-      buttons: [
-        { extend: 'excelHtml5', text: '<i class="fas fa-file-excel"></i> Excel', className: 'btn btn-success btn-sm' },
-        { extend: 'print', text: '<i class="fas fa-print"></i> Imprimer', className: 'btn btn-secondary btn-sm' },
-        { extend: 'csvHtml5', text: '<i class="fas fa-file-csv"></i> CSV', className: 'btn btn-info btn-sm' },
-      ],
-      columnDefs: [{ targets: '_all', className: 'text-center' }],
-    });
+          // ✅ إعادة تهيئة DataTable
+          const table = $('#modalProductsTable').DataTable({
+            paging: true,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50, 100],
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+              {
+                extend: 'excelHtml5',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-success btn-sm',
+              },
+              {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Imprimer',
+                className: 'btn btn-secondary btn-sm',
+              },
+              {
+                extend: 'csvHtml5',
+                text: '<i class="fas fa-file-csv"></i> CSV',
+                className: 'btn btn-info btn-sm',
+              },
+            ],
+            columnDefs: [{ targets: '_all', className: 'text-center' }],
+          });
 
-    // 🌟 فتح الـ Modal
-    const modal = new bootstrap.Modal(document.getElementById('productsModal'));
-    modal.show();
+          // ✅ التحكم في الأعمدة ديناميكيًا بعد إعادة تهيئة الجدول
+          $('.column-toggle')
+            .off('change') // إزالة أي أحداث قديمة
+            .on('change', function () {
+              const colIndex = $(this).data('column');
+              const col = table.column(colIndex);
+              col.visible($(this).is(':checked'));
+            });
 
-  } catch (err) {
-    console.error('Erreur lors du fetch:', err);
-    alert('Erreur lors du chargement des produits');
-  }
-}
+          // 🌟 فتح الـ Modal
+          const modal = new bootstrap.Modal(document.getElementById('productsModal'));
+          modal.show();
+        } catch (err) {
+          console.error('Erreur lors du fetch:', err);
+          showToast('Erreur lors du chargement des produits', 'error');
+        }
+      }
 
       // ✅ حذف جميع منتجات بائع محدد
       async function deleteUserProducts(nameVendeur) {
@@ -572,7 +569,7 @@
           const produits = await res.json();
 
           if (!produits.length) {
-            alert(`Aucun produit trouvé pour ${nameVendeur}`);
+            showToast(`Aucun produit trouvé pour ${nameVendeur}`, 'warning');
             return;
           }
 
@@ -581,11 +578,15 @@
             await fetch(`/api/inventairePro/${prod._id}`, { method: 'DELETE' });
           }
 
-          alert(`✅ Tous les produits de ${nameVendeur} ont été supprimés (${produits.length})`);
+          showToast(
+            `✅ Tous les produits de ${nameVendeur} ont été supprimés
+          (${produits.length})`,
+            'success'
+          );
           location.reload();
         } catch (err) {
           console.error(err);
-          alert('❌ Erreur lors de la suppression des produits');
+          showToast('❌ Erreur lors de la suppression des produits', 'error');
         }
       }
 
@@ -599,28 +600,52 @@
           const result = await res.json();
 
           if (result.success) {
-            alert(result.message || 'Toutes les données ont été supprimées');
+            showToast(result.message || 'Toutes les données ont été supprimées', 'success');
             location.reload();
           } else {
-            alert('Aucune donnée supprimée');
+            showToast('Aucune donnée supprimée', 'warning');
           }
         } catch (err) {
           console.error(err);
-          alert('❌ Erreur lors de la suppression globale');
+          showToast('❌ Erreur lors de la suppression globale', 'error');
         }
       }
+
       function filterVendeurs() {
         const input = document.getElementById('searchVendeur').value.toLowerCase().trim();
         const cards = document.querySelectorAll('#vendeursContainer .cards');
+
+        let found = 0;
 
         cards.forEach((card) => {
           const name = card.querySelector('.badge').textContent.toLowerCase();
           if (name.includes(input)) {
             card.style.display = '';
+            found++;
           } else {
             card.style.display = 'none';
           }
         });
+
+        // ✅ رسالة بعد انتهاء البحث
+        if (input === '') {
+          showToast('🔍 Veuillez entrer un nom à rechercher.', 'warning');
+        } else if (found > 0) {
+          showToast(`✅ ${found} vendeur(s) trouvé(s).`, 'success');
+        } else {
+          showToast('❌ Aucun vendeur trouvé.', 'error');
+        }
+      }
+
+      // دالة عرض الرسالة
+      function showToast(message, type = '', duration = 3000) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast ${type} show`;
+
+        setTimeout(() => {
+          toast.className = `toast ${type}`;
+        }, duration);
       }
     </script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>

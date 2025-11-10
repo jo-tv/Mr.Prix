@@ -9,6 +9,10 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="css/navb.css"
+    />
 
     <!-- DataTables -->
     <link
@@ -19,36 +23,48 @@
     <!-- FontAwesome -->
 
     <style>
-      body {
-        background: #f8f9fa;
-      }
-
-      .dashboard-header {
-        margin-top: 20px;
-      }
-
-      .card {
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-      }
-
-      .card i {
-        font-size: 2rem;
-      }
-
-      .data-section {
-        margin-top: 30px;
-      }
-
-      @media (max-width: 768px) {
-        .card i {
-          font-size: 1.5rem;
+      html,
+        body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
         }
-      .chart {
-        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        body {
+          background: #f8f9fa;
+        }
+         .chart-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
+
+        .dashboard-header {
+          margin-top: 20px;
+        }
+
+        .card {
+          border: none;
+          border-radius: 15px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        }
+
+        .card i {
+          font-size: 2rem;
+        }
+
+        .data-section {
+          margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+          .card i {
+            font-size: 1.5rem;
+          }
+        .chart {
+          box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        }
     </style>
   </head>
 
@@ -85,17 +101,9 @@
 
         <div class="col-md-3 col-6 mb-3">
           <div class="card text-bg-warning p-3">
-            <i class="fas fa-boxes-stacked mb-2"></i>
+            <i class="fa-solid fa-at"></i>
             <h5>N° Adress</h5>
             <h3 id="adressCount">0 / 700</h3>
-          </div>
-        </div>
-
-        <div class="col-md-3 col-6 mb-3">
-          <div class="card text-bg-info p-3">
-            <i class="fas fa-coins mb-2"></i>
-            <h5>Valeur Totale</h5>
-            <h3 id="totalValue">0 DH</h3>
           </div>
         </div>
 
@@ -113,11 +121,12 @@
         <div class="card chart border-0 rounded-4">
           <div class="card-body">
             <h5 class="card-title text-center mb-4">
-              <i class="fas fa-chart-bar text-primary"></i> Top 10 vendeurs par nombre de produits
+              <i class="fas fa-map-marker-alt text-success"></i>
+              Statistiques des adresses utilisées
             </h5>
             <div style="height: 400px; overflow-x: auto">
               <canvas
-                id="vendeurChart"
+                id="adressChart"
                 style="max-height: 400px; width: 100%"
               ></canvas>
             </div>
@@ -128,12 +137,24 @@
         <div class="card chart border-0 rounded-4">
           <div class="card-body">
             <h5 class="card-title text-center mb-4">
-              <i class="fas fa-map-marker-alt text-success"></i>
-              Statistiques des adresses utilisées
+              <i class="fas fa-chart-bar text-primary"></i> Comparaison des adresses réelles et de
+              l’objectif par rayon
+            </h5>
+            <div class="chart-container">
+              <canvas id="rayonChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid my-5">
+        <div class="card chart border-0 rounded-4">
+          <div class="card-body">
+            <h5 class="card-title text-center mb-4">
+              <i class="fas fa-chart-bar text-primary"></i> Top 10 vendeurs par nombre de produits
             </h5>
             <div style="height: 400px; overflow-x: auto">
               <canvas
-                id="adressChart"
+                id="vendeurChart"
                 style="max-height: 400px; width: 100%"
               ></canvas>
             </div>
@@ -164,6 +185,93 @@
         </div>
       </div>
     </div>
+
+    <!--nav FAB Button -->
+    <div
+      class="containeer"
+      style="zoom: 1.7"
+    >
+      <div class="menu-toggle">
+        <span class="fa fa-plus"></span>
+      </div>
+
+      <div class="menu-round">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="galerie"
+              ><i
+                class="fas fa-file-image"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="upload"
+              ><i
+                class="fas fa-file-arrow-up"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="logout"
+              ><i
+                class="fas fa-sign-out-alt"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-line">
+        <div class="btn-app">
+          <div class="fa">
+            <a href="CHERCHER"
+              ><i
+                class="fas fa-search"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="/dashboard"
+              ><i
+                class="fa-solid fa-chart-line"
+                style="color: white"
+              ></i>
+            </a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="cmd"
+              ><i
+                class="far fa-file-excel"
+                style="color: white"
+              ></i
+            ></a>
+          </div>
+        </div>
+        <div class="btn-app">
+          <div class="fa">
+            <a href="prix"
+              ><i
+                class="fas fa-cash-register"
+                style="color: white"
+              ></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--fin FAB Button -->
 
     <!-- JS Libraries (ترتيب التحميل مهم) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -200,6 +308,7 @@
         try {
           // جلب البيانات مرة واحدة
           const resp = await fetch('/api/inventairePro');
+
           if (!resp.ok) throw new Error('HTTP ' + resp.status);
           const produits = await resp.json();
 
@@ -214,14 +323,71 @@
           const adressesUnique = Array.from(
             new Set(produits.map((p) => p.adresse).filter(Boolean))
           );
-          document.getElementById('adressCount').textContent = `${adressesUnique.length} / 700`;
 
           // عدد المنتجات
           document.getElementById('productsCount').textContent = produits.length;
 
-          // القيمة الإجمالية
-          const totalValue = produits.reduce((s, p) => s + (parseFloat(p.prix) || 0), 0);
-          document.getElementById('totalValue').textContent = totalValue.toFixed(2) + ' DH';
+          const ctx = document.getElementById('rayonChart').getContext('2d');
+
+          // 🔹 تعريف الحروف الخاصة بكل Rayon
+          const rayons = {
+            Électricité: { regex: /^E-/i, objectif: 80 },
+            Jardin: { regex: /^J-/i, objectif: 40 },
+            Sanitaire: { regex: /^S-/i, objectif: 60 },
+            Outillage: { regex: /^O-/i, objectif: 70 },
+            Qankiri: { regex: /^Q-/i, objectif: 30 },
+            Bois: { regex: /^B-/i, objectif: 50 },
+            Décorations: { regex: /^D-/i, objectif: 45 },
+          };
+
+          // 🔹 حساب عدد العناوين لكل rayon من قاعدة البيانات
+          const rayonNames = Object.keys(rayons);
+          const rayonCounts = rayonNames.map(
+            (rayon) =>
+              produits.filter((p) => p.adresse && rayons[rayon].regex.test(p.adresse)).length
+          );
+
+          // 🔹 استخراج الأهداف المخصصة
+          const rayonObjectifs = rayonNames.map((rayon) => rayons[rayon].objectif);
+
+          // 🔹 إعداد المبيان
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: rayonNames,
+              datasets: [
+                {
+                  label: 'Objectif par rayon',
+                  data: rayonObjectifs,
+                  backgroundColor: '#0ba360',
+                },
+                {
+                  label: 'Adresses réelles',
+                  data: rayonCounts,
+                  backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: { display: true, text: "Nombre d'adresses" },
+                },
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Comparaison des adresses réelles et de l’objectif par rayon',
+                  font: { size: 18 },
+                },
+                legend: { position: 'bottom' },
+              },
+            },
+          });
+
+          document.getElementById('adressCount').textContent = `${adressesUnique.length} / 700`;
 
           // --- عناوين مشتركة (group by adresse) ---
           const groupedByAdresse = {};
@@ -361,6 +527,8 @@
 
           const ctxA = document.getElementById('adressChart')?.getContext('2d');
           if (ctxA) {
+            const totalAdresses = 700; // العدد الإجمالي
+            const percentageUsed = ((adresseCount / totalAdresses) * 100).toFixed(2); // النسبة المئوية
             window._charts.adress = new Chart(ctxA, {
               type: 'bar',
               data: {
@@ -368,7 +536,7 @@
                 datasets: [
                   {
                     label: 'Adresses',
-                    data: [adresseCount, 700],
+                    data: [adresseCount, totalAdresses],
                     backgroundColor: ['#2575fc', '#4facfe'],
                     borderColor: ['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.15)'],
                     borderWidth: 1,
@@ -376,21 +544,38 @@
                 ],
               },
               options: {
-                indexAxis: 'y', // يجعل الأعمدة أفقية
+                indexAxis: 'y', // الأعمدة أفقية
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
                   x: {
                     beginAtZero: true,
-                    max: 700,
-                    ticks: { stepSize: Math.max(1, Math.ceil(700 / 7)) }, // خطوة مقاربة
+                    max: totalAdresses,
+                    ticks: { stepSize: Math.max(1, Math.ceil(totalAdresses / 7)) }, // خطوة مقاربة
                   },
                   y: { grid: { display: false } },
                 },
                 plugins: {
                   legend: { display: false },
-                  title: { display: true, text: 'Utilisation des adresses (sur 700)' },
-                  tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.x} adresses` } },
+                  title: {
+                    display: true,
+                    // عرض النسبة المئوية في العنوان
+                    text: `Utilisation des adresses (sur ${totalAdresses}) - ${percentageUsed}% utilisés`,
+                    font: {
+                      size: 16,
+                      weight: 'bold', // جعل النص عريضًا
+                    },
+                    color: '#2575fc', // اللون الأزرق للنسبة المئوية
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: (ctx) => {
+                        const value = ctx.parsed.x;
+                        const percentage = ((value / totalAdresses) * 100).toFixed(2);
+                        return `${value} adresses (${percentage}%)`;
+                      },
+                    },
+                  },
                 },
               },
             });
@@ -415,5 +600,7 @@
       // تحديث البيانات كل 5 ثواني
       //setInterval(initDashboard, 5000);
     </script>
+
+    <script src="js/main2.js"></script>
   </body>
 </html>

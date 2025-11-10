@@ -7,6 +7,7 @@ const scanBtn = document.querySelector('#scanBtn');
 const input = document.getElementById('textSearch');
 const searchBtn = document.getElementById('searchBtn');
 const nameInput = document.getElementById('nameVendeur');
+const inputAdress = document.getElementById('adresse');
 
 // 🔉 صوت المسح
 const beepSound = new Audio('/sounds/beep.mp3'); // ضع الصوت في مجلدك إن أردت
@@ -24,11 +25,24 @@ nameInput.addEventListener('input', () => {
   }
 });
 
+inputAdress.addEventListener('input', () => {
+  let adresseInv = inputAdress.value.trim().toUpperCase(); // حذف المسافات وتحويل إلى حروف صغيرة
+  if (adresseInv) {
+    localStorage.setItem('adresseInv', adresseInv);
+  } else {
+    localStorage.removeItem('adresseInv');
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   const savedName = localStorage.getItem('nameVendeur');
+  const savedAdress = localStorage.getItem('adresseInv');
   if (savedName) {
-    document.getElementById('nameVendeur').value = savedName.toLowerCase().trim();
-    document.getElementById('nomFichier').value = savedName.toLowerCase().trim();
+    document.getElementById('nameVendeur').value = savedName.toLowerCase().trim() || '';
+    document.getElementById('nomFichier').value = savedName.toLowerCase().trim() || '';
+  }
+  if (savedAdress) {
+    document.getElementById('adresse').value = savedAdress.toUpperCase().trim() || '';
   }
   loadProductsFromDatabase();
   setupEventListeners();
@@ -163,7 +177,7 @@ async function searchProduct() {
     document.getElementById('fournisseur').value = p.FOURNISSEUR_P;
     document.getElementById('stock').value = p.STOCK;
     document.getElementById('prix').value = p.PV_TTC;
-    document.getElementById('nameVendeur').value = localStorage.nameVendeur;
+    document.getElementById('nameVendeur').value = localStorage.nameVendeur || '';
     document.getElementById('productForm').style.display = 'block';
     showToast('✅ Produit trouvé et chargé avec succès. 🛍️', 'success');
   } catch (error) {
@@ -175,7 +189,13 @@ async function searchProduct() {
 // ====================
 // إضافة منتج جديد
 // ====================
+
 async function addProduct() {
+  // 🔹 منع الضغط المتكرر
+  if (ajouterBtn.disabled) return;
+  ajouterBtn.disabled = true;
+  ajouterBtn.textContent = 'Enregistrement...';
+
   const product = {
     libelle: document.getElementById('libelle').value.trim(),
     gencode: document.getElementById('gencode').value.trim(),
@@ -184,12 +204,23 @@ async function addProduct() {
     stock: document.getElementById('stock').value.trim(),
     prix: document.getElementById('prix').value.trim(),
     qteInven: document.getElementById('qteInven').value.trim(),
-    adresse: document.getElementById('adresse').value.trim(),
+    adresse: document.getElementById('adresse').value.trim().toUpperCase(), // الحروف الكبيرة
     nameVendeur: document.getElementById('nameVendeur').value.toLowerCase().trim(),
   };
 
-  if (!product.libelle || !product.gencode || !product.anpf || !product.nameVendeur)
-    return showToast('⚠️ Tous les champs sont obligatoires 🆔', 'warning');
+  if (
+    !product.libelle ||
+    !product.gencode ||
+    !product.anpf ||
+    !product.adresse ||
+    !product.qteInven ||
+    !product.nameVendeur
+  ) {
+    showToast('⚠️ Tous les champs sont obligatoires 🆔', 'warning');
+    ajouterBtn.disabled = false;
+    ajouterBtn.textContent = 'Ajouter le produit';
+    return;
+  }
 
   try {
     const response = await fetch('/api/inventairePro', {
@@ -198,16 +229,24 @@ async function addProduct() {
       body: JSON.stringify(product),
     });
 
-    if (!response.ok) throw new Error("Échec de l'ajout du produit", 'error');
+    if (!response.ok) throw new Error("Échec de l'ajout du produit");
+
     const addedProduct = await response.json();
+
     document.getElementById('productForm').style.display = 'none';
-    input.value = '';
+
+    // 🔹 إذا كان لديك input محدد للتفريغ، يجب تعريفه أو استخدام productForm.reset()
     addProductToTable(addedProduct);
-    resetProductForm();
+    clearForm();
+
     showToast('✅ Produit 🛍️ ajouté avec succès', 'success');
   } catch (error) {
     console.error('Error adding product:', error);
     showToast("❌ Une erreur est survenue lors de l'ajout du produit", 'error');
+  } finally {
+    // 🔹 إعادة تفعيل الزر بعد انتهاء العملية
+    ajouterBtn.disabled = false;
+    ajouterBtn.textContent = 'Ajouter le produit';
   }
 }
 
@@ -227,7 +266,7 @@ function addProductToTable(product) {
     <td><i class="fa fa-truck text-orange"></i> ${product.fournisseur}</td>
     <td class="price"><i class="fa fa-tags text-green"></i> <strong>${product.prix} DH</strong></td>
     <td><i class="fa fa-cubes text-teal"></i> ${product.qteInven || '0'}</td>
-    <td><i class="fa fa-map-marker-alt text-red"></i> ${product.adresse || '!'}</td>
+    <td><i class="fa fa-map-marker-alt text-red"></i> ${product.adresse.toUpperCase() || '!'}</td>
     <td class="actions">
       <button class="btnRed" onclick="removeProduct(this)"><i class="fa fa-trash"></i> Supprimer</button>
       <button class="btnBlue" onclick="editProduct(this)"><i class="fa fa-edit"></i> Modifier</button>
@@ -298,7 +337,7 @@ async function saveProductChanges() {
     fournisseur: document.getElementById('editFour').value.trim(),
     prix: parseFloat(document.getElementById('editPrice').value) || 0,
     qteInven: document.getElementById('editQteInven').value.trim(),
-    adresse: document.getElementById('editAdresse').value.trim(),
+    adresse: document.getElementById('editAdresse').value.trim().toUpperCase(),
   };
 
   try {
@@ -336,7 +375,7 @@ async function saveProductChanges() {
           <i class="fa fa-cubes text-teal"></i> ${updatedProduct.qteInven || '0'}
         </td>
         <td>
-          <i class="fa fa-map-marker-alt text-red"></i> ${updatedProduct.adresse || '!'}
+          <i class="fa fa-map-marker-alt text-red"></i> ${updatedProduct.adresse.toUpperCase() || '!'}
         </td>
         <td class="actions">
           <button class="btnRed" onclick="removeProduct(this)">
@@ -490,6 +529,7 @@ function clearTableVendeur() {
   if (confirm('هل أنت متأكد من مسح جميع البيانات؟')) {
     localStorage.clear();
     showToast('🧹 Données effacées avec succès', 'success');
+    window.location.reload();
   }
 }
 // 🧠 وظيفة البحث المحلي
@@ -502,7 +542,7 @@ document.getElementById('searchLocal').addEventListener('input', function () {
     const gencode = row.children[1]?.textContent.toLowerCase() || '';
     const anpf = row.children[2]?.textContent.toLowerCase() || '';
     const fournisseur = row.children[3]?.textContent.toLowerCase() || '';
-    const adresse = row.children[7]?.textContent.toLowerCase() || '';
+    const adresse = row.children[6]?.textContent.toLowerCase() || '';
 
     const match =
       gencode.includes(searchTerm) ||
@@ -523,6 +563,17 @@ document.getElementById('searchLocal').addEventListener('input', function () {
     showToast(`✅ ${visibleCount} résultat(s) trouvé(s)`, 'success');
   }
 });
+
+function clearForm() {
+  document.getElementById('textSearch').value = '';
+  document.getElementById('libelle').value = '';
+  document.getElementById('gencode').value = '';
+  document.getElementById('anpf').value = '';
+  document.getElementById('fournisseur').value = '';
+  document.getElementById('stock').value = '';
+  document.getElementById('prix').value = '';
+  document.getElementById('qteInven').value = '';
+}
 
 // دالة عرض الرسالة
 function showToast(message, type = '', duration = 3000) {
