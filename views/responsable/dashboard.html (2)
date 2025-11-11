@@ -289,6 +289,7 @@
     <!-- <canvas id="adressChart"></canvas> -->
 
     <script>
+      const totalProducrs = 66.636;
       /* === Helpers & Globals === */
       function escapeHtml(unsafe) {
         if (unsafe == null) return '';
@@ -308,6 +309,7 @@
         try {
           // جلب البيانات مرة واحدة
           const resp = await fetch('/api/inventairePro');
+
           if (!resp.ok) throw new Error('HTTP ' + resp.status);
           const produits = await resp.json();
 
@@ -322,6 +324,10 @@
           const adressesUnique = Array.from(
             new Set(produits.map((p) => p.adresse).filter(Boolean))
           );
+
+          // عدد المنتجات
+          document.getElementById('productsCount').textContent =
+            produits.length + ' / ' + totalProducrs;
 
           const ctx = document.getElementById('rayonChart').getContext('2d');
 
@@ -385,9 +391,6 @@
 
           document.getElementById('adressCount').textContent = `${adressesUnique.length} / 700`;
 
-          // عدد المنتجات
-          document.getElementById('productsCount').textContent = produits.length;
-
           // --- عناوين مشتركة (group by adresse) ---
           const groupedByAdresse = {};
           for (const p of produits) {
@@ -415,12 +418,12 @@
           tbody.innerHTML = sharedEntries
             .map(
               (row) => `
-        <tr>
-          <td>${escapeHtml(row.adresse)}</td>
-          <td>${escapeHtml(row.vendeurs.join(', '))}</td>
-          <td>${row.vendeursCount}</td>
-        </tr>
-      `
+          <tr>
+            <td>${escapeHtml(row.adresse)}</td>
+            <td>${escapeHtml(row.vendeurs.join(', '))}</td>
+            <td>${row.vendeursCount}</td>
+          </tr>
+        `
             )
             .join('');
 

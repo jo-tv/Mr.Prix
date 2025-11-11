@@ -619,18 +619,14 @@ app.get('/api/inventairePro', async (req, res) => {
     res.status(500).send({ message: 'Error loading products', error });
   }
 });
-//جلب جميع بيانات products 
+//جلب جميع بيانات products
 app.get('/api/Produits', async (req, res) => {
   try {
-    // جلب جميع المنتجات من قاعدة البيانات
-    const produits = await Product.find(); // إذا كنت تحتاج إلى تحديد بعض الحقول فقط يمكنك استخدام .select()
+    // جلب عدد المنتجات فقط
+    const produitsCount = await Product.countDocuments(); // بدلاً من find()
 
-    if (produits.length === 0) {
-      return res.status(404).json({ message: 'لا توجد منتجات في قاعدة البيانات' });
-    }
-
-    // إعادة جميع المنتجات
-    res.json(produits.length);
+    // إرجاع العدد
+    res.json({ count: produitsCount });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'حدث خطأ في الخادم' });

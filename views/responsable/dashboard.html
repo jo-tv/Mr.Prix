@@ -57,6 +57,17 @@
         .data-section {
           margin-top: 30px;
         }
+        .hh{
+          margin-bottom: 150px;
+        }
+         #sharedTable tr td,
+         #sharedTable tr th{
+          font-size :20px;
+          text-align: center;
+          font-weight: 700;
+          vertical-align: center;
+        }
+
 
         @media (max-width: 768px) {
           .card i {
@@ -107,7 +118,7 @@
           </div>
         </div>
 
-        <div class="col-md-3 col-6 mb-3">
+        <div class="col-md-3 col-6 mb-3 Adresses">
           <div class="card text-bg-danger p-3">
             <i class="fas fa-map-marker-alt mb-2"></i>
             <h5>Adresses partagées</h5>
@@ -129,6 +140,19 @@
                 id="adressChart"
                 style="max-height: 400px; width: 100%"
               ></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid my-5">
+        <div class="card chart border-0 rounded-4">
+          <div class="card-body">
+            <h5 class="card-title text-center mb-4">
+              <i class="fas fa-chart-bar text-primary"></i> Comparaison entre le nombre total de
+              produits et les produits extraits
+            </h5>
+            <div class="chart-container">
+              <canvas id="countProduct"></canvas>
             </div>
           </div>
         </div>
@@ -163,7 +187,7 @@
       </div>
 
       <!-- Tableau des adresses partagées -->
-      <div class="data-section">
+      <div class="data-section hh">
         <div class="card p-3">
           <h5 class="mb-3"><i class="fas fa-location-dot text-danger"></i> Adresses partagées</h5>
           <div class="table-responsive">
@@ -283,6 +307,7 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
     <!-- تأكّد من وجود هذه الـ canvases في HTML -->
     <!-- <canvas id="vendeurChart"></canvas> -->
@@ -308,9 +333,11 @@
         try {
           // جلب البيانات مرة واحدة
           const resp = await fetch('/api/inventairePro');
+          const response = await fetch('/api/Produits');
 
           if (!resp.ok) throw new Error('HTTP ' + resp.status);
           const produits = await resp.json();
+          const data = await response.json();
 
           // --- إحصائيات عامة ---
           // بائعين فريدين
@@ -325,7 +352,115 @@
           );
 
           // عدد المنتجات
-          document.getElementById('productsCount').textContent = produits.length;
+          document.getElementById('productsCount').textContent =
+            produits.length + ' / ' + data.count;
+
+          const ctxB = document.getElementById('countProduct').getContext('2d');
+
+          // أمثلة: عوّض هذه القيم من مصدر بياناتك الحقيقي
+          let dataCount = produits.length || 0; // عدد المنتجات المستخرجة
+          let produitsLength = data?.count || 0; // العدد الكلي الذي قارنته به (تأكد من مصدره)
+
+          // حماية: لا تسمح بقيم سالبة أو تجاوز منطق
+          if (produitsLength < 0) produitsLength = 0;
+          if (dataCount < 0) dataCount = 0;
+          if (dataCount > produitsLength) {
+            // إذا كانت القيمة المستخرجة أكبر من الإجمالي (بيانات غير متناسقة)، نضبطها
+            dataCount = produitsLength;
+          }
+
+          // نحسب الباقي ليصبح الرسم يعكس الحصة مقابل الإجمالي
+          const remainder = produitsLength - dataCount;
+
+          // نسبة مئوية محمية (0..100)
+          const dataCountPercentage = produitsLength > 0 ? (dataCount / produitsLength) * 100 : 0;
+
+          // إضافة مخصصة لعرض النص في الوسط (Chart.js v3+ compatible)
+          const centerText = {
+            id: 'centerText',
+            beforeDraw: (chart) => {
+              const { ctx, chartArea } = chart;
+              if (!chartArea) return; // حماية إذا لم تُحمَّل المساحة بعد
+              ctx.save();
+
+              // مركز الرسم من chartArea (أكثر ثباتًا من استخدام datapoint.x/y)
+              const centerX = (chartArea.left + chartArea.right) / 2;
+              const centerY = (chartArea.top + chartArea.bottom) / 2;
+
+              // إعدادات نص قابلة للتعديل
+              const percentText = `${dataCountPercentage.toFixed(2)}%`;
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+
+              // خط أكبر للنسبة
+              ctx.font = 'bold 44px Arial';
+              // نغير لون النص الرئيسي بحسب الحالة (مثال: أحمر عندما 100%)
+              ctx.fillStyle = dataCountPercentage >= 100 ? '#FF4D4D' : '#333333';
+              ctx.fillText(percentText, centerX, centerY - 10);
+
+              // خط أصغر للوصف
+              ctx.font = '16px Arial';
+              ctx.fillStyle = '#666';
+              ctx.fillText('Part de produits extraits', centerX, centerY + 24);
+
+              ctx.restore();
+            },
+          };
+
+          // ألوان: لون رئيسي للجزء المأخوذ، ولون رمادي للباقي
+          const mainColor = '#FF6384';
+          const remainderColor = '#7062da';
+
+          // بيانات الرسم: نمرّر [taken, remaining]
+          const chartData = [dataCount, remainder];
+
+          const myChart = new Chart(ctxB, {
+            type: 'doughnut',
+            data: {
+              labels: ['Extraits', 'Reste'],
+              datasets: [
+                {
+                  data: chartData,
+                  backgroundColor: [mainColor, remainderColor],
+                  hoverBackgroundColor: [mainColor, remainderColor],
+                  borderWidth: 0,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              cutout: '68%', // سمك الحلقة - عدّله حسب التصميم
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                },
+                title: {
+                  display: true,
+                  text: 'Comparaison entre produitsLength et dataCount',
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      const value = context.raw;
+                      const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                      const perc = total > 0 ? ((value / total) * 100).toFixed(2) : '0.00';
+                      return `${context.label}: ${value} (${perc}%)`;
+                    },
+                  },
+                },
+                // عطل أي امتدادات datalabels إذا كانت موجودة لتجنب التداخل
+                datalabels: {
+                  display: false,
+                },
+              },
+              // حماية: منع السلوك الافتراضي إذا لم توجد بيانات
+              onHover: (e, activeEls) => {
+                // مثال: لو تريد تغيير مؤشر الفأرة عندما تقف فوق جزء
+                e.native.target.style.cursor = activeEls.length ? 'pointer' : 'default';
+              },
+            },
+            plugins: [centerText],
+          });
 
           const ctx = document.getElementById('rayonChart').getContext('2d');
 
@@ -416,12 +551,12 @@
           tbody.innerHTML = sharedEntries
             .map(
               (row) => `
-        <tr>
-          <td>${escapeHtml(row.adresse)}</td>
-          <td>${escapeHtml(row.vendeurs.join(', '))}</td>
-          <td>${row.vendeursCount}</td>
-        </tr>
-      `
+          <tr>
+            <td class="text-bg-danger">${escapeHtml(row.adresse)}</td>
+            <td class="text-bg-primary">${escapeHtml(row.vendeurs.join(' ; ').toUpperCase())}</td>
+            <td class="text-bg-danger">${row.vendeursCount}</td>
+          </tr>
+        `
             )
             .join('');
 
@@ -526,6 +661,7 @@
           }
 
           const ctxA = document.getElementById('adressChart')?.getContext('2d');
+
           if (ctxA) {
             const totalAdresses = 700; // العدد الإجمالي
             const percentageUsed = ((adresseCount / totalAdresses) * 100).toFixed(2); // النسبة المئوية
@@ -562,7 +698,7 @@
                     // عرض النسبة المئوية في العنوان
                     text: `Utilisation des adresses (sur ${totalAdresses}) - ${percentageUsed}% utilisés`,
                     font: {
-                      size: 16,
+                      size: 24,
                       weight: 'bold', // جعل النص عريضًا
                     },
                     color: '#2575fc', // اللون الأزرق للنسبة المئوية
@@ -592,6 +728,10 @@
 
       document.querySelector('.usersCount').addEventListener('click', () => {
         window.location.href = '/listVendeurs';
+      });
+      document.querySelector('.Adresses').addEventListener('click', () => {
+        window.location.href = '#sharedTable';
+        console.log('hello');
       });
 
       /* شغّل التحميل مرة واحدة عند انتهاء البناء */
