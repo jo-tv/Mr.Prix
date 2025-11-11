@@ -1,4 +1,5 @@
 <!doctype html>
+<!doctype html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
@@ -88,6 +89,19 @@
       .badge {
         letter-spacing: 1px;
         color: #ffff;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center; /* توسيط أفقي */
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      table td,
+      table th {
+        vertical-align: middle; /* توسيط عمودي */
+        padding: 8px; /* مسافة بسيطة داخل الخلية */
       }
     </style>
     <style>
@@ -263,12 +277,12 @@
                   type="checkbox"
                   data-column="4"
                   checked
-                  id="col5"
+                  id="col4"
                 />
                 <label
                   class="form-check-label"
-                  for="col5"
-                  >Quantité</label
+                  for="col4"
+                  >Stock Système</label
                 >
               </div>
               <div class="form-check me-2">
@@ -276,6 +290,34 @@
                   class="form-check-input column-toggle"
                   type="checkbox"
                   data-column="5"
+                  checked
+                  id="col5"
+                />
+                <label
+                  class="form-check-label"
+                  for="col5"
+                  >Quantité Physique</label
+                >
+              </div>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="6"
+                  checked
+                  id="col5"
+                />
+                <label
+                  class="form-check-label"
+                  for="col5"
+                  >Écart d’Inventaire</label
+                >
+              </div>
+              <div class="form-check me-2">
+                <input
+                  class="form-check-input column-toggle"
+                  type="checkbox"
+                  data-column="7"
                   checked
                   id="col6"
                 />
@@ -289,7 +331,7 @@
                 <input
                   class="form-check-input column-toggle"
                   type="checkbox"
-                  data-column="6"
+                  data-column="8"
                   checked
                   id="col7"
                 />
@@ -303,7 +345,7 @@
                 <input
                   class="form-check-input column-toggle"
                   type="checkbox"
-                  data-column="7"
+                  data-column="9"
                   checked
                   id="col8"
                 />
@@ -326,7 +368,9 @@
                     <th>Gencode</th>
                     <th>Anpf</th>
                     <th>Prix</th>
-                    <th>Quantité</th>
+                    <th>Stock Système</th>
+                    <th>Quantité Physique</th>
+                    <th>Écart d’Inventaire</th>
                     <th>Fournisseur</th>
                     <th>Adresse</th>
                     <th>Date d'ajout</th>
@@ -494,18 +538,38 @@
 
           // ✅ إضافة الصفوف الجديدة
           produits.forEach((p) => {
-            tbody.append(`
-        <tr>
-          <td>${p.libelle.split(' ').slice(0, 4).join(' ')}</td>
-          <td>${p.gencode}</td>
-          <td>${p.anpf}</td>
-          <td>${p.prix || '—'}</td>
-          <td>${p.qteInven || '—'}</td>
-          <td>${p.fournisseur || '—'}</td>
-          <td>${p.adresse || '—'}</td>
-          <td>${p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : ''}</td>
-        </tr>
-      `);
+            // تحويل القيم إلى أرقام صحيحة (مع التعامل مع القيم الفارغة)
+            const stock = parseFloat(p.stock) || 0;
+            const qteInven = parseFloat(p.qteInven) || 0;
+
+            // حساب الفرق
+            const totalInven = qteInven - stock;
+
+            // تحديد لون الخلفية حسب النتيجة
+            let bgColor = '';
+            if (totalInven < 0) {
+              bgColor = 'background-color: #dc3545; color: white;'; // أحمر وأبيض للنقص
+            } else if (totalInven === 0) {
+              bgColor = 'background-color: #f8f9fa;'; // رمادي فاتح عادي
+            } else {
+              bgColor = 'background-color: #198754; color: white;'; // أخضر وأبيض للزيادة
+            }
+
+            // إنشاء الصف وإضافته
+            tbody.prepend(`
+                <tr>
+                  <td>${p.libelle.split(' ').slice(0, 4).join(' ')}</td>
+                  <td>${p.gencode}</td>
+                  <td>${p.anpf}</td>
+                  <td>${p.prix || '—'}</td>
+                  <td>${stock}</td>
+                  <td>${qteInven}</td>
+                  <td style="${bgColor}">${totalInven}</td>
+                  <td>${p.fournisseur || '—'}</td>
+                  <td>${p.adresse || '—'}</td>
+                  <td>${p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : ''}</td>
+                </tr>
+              `);
           });
 
           // ✅ إعادة تهيئة DataTable
@@ -517,7 +581,7 @@
             ordering: true,
             info: true,
             responsive: true,
-            dom: 'Bfrtip',
+            dom: 'Blfrtip',
             buttons: [
               {
                 extend: 'excelHtml5',
