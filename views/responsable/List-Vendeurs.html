@@ -399,7 +399,7 @@
         <span class="fa fa-plus"></span>
       </div>
       <div class="menu-round">
-        <div class="btn-app">
+        <div class="btn-app" data-label="Dashboard">
           <div class="fa">
             <a href="/dashboard"
               ><i
@@ -525,6 +525,7 @@
           }
 
           document.getElementById('modalVendeurName').textContent = nameVendeur;
+          document.querySelector('title').textContent = nameVendeur;
 
           const tbody = $('#modalProductsTable tbody');
 

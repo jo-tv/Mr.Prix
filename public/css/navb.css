@@ -110,3 +110,38 @@
 .menu-line.open .btn-app:nth-of-type(7) {
   bottom: 25.25em;
 }
+.btn-app {
+  width: 2.5em;
+  height: 2.5em;
+  border-radius: 50%;
+  position: absolute;
+  background-color: #4644fd;
+  color: #fff;
+  text-align: center;
+  margin: 5px auto;
+  cursor: pointer;
+}
+
+/* النص عند المرور */
+.btn-app::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 110%; /* النص يظهر بجانب الأيقونة */
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 0.8rem;
+  padding: 5px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.3s, right 0.3s;
+}
+
+/* عند الـ hover */
+.btn-app:hover::after {
+  opacity: 1;
+  right: 130%;
+}
