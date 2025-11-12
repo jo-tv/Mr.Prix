@@ -120,7 +120,7 @@ async function loadProductsFromDatabase() {
     }
 
     // كل شيء تمام — عرض المنتجات
-    products.forEach(addProductToTable);
+    products.reverse().forEach(addProductToTable);
     showToast(`✅ ${products.length} produit(s) chargé(s) avec succès`, 'success');
   } catch (err) {
     // تمييز الخطأ إذا كان نتيجة timeout/abort
@@ -266,13 +266,21 @@ function addProductToTable(product) {
     <td><i class="fa fa-truck text-orange"></i> ${product.fournisseur}</td>
     <td class="price"><i class="fa fa-tags text-green"></i> <strong>${product.prix} DH</strong></td>
     <td><i class="fa fa-cubes text-teal"></i> ${product.qteInven || '0'}</td>
-    <td><i class="fa fa-map-marker-alt text-red"></i> ${product.adresse.toUpperCase() || '!'}</td>
+    <td><i class="fa fa-map-marker-alt text-red"></i> ${product.adresse?.toUpperCase() || '!'}</td>
     <td class="actions">
       <button class="btnRed" onclick="removeProduct(this)"><i class="fa fa-trash"></i> Supprimer</button>
       <button class="btnBlue" onclick="editProduct(this)"><i class="fa fa-edit"></i> Modifier</button>
     </td>
   `;
-  document.querySelector('#produitTable tbody').appendChild(row);
+
+  const tbody = document.querySelector('#produitTable tbody');
+
+  // ✅ إدراج الصف في الأعلى بدل الأسفل
+  if (tbody.firstChild) {
+    tbody.insertBefore(row, tbody.firstChild);
+  } else {
+    tbody.appendChild(row);
+  }
 }
 
 // ====================
@@ -375,7 +383,9 @@ async function saveProductChanges() {
           <i class="fa fa-cubes text-teal"></i> ${updatedProduct.qteInven || '0'}
         </td>
         <td>
-          <i class="fa fa-map-marker-alt text-red"></i> ${updatedProduct.adresse.toUpperCase() || '!'}
+          <i class="fa fa-map-marker-alt text-red"></i> ${
+            updatedProduct.adresse.toUpperCase() || '!'
+          }
         </td>
         <td class="actions">
           <button class="btnRed" onclick="removeProduct(this)">

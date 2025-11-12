@@ -114,7 +114,7 @@
           <div class="card text-bg-warning p-3">
             <i class="fa-solid fa-at"></i>
             <h5>N° Adress</h5>
-            <h3 id="adressCount">0 / 700</h3>
+            <h3 id="adressCount">0 / 686</h3>
           </div>
         </div>
 
@@ -487,13 +487,17 @@
 
           // 🔹 تعريف الحروف الخاصة بكل Rayon
           const rayons = {
-            Électricité: { regex: /^E-/i, objectif: 80 },
-            Jardin: { regex: /^J-/i, objectif: 40 },
-            Sanitaire: { regex: /^S-/i, objectif: 60 },
-            Outillage: { regex: /^O-/i, objectif: 70 },
-            Qankiri: { regex: /^Q-/i, objectif: 30 },
-            Bois: { regex: /^B-/i, objectif: 50 },
-            Décorations: { regex: /^D-/i, objectif: 45 },
+            Électricité: { regex: /^E-/i, objectif: 105 },
+            Sanitaire: { regex: /^S-/i, objectif: 59 },
+            Outillage: { regex: /^O-/i, objectif: 81 },
+            Quin: { regex: /^Q-/i, objectif: 80 },
+            Bois: { regex: /^B-/i, objectif: 8 },
+            Jardin: { regex: /^J-/i, objectif: 102 },
+            Décorations: { regex: /^D-/i, objectif: 142 },
+            Cuisine: { regex: /^C-/i, objectif: 48 },
+            TG: { regex: /^TG-/i, objectif: 17 },
+            Podiome: { regex: /^P-/i, objectif: 32 },
+            Persentoir : { regex: /^PR-/i, objectif: 9 },
           };
 
           // 🔹 حساب عدد العناوين لكل rayon من قاعدة البيانات
@@ -543,7 +547,7 @@
             },
           });
 
-          document.getElementById('adressCount').textContent = `${adressesUnique.length} / 700`;
+          document.getElementById('adressCount').textContent = `${adressesUnique.length} / 686`;
 
           // --- عناوين مشتركة (group by adresse) ---
           const groupedByAdresse = {};
@@ -668,7 +672,7 @@
             });
           }
 
-          // --- رسم مخطط العناوين (Horizontal bar ثابت الحد الأقصى = 700) ---
+          // --- رسم مخطط العناوين (Horizontal bar ثابت الحد الأقصى = 686) ---
           const adresseCount = adressesUnique.length;
 
           // دمر المخطط السابق إن وُجد
@@ -684,7 +688,7 @@
           const ctxA = document.getElementById('adressChart')?.getContext('2d');
 
           if (ctxA) {
-            const totalAdresses = 700; // العدد الإجمالي
+            const totalAdresses = 686; // العدد الإجمالي
             const percentageUsed = ((adresseCount / totalAdresses) * 100).toFixed(2); // النسبة المئوية
             window._charts.adress = new Chart(ctxA, {
               type: 'bar',
