@@ -40,156 +40,10 @@
       rel="stylesheet"
       href="/css/navb.css"
     />
-    <style>
-      /* نافذة تعديل المنتج */
-      #editModal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-      }
-
-      #editModal .modal-content {
-        background: #fff;
-        border-radius: 12px;
-        padding: 25px;
-        width: 90%;
-        max-width: 450px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        animation: fadeIn 0.3s ease;
-      }
-
-      #editModal .form-group {
-        margin-bottom: 10px;
-      }
-
-      #editModal label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 5px;
-        color: #333;
-      }
-
-      #editModal input {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-      }
-
-      #editModal .bb {
-        background: #27ae60;
-        color: #fff;
-      }
-
-      #editModal .btnRed {
-        background: #e74c3c;
-        color: #fff;
-      }
-      .text-blue {
-        color: #007bff;
-      }
-      .text-gray {
-        color: #6c757d;
-      }
-      .text-purple {
-        color: #6f42c1;
-      }
-      .text-orange {
-        color: #fd7e14;
-      }
-      .text-green {
-        color: #198754;
-      }
-      .text-teal {
-        color: #20c997;
-      }
-      .text-red {
-        color: #dc3545;
-      }
-
-      #produitTable td {
-        vertical-align: middle;
-        padding: 8px 10px;
-      }
-
-      #produitTable td i {
-        margin-right: 6px;
-      }
-
-      .actions button {
-        border: none;
-        border-radius: 8px;
-        padding: 6px 10px;
-        margin: 0 3px;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .actions .btnRed {
-        background-color: #e74c3c;
-        color: white;
-      }
-      .actions .btnRed:hover {
-        background-color: #c0392b;
-      }
-
-      .actions .btnBlue {
-        background-color: #3498db;
-        color: white;
-      }
-      .actions .btnBlue:hover {
-        background-color: #2c80b4;
-      }
-    </style>
-
-    <style>
-      /* تصميم نافذة منبثقة */
-      .toast {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        min-width: 200px;
-        max-width: 350px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: #fff;
-        font-weight: bold;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(20px);
-        transition: all 0.4s ease;
-        z-index: 9999;
-      }
-
-      /* أنواع الرسائل */
-      .toast.success {
-        background-color: #4caf50;
-      }
-      .toast.error {
-        background-color: #f44336;
-      }
-      .toast.info {
-        background-color: #2196f3;
-      }
-      .toast.warning {
-        background-color: #eaa641;
-      }
-      /* عند الظهور */
-      .toast.show {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateY(0);
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="/css/searchPro.css"
+    />
   </head>
   <body>
     <!-- مكان الرسائل -->
@@ -301,7 +155,7 @@
         <select
           id="calcul"
           class="form-control"
-          style="background: palegoldenrod; font-weight: 700 ;text-align: center;"
+          style="background: palegoldenrod; font-weight: 700; text-align: center"
         >
           <option value="">-- Sélectionnez ce que vous voulez calculer --</option>
           <option value="casquette">Casquette</option>
@@ -526,17 +380,16 @@
     <!-- From Uiverse.io by paesjr -->
 
     <!-- 🧾 نافذة تعديل المنتج -->
+    <!-- ✅ نافذة تعديل المنتج -->
     <div
       id="editModal"
       class="modal"
     >
-      <div
-        class="modal-content"
-        style="max-width: 450px; text-align: left"
-      >
-        <h3 style="text-align: center; color: #007bff">تعديل المنتج</h3>
+      <div class="modal-content">
+        <h3><i class="fas fa-pen-to-square text-primary"></i> تعديل المنتج</h3>
+
         <div class="form-group">
-          <label>Libellé</label>
+          <label><i class="fas fa-box text-info"></i> Libellé</label>
           <input
             type="text"
             id="editName"
@@ -544,8 +397,9 @@
             readonly
           />
         </div>
+
         <div class="form-group">
-          <label>GenCode</label>
+          <label><i class="fas fa-barcode text-secondary"></i> GenCode</label>
           <input
             type="text"
             id="editBarcode"
@@ -553,8 +407,9 @@
             readonly
           />
         </div>
+
         <div class="form-group">
-          <label>Anpf</label>
+          <label><i class="fas fa-hashtag text-warning"></i> Anpf</label>
           <input
             type="text"
             id="editAnpf"
@@ -562,8 +417,9 @@
             readonly
           />
         </div>
+
         <div class="form-group">
-          <label>FOURNI</label>
+          <label><i class="fas fa-truck text-success"></i> Fournisseur</label>
           <input
             type="text"
             id="editFour"
@@ -571,8 +427,9 @@
             readonly
           />
         </div>
+
         <div class="form-group">
-          <label>Prix TTC</label>
+          <label><i class="fas fa-tag text-danger"></i> Prix TTC</label>
           <input
             type="number"
             id="editPrice"
@@ -580,8 +437,11 @@
             readonly
           />
         </div>
+
         <div class="form-group">
-          <label for="calcul">Sélectionnez ce que vous voulez calculer</label>
+          <label
+            ><i class="fas fa-calculator text-primary"></i> Sélectionnez le type de calcul</label
+          >
           <select
             id="editCalcul"
             class="form-control"
@@ -592,13 +452,14 @@
               font-weight: 700;
             "
           >
-            <option value="">-- Sélectionnez ce que vous voulez calculer --</option>
-            <option value="casquette">Casquette</option>
-            <option value="fondRayon">Fond Rayon</option>
+            <option value="">-- Sélectionnez une option --</option>
+            <option value="casquette">🧢 Casquette</option>
+            <option value="fondRayon">📦 Fond Rayon</option>
           </select>
         </div>
+
         <div class="form-group">
-          <label>Quantité Inventaire</label>
+          <label><i class="fas fa-boxes-stacked text-warning"></i> Quantité Inventaire</label>
           <input
             type="number"
             id="editQteInven"
@@ -607,8 +468,9 @@
             required
           />
         </div>
+
         <div class="form-group">
-          <label>Adresse</label>
+          <label><i class="fas fa-location-dot text-danger"></i> Adresse</label>
           <input
             type="text"
             id="editAdresse"
@@ -623,10 +485,7 @@
           id="editId"
         />
 
-        <div
-          class="modal-actions"
-          style="text-align: center; margin-top: 15px"
-        >
+        <div class="modal-actions">
           <button
             onclick="saveProductChanges()"
             class="bb"
@@ -642,6 +501,8 @@
         </div>
       </div>
     </div>
+
+    <!-- ✅ تنسيق المودال -->
 
     <div
       id="confirmModal"

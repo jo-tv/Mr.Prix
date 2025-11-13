@@ -285,8 +285,8 @@ function addProductToTable(product) {
     <td><i class="fa fa-cubes text-teal"></i> ${product.qteInven || '0'}</td>
     <td><i class="fa fa-map-marker-alt text-red"></i> ${product.adresse?.toUpperCase() || '!'}</td>
     <td class="actions">
-      <button class="btnRed" onclick="removeProduct(this)"><i class="fa fa-trash"></i> Supprimer</button>
-      <button class="btnBlue" onclick="editProduct(this)"><i class="fa fa-edit"></i> Modifier</button>
+      <button id="btnRed" class="btnRed" onclick="removeProduct(this)"><i class="fa fa-trash"></i> Supprimer</button>
+      <button id="btnBlue" class="btnBlue" onclick="editProduct(this)"><i class="fa fa-edit"></i> Modifier</button>
     </td>
   `;
 

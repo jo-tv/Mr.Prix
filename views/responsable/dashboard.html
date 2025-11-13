@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>Tableau de bord | Inventaire</title>
 
-    <!-- Bootstrap -->
+    <!-- ✅ Bootstrap -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -18,15 +18,43 @@
       href="css/dashboard.css"
     />
 
-    <!-- DataTables -->
+    <!-- ✅ DataTables CSS -->
     <link
       rel="stylesheet"
       href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"
     />
+
+    <!-- ✅ Buttons CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css"
+    />
+
+    <!-- ✅ FontAwesome -->
+    <!-- FontAwesome بدون مشاكل CORS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome -->
 
+    <!-- ✅ jQuery (يجب أن يكون قبل كل سكريبت يعتمد عليه) -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
+    <!-- ✅ DataTables الأساسية -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- ✅ مكتبات DataTables Buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+
+    <!-- ✅ مكتبات التصدير (Excel + Print) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
   </head>
 
   <body>
@@ -310,17 +338,8 @@
     </div>
     <!--fin FAB Button -->
 
-    <!-- JS Libraries (ترتيب التحميل مهم) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ✅ Chart.js (يمكن أن يبقى في أي مكان بعد jQuery) -->
 
-    <!-- DataTables -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
     <script src="js/dashboard.js"></script>
     <script src="js/main2.js"></script>
