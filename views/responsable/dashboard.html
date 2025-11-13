@@ -13,6 +13,10 @@
       rel="stylesheet"
       href="css/navb.css"
     />
+    <link
+      rel="stylesheet"
+      href="css/dashboard.css"
+    />
 
     <!-- DataTables -->
     <link
@@ -22,64 +26,27 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- FontAwesome -->
 
-    <style>
-      html,
-        body {
-          height: 100%;
-          margin: 0;
-          padding: 0;
-        }
-        body {
-          background: #f8f9fa;
-        }
-         .chart-container {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
 
-        .dashboard-header {
-          margin-top: 20px;
-        }
-
-        .card {
-          border: none;
-          border-radius: 15px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-        }
-
-        .card i {
-          font-size: 2rem;
-        }
-
-        .data-section {
-          margin-top: 30px;
-        }
-        .hh{
-          margin-bottom: 150px;
-        }
-         #sharedTable tr td,
-         #sharedTable tr th{
-          font-size :20px;
-          text-align: center;
-          font-weight: 700;
-          vertical-align: center;
-        }
-
-
-        @media (max-width: 768px) {
-          .card i {
-            font-size: 1.5rem;
-          }
-        .chart {
-          box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-        }
-    </style>
   </head>
 
   <body>
+    <!-- زر إعادة التحميل -->
+    <nav class="navbar navbar-dark bg-dark mb-4">
+      <div class="container-fluid d-flex justify-content-between align-items-center">
+        <span class="navbar-brand mb-0 h1 fs-1">
+          <i class="fa-solid fa-gauge fs-2"></i> Dashboard
+        </span>
+        <button
+          class="btn btn-primary me-2"
+          id="reloadBtn"
+        >
+          <i class="fas fa-rotate-right"></i> Rafraîchir
+        </button>
+      </div>
+    </nav>
+    <div id="topLoad">
+      <div id="loading">⏳ Chargement des données...</div>
+    </div>
     <div class="container-fluid p-4">
       <h2 class="text-center dashboard-header">
         <link
@@ -102,7 +69,7 @@
           </div>
         </div>
 
-        <div class="col-md-3 col-6 mb-3">
+        <div class="col-md-3 col-6 mb-3 usersPro">
           <div class="card text-bg-success p-3">
             <i class="fas fa-boxes-stacked mb-2"></i>
             <h5>Produits</h5>
@@ -201,6 +168,31 @@
                   <th>Adresse</th>
                   <th>Vendeurs</th>
                   <th>N° Vendeurs</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-section hh">
+        <div class="card p-3">
+          <h5 class="mb-3">
+            <i class="fa-brands fa-invision text-danger"></i> Détail des adresses avec Casquette /
+            FondRayon
+          </h5>
+          <div class="table-responsive">
+            <table
+              id="sharedTableType"
+              class="table table-striped table-bordered"
+              style="width: 100%"
+            >
+              <thead class="table-dark">
+                <tr>
+                  <th>Adresse</th>
+                  <th>Casquette</th>
+                  <th>FondRayon</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -330,442 +322,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
-    <!-- تأكّد من وجود هذه الـ canvases في HTML -->
-    <!-- <canvas id="vendeurChart"></canvas> -->
-    <!-- <canvas id="adressChart"></canvas> -->
-
-    <script>
-      /* === Helpers & Globals === */
-      function escapeHtml(unsafe) {
-        if (unsafe == null) return '';
-        return String(unsafe)
-          .replaceAll('&', '&amp;')
-          .replaceAll('<', '&lt;')
-          .replaceAll('>', '&gt;')
-          .replaceAll('"', '&quot;')
-          .replaceAll("'", '&#039;');
-      }
-
-      // حافظ على مراجع المخططات عالمياً لكي تتمكن من تدميرها قبل إعادة الرسم
-      window._charts = window._charts || { vendeur: null, adress: null };
-
-      /* === الدالة الأساسية لتحميل البيانات ورسم كل شيء === */
-      async function initDashboard() {
-        try {
-          // جلب البيانات مرة واحدة
-          const resp = await fetch('/api/inventairePro');
-          const response = await fetch('/api/Produits');
-
-          if (!resp.ok) throw new Error('HTTP ' + resp.status);
-          const produits = await resp.json();
-          const data = await response.json();
-
-          // --- إحصائيات عامة ---
-          // بائعين فريدين
-          const vendeursUnique = Array.from(
-            new Set(produits.map((p) => p.nameVendeur).filter(Boolean))
-          );
-          document.getElementById('usersCount').textContent = vendeursUnique.length;
-
-          // عناوين فريدة
-          const adressesUnique = Array.from(
-            new Set(produits.map((p) => p.adresse).filter(Boolean))
-          );
-
-          // عدد المنتجات
-          document.getElementById('productsCount').textContent =
-            produits.length + ' / ' + data.count;
-
-          const ctxB = document.getElementById('countProduct').getContext('2d');
-
-          // أمثلة: عوّض هذه القيم من مصدر بياناتك الحقيقي
-          let dataCount = produits.length || 0; // عدد المنتجات المستخرجة
-          let produitsLength = data?.count || 0; // العدد الكلي الذي قارنته به (تأكد من مصدره)
-
-          // حماية: لا تسمح بقيم سالبة أو تجاوز منطق
-          if (produitsLength < 0) produitsLength = 0;
-          if (dataCount < 0) dataCount = 0;
-          if (dataCount > produitsLength) {
-            // إذا كانت القيمة المستخرجة أكبر من الإجمالي (بيانات غير متناسقة)، نضبطها
-            dataCount = produitsLength;
-          }
-
-          // نحسب الباقي ليصبح الرسم يعكس الحصة مقابل الإجمالي
-          const remainder = produitsLength - dataCount;
-
-          // نسبة مئوية محمية (0..100)
-          const dataCountPercentage = produitsLength > 0 ? (dataCount / produitsLength) * 100 : 0;
-
-          // إضافة مخصصة لعرض النص في الوسط (Chart.js v3+ compatible)
-          const centerText = {
-            id: 'centerText',
-            beforeDraw: (chart) => {
-              const { ctx, chartArea } = chart;
-              if (!chartArea) return; // حماية إذا لم تُحمَّل المساحة بعد
-              ctx.save();
-
-              // مركز الرسم من chartArea (أكثر ثباتًا من استخدام datapoint.x/y)
-              const centerX = (chartArea.left + chartArea.right) / 2;
-              const centerY = (chartArea.top + chartArea.bottom) / 2;
-
-              // إعدادات نص قابلة للتعديل
-              const percentText = `${dataCountPercentage.toFixed(2)}%`;
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-
-              // خط أكبر للنسبة
-              ctx.font = 'bold 44px Arial';
-              // نغير لون النص الرئيسي بحسب الحالة (مثال: أحمر عندما 100%)
-              ctx.fillStyle = dataCountPercentage >= 100 ? '#FF4D4D' : '#333333';
-              ctx.fillText(percentText, centerX, centerY - 10);
-
-              // خط أصغر للوصف
-              ctx.font = '16px Arial';
-              ctx.fillStyle = '#666';
-              ctx.fillText('Part de produits extraits', centerX, centerY + 24);
-
-              ctx.restore();
-            },
-          };
-
-          // ألوان: لون رئيسي للجزء المأخوذ، ولون رمادي للباقي
-          const mainColor = '#FF6384';
-          const remainderColor = '#7062da';
-
-          // بيانات الرسم: نمرّر [taken, remaining]
-          const chartData = [dataCount, remainder];
-
-          const myChart = new Chart(ctxB, {
-            type: 'doughnut',
-            data: {
-              labels: ['Extraits', 'Reste'],
-              datasets: [
-                {
-                  data: chartData,
-                  backgroundColor: [mainColor, remainderColor],
-                  hoverBackgroundColor: [mainColor, remainderColor],
-                  borderWidth: 0,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              cutout: '68%', // سمك الحلقة - عدّله حسب التصميم
-              plugins: {
-                legend: {
-                  position: 'bottom',
-                },
-                title: {
-                  display: true,
-                  text: 'Comparaison entre produitsLength et dataCount',
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function (context) {
-                      const value = context.raw;
-                      const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                      const perc = total > 0 ? ((value / total) * 100).toFixed(2) : '0.00';
-                      return `${context.label}: ${value} (${perc}%)`;
-                    },
-                  },
-                },
-                // عطل أي امتدادات datalabels إذا كانت موجودة لتجنب التداخل
-                datalabels: {
-                  display: false,
-                },
-              },
-              // حماية: منع السلوك الافتراضي إذا لم توجد بيانات
-              onHover: (e, activeEls) => {
-                // مثال: لو تريد تغيير مؤشر الفأرة عندما تقف فوق جزء
-                e.native.target.style.cursor = activeEls.length ? 'pointer' : 'default';
-              },
-            },
-            plugins: [centerText],
-          });
-
-          const ctx = document.getElementById('rayonChart').getContext('2d');
-
-          // 🔹 تعريف الحروف الخاصة بكل Rayon
-          const rayons = {
-            Électricité: { regex: /^E-/i, objectif: 105 },
-            Sanitaire: { regex: /^S-/i, objectif: 59 },
-            Outillage: { regex: /^O-/i, objectif: 81 },
-            Quin: { regex: /^Q-/i, objectif: 80 },
-            Bois: { regex: /^B-/i, objectif: 8 },
-            Jardin: { regex: /^J-/i, objectif: 102 },
-            Décorations: { regex: /^D-/i, objectif: 142 },
-            Cuisine: { regex: /^C-/i, objectif: 48 },
-            TG: { regex: /^TG-/i, objectif: 17 },
-            Podiome: { regex: /^P-/i, objectif: 32 },
-            Persentoir : { regex: /^PR-/i, objectif: 9 },
-          };
-
-          // 🔹 حساب عدد العناوين لكل rayon من قاعدة البيانات
-          const rayonNames = Object.keys(rayons);
-          const rayonCounts = rayonNames.map(
-            (rayon) =>
-              produits.filter((p) => p.adresse && rayons[rayon].regex.test(p.adresse)).length
-          );
-
-          // 🔹 استخراج الأهداف المخصصة
-          const rayonObjectifs = rayonNames.map((rayon) => rayons[rayon].objectif);
-
-          // 🔹 إعداد المبيان
-          new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: rayonNames,
-              datasets: [
-                {
-                  label: 'Objectif par rayon',
-                  data: rayonObjectifs,
-                  backgroundColor: '#0ba360',
-                },
-                {
-                  label: 'Adresses réelles',
-                  data: rayonCounts,
-                  backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  title: { display: true, text: "Nombre d'adresses" },
-                },
-              },
-              plugins: {
-                title: {
-                  display: true,
-                  text: 'Comparaison des adresses réelles et de l’objectif par rayon',
-                  font: { size: 18 },
-                },
-                legend: { position: 'bottom' },
-              },
-            },
-          });
-
-          document.getElementById('adressCount').textContent = `${adressesUnique.length} / 686`;
-
-          // --- عناوين مشتركة (group by adresse) ---
-          const groupedByAdresse = {};
-          for (const p of produits) {
-            if (!p.adresse) continue;
-            if (!groupedByAdresse[p.adresse])
-              groupedByAdresse[p.adresse] = { vendeursSet: new Set(), produitsCount: 0 };
-            if (p.nameVendeur) groupedByAdresse[p.adresse].vendeursSet.add(p.nameVendeur);
-            groupedByAdresse[p.adresse].produitsCount++;
-          }
-
-          const sharedEntries = Object.entries(groupedByAdresse)
-            .map(([adresse, info]) => ({
-              adresse,
-              vendeurs: Array.from(info.vendeursSet),
-              vendeursCount: info.vendeursSet.size,
-              produitsCount: info.produitsCount,
-            }))
-            .filter((e) => e.vendeursCount > 1)
-            .sort((a, b) => b.vendeursCount - a.vendeursCount || b.produitsCount - a.produitsCount);
-
-          document.getElementById('sharedAddresses').textContent = sharedEntries.length;
-
-          // تعبئة جدول العناوين المشتركة
-          const tbody = document.querySelector('#sharedTable tbody');
-          tbody.innerHTML = sharedEntries
-            .map(
-              (row) => `
-          <tr>
-            <td class="text-bg-danger">${escapeHtml(row.adresse)}</td>
-            <td class="text-bg-primary">${escapeHtml(row.vendeurs.join(' ; ').toUpperCase())}</td>
-            <td class="text-bg-danger">${row.vendeursCount}</td>
-          </tr>
-        `
-            )
-            .join('');
-
-          // تهيئة DataTable بأمان (destroy إن كان موجود)
-          if ($.fn.dataTable && $.fn.dataTable.isDataTable('#sharedTable')) {
-            $('#sharedTable').DataTable().clear().destroy();
-          }
-          $('#sharedTable').DataTable({
-            pageLength: 5,
-            responsive: true,
-            lengthMenu: [5, 10, 25],
-            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
-          });
-
-          // --- رسم مخطط Top10 vendeurs (Bar vertical) ---
-          const vendeursCountMap = {};
-          for (const p of produits) {
-            if (!p.nameVendeur) continue;
-            vendeursCountMap[p.nameVendeur] = (vendeursCountMap[p.nameVendeur] || 0) + 1;
-          }
-          const top10 = Object.entries(vendeursCountMap)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 10);
-          const topLabels = top10.map((v) => v[0]);
-          const topValues = top10.map((v) => v[1]);
-
-          // دمر المخطط السابق إن وُجد
-          if (window._charts.vendeur) {
-            try {
-              window._charts.vendeur.destroy();
-            } catch (e) {
-              /* ignore */
-            }
-            window._charts.vendeur = null;
-          }
-
-          const ctxV = document.getElementById('vendeurChart')?.getContext('2d');
-          if (ctxV) {
-            window._charts.vendeur = new Chart(ctxV, {
-              type: 'bar',
-              data: {
-                labels: topLabels,
-                datasets: [
-                  {
-                    label: 'Nombre de produits',
-                    data: topValues,
-                    backgroundColor: [
-                      '#1abc9c', // turquoise
-                      '#3498db', // blue
-                      '#9b59b6', // purple
-                      '#e67e22', // orange
-                      '#e74c3c', // red
-                      '#2ecc71', // green
-                      '#16a085', // teal
-                      '#f1c40f', // yellow
-                      '#2980b9', // deep blue
-                      '#8e44ad', // violet
-                      '#d35400', // dark orange
-                      '#27ae60', // emerald
-                      '#c0392b', // dark red
-                      '#f39c12', // amber
-                      '#7f8c8d', // gray
-                    ],
-
-                    borderColor: 'rgba(0,0,0,0.2)',
-                    borderWidth: 1,
-                  },
-                ],
-              },
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  x: {
-                    ticks: { autoSkip: true, maxRotation: 45, minRotation: 30, font: { size: 12 } },
-                  },
-                  y: {
-                    beginAtZero: true,
-                    ticks: { precision: 0, stepSize: 1 },
-                  },
-                },
-                plugins: {
-                  legend: { display: false },
-                  title: { display: true, text: 'Top 10 vendeurs (par nombre de produits)' },
-                  tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y} produits` } },
-                },
-              },
-            });
-          }
-
-          // --- رسم مخطط العناوين (Horizontal bar ثابت الحد الأقصى = 686) ---
-          const adresseCount = adressesUnique.length;
-
-          // دمر المخطط السابق إن وُجد
-          if (window._charts.adress) {
-            try {
-              window._charts.adress.destroy();
-            } catch (e) {
-              /* ignore */
-            }
-            window._charts.adress = null;
-          }
-
-          const ctxA = document.getElementById('adressChart')?.getContext('2d');
-
-          if (ctxA) {
-            const totalAdresses = 686; // العدد الإجمالي
-            const percentageUsed = ((adresseCount / totalAdresses) * 100).toFixed(2); // النسبة المئوية
-            window._charts.adress = new Chart(ctxA, {
-              type: 'bar',
-              data: {
-                labels: ['Adresses utilisées', 'Capacité totale'],
-                datasets: [
-                  {
-                    label: 'Adresses',
-                    data: [adresseCount, totalAdresses],
-                    backgroundColor: ['#2575fc', '#4facfe'],
-                    borderColor: ['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.15)'],
-                    borderWidth: 1,
-                  },
-                ],
-              },
-              options: {
-                indexAxis: 'y', // الأعمدة أفقية
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  x: {
-                    beginAtZero: true,
-                    max: totalAdresses,
-                    ticks: { stepSize: Math.max(1, Math.ceil(totalAdresses / 7)) }, // خطوة مقاربة
-                  },
-                  y: { grid: { display: false } },
-                },
-                plugins: {
-                  legend: { display: false },
-                  title: {
-                    display: true,
-                    // عرض النسبة المئوية في العنوان
-                    text: `Utilisation des adresses (sur ${totalAdresses}) - ${percentageUsed}% utilisés`,
-                    font: {
-                      size: 24,
-                      weight: 'bold', // جعل النص عريضًا
-                    },
-                    color: '#2575fc', // اللون الأزرق للنسبة المئوية
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: (ctx) => {
-                        const value = ctx.parsed.x;
-                        const percentage = ((value / totalAdresses) * 100).toFixed(2);
-                        return `${value} adresses (${percentage}%)`;
-                      },
-                    },
-                  },
-                },
-              },
-            });
-          }
-        } catch (err) {
-          console.error('Erreur lors du chargement du dashboard:', err);
-          const container = document.querySelector('.container-fluid') || document.body;
-          const errEl = document.createElement('div');
-          errEl.className = 'alert alert-danger mt-3';
-          errEl.textContent = 'Erreur lors du chargement du dashboard. Vérifiez la console.';
-          container.prepend(errEl);
-        }
-      }
-
-      document.querySelector('.usersCount').addEventListener('click', () => {
-        window.location.href = '/listVendeurs';
-      });
-      document.querySelector('.Adresses').addEventListener('click', () => {
-        window.location.href = '#sharedTable';
-        console.log('hello');
-      });
-
-      /* شغّل التحميل مرة واحدة عند انتهاء البناء */
-      document.addEventListener('DOMContentLoaded', initDashboard);
-
-      // تحديث البيانات كل 5 ثواني
-      //setInterval(initDashboard, 5000);
-    </script>
-
+    <script src="js/dashboard.js"></script>
     <script src="js/main2.js"></script>
   </body>
 </html>

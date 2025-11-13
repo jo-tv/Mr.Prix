@@ -297,12 +297,25 @@
         />
       </div>
       <div class="form-group">
+        <label for="calcul">Sélectionnez ce que vous voulez calculer</label>
+        <select
+          id="calcul"
+          class="form-control"
+          style="background: palegoldenrod; font-weight: 700 ;text-align: center;"
+        >
+          <option value="">-- Sélectionnez ce que vous voulez calculer --</option>
+          <option value="casquette">Casquette</option>
+          <option value="fondRayon">Fond Rayon</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="qteInven">Quantité</label>
         <input
           type="number"
           id="qteInven"
           placeholder="Quantité"
           class="infor"
+          style="background: palegoldenrod; font-weight: 700"
           required
         />
       </div>
@@ -313,6 +326,7 @@
           id="adresse"
           placeholder="Adresse"
           class="infor"
+          style="background: palegoldenrod; font-weight: 700"
           required
         />
       </div>
@@ -567,11 +581,29 @@
           />
         </div>
         <div class="form-group">
+          <label for="calcul">Sélectionnez ce que vous voulez calculer</label>
+          <select
+            id="editCalcul"
+            class="form-control"
+            style="
+              border: solid 1px #000;
+              text-align: center;
+              background: palegoldenrod;
+              font-weight: 700;
+            "
+          >
+            <option value="">-- Sélectionnez ce que vous voulez calculer --</option>
+            <option value="casquette">Casquette</option>
+            <option value="fondRayon">Fond Rayon</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label>Quantité Inventaire</label>
           <input
             type="number"
             id="editQteInven"
             class="edit-input"
+            style="background: palegoldenrod; font-weight: 700"
             required
           />
         </div>
@@ -581,6 +613,7 @@
             type="text"
             id="editAdresse"
             class="edit-input"
+            style="background: palegoldenrod; font-weight: 700"
             required
           />
         </div>

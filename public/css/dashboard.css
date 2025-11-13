@@ -1,0 +1,88 @@
+
+      html,
+        body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+        body {
+          background: #f8f9fa;
+        }
+         .chart-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+        .dashboard-header {
+          margin-top: 20px;
+        }
+
+        .card {
+          border: none;
+          border-radius: 15px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        }
+
+        .card i {
+          font-size: 2rem;
+        }
+
+        .data-section {
+          margin-top: 30px;
+        }
+        .hh{
+          margin-bottom: 150px;
+        }
+         #sharedTable tr td,
+         #sharedTable tr th{
+          font-size :20px;
+          text-align: center;
+          font-weight: 700;
+          vertical-align: center;
+        }
+      #topLoad {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        display: none; /* مخفي افتراضياً */
+
+        inset: 0; /* يغطي كامل الصفحة */
+        background: rgba(0, 0, 0, 0.7);
+        width: 100vw;
+        height: 100vh;
+        z-index: 1000;
+      }
+      #loading {
+        /* محاذاة المحتوى في منتصف الشاشة */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative; /* يغطي كل الصفحة */
+
+        /* خلفية سوداء شفافة */
+
+        /* نص التحميل */
+        font-size: 2rem;
+        font-weight: bold;
+        color: #ffffff;
+        text-align: center;
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+
+        /* تموضع العنصر بدقة في منتصف الشاشة */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+
+        @media (max-width: 768px) {
+          .card i {
+            font-size: 1.5rem;
+          }
+        .chart {
+          box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        }
+        }

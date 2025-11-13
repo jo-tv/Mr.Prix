@@ -4,6 +4,7 @@ const ExcelJS = require('exceljs');
 const mongoose = require('mongoose');
 const compression = require('compression');
 const path = require('path');
+const XLSX = require('xlsx');
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const serverless = require('serverless-http');
@@ -22,12 +23,19 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // الاتصال بقاعدة بيانات MongoDB
-mongoose
-  .connect(process.env.MONGO_URI, {
-    // لا حاجة لاستخدام الخيارات deprecated منذ إصدار 4.0
-  })
-  .then(() => console.log('✅ تم الاتصال بقاعدة البيانات MongoDB'))
-  .catch((err) => console.error('❌ فشل الاتصال بـ MongoDB:', err));
+
+async function connectDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('✅ تم الاتصال بقاعدة البيانات MongoDB');
+  } catch (err) {
+    console.error('❌ فشل الاتصال بـ MongoDB:', err);
+    process.exit(1); // إيقاف السيرفر إذا فشل الاتصال
+  }
+}
+
+// استدعاء الاتصال عند بدء السيرفر
+connectDB();
 
 // تفعيل ضغط GZIP لتحسين الأداء
 app.use(compression());
@@ -599,8 +607,12 @@ app.get('/dashboard', isAuthenticated, isResponsable, (req, res) => {
 app.get('/listVendeurs', isAuthenticated, isResponsable, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/responsable/List-Vendeurs.html')); // ✅ صفحة فارغة مؤقتاً
 });
+app.get('/produitTotal', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/produitTotal.html')); // ✅ صفحة فارغة مؤقتاً
+});
 
-app.get('/api/inventairePro', async (req, res) => {
+// GET /api/dashboard
+app.get('/api/inventaireProo', async (req, res) => {
   try {
     const { nameVendeur } = req.query;
     let filter = {};
@@ -619,6 +631,218 @@ app.get('/api/inventairePro', async (req, res) => {
     res.status(500).send({ message: 'Error loading products', error });
   }
 });
+
+// 🔹 ملخص البائعين
+app.get('/api/inventairePro', async (req, res) => {
+  try {
+    const result = await Inventaire.aggregate([
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: '$nameVendeur',
+          count: { $sum: 1 },
+          lastProduit: { $first: '$$ROOT' },
+        },
+      },
+      {
+        $project: {
+          nameVendeur: '$_id',
+          count: 1,
+          lastProduit: 1,
+          _id: 0,
+        },
+      },
+    ]);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Erreur lors du chargement des vendeurs', err });
+  }
+});
+
+// 🔹 جلب منتجات بائع مع Pagination
+app.get('/api/inventairePro/:vendeur', async (req, res) => {
+  try {
+    const { page = 1, limit = 50 } = req.query;
+    const nameVendeur = req.params.vendeur;
+
+    const produits = await Inventaire.find({ nameVendeur })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const total = await Inventaire.countDocuments({ nameVendeur });
+
+    res.json({ produits, total, page: parseInt(page), limit: parseInt(limit) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Erreur lors du chargement des produits du vendeur', err });
+  }
+});
+
+// ✅ جلب جميع بيانات المنتجات
+app.get('/api/ProduitsTotal', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50; // عدد المنتجات في كل صفحة
+
+    const total = await Inventaire.countDocuments();
+    const produits = await Inventaire.find()
+      .sort({ _id: -1 }) // من الأحدث للأقدم
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json({
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      produits,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'حدث خطأ في الخادم' });
+  }
+});
+
+// get data to excel
+
+// ✅ دالة عامة لتوليد ملف Excel لأي بائع
+async function exportExcelByVendeur(nameVendeur, res) {
+  try {
+    const produits = await Inventaire.find({ nameVendeur }).sort({ createdAt: -1 });
+
+    // إنشاء ملف Excel
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Produits');
+
+    // ✅ تحديد الأعمدة
+    sheet.columns = [
+      { header: 'Libelle', key: 'libelle', width: 30 },
+      { header: 'Gencode', key: 'gencode', width: 20 },
+      { header: 'Anpf', key: 'anpf', width: 15 },
+      { header: 'Prix', key: 'prix', width: 15 },
+      { header: 'Stock Système', key: 'stock', width: 15 },
+      { header: 'Quantité Physique', key: 'qteInven', width: 18 },
+      { header: 'Écart d’Inventaire', key: 'ecart', width: 18 },
+      { header: 'Fournisseur', key: 'fournisseur', width: 20 },
+      { header: 'Adresse', key: 'adresse', width: 30 },
+      { header: 'Type', key: 'calcul', width: 20 },
+      { header: 'Date', key: 'createdAt', width: 20 },
+    ];
+
+    // ✅ تعبئة البيانات
+    produits.forEach((p) => {
+      const stock = parseFloat(p.stock) || 0;
+      const qteInven = parseFloat(p.qteInven) || 0;
+      const ecart = qteInven - stock;
+
+      sheet.addRow({
+        libelle: p.libelle,
+        gencode: p.gencode,
+        anpf: p.anpf,
+        prix: p.prix || '—',
+        stock,
+        qteInven,
+        ecart,
+        fournisseur: p.fournisseur || '—',
+        adresse: p.adresse || '—',
+        calcul: p.calcul?.trim() || p['calcul ']?.trim() || '—',
+        createdAt: p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : '',
+      });
+    });
+
+    // ✅ إعدادات الرد
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader('Content-Disposition', `attachment; filename=${nameVendeur}.xlsx`);
+
+    // ✅ كتابة الملف في الرد مباشرة
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error('❌ Erreur export Excel:', err);
+    res.status(500).send({ message: "Erreur lors de l'export Excel", err });
+  }
+}
+
+// ✅ المسار العام لتصدير ملف Excel لأي بائع
+app.get('/api/exportExcel/:vendeur', async (req, res) => {
+  await exportExcelByVendeur(req.params.vendeur, res);
+});
+
+    
+
+// 🔹 دالة عامة لتصدير جميع البيانات
+async function exportAllProducts(res) {
+  try {
+    // ⚙️ إنشاء مصنف جديد
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Inventaire Complet');
+
+    // ✅ الأعمدة
+    sheet.columns = [
+      { header: 'Libelle', key: 'libelle', width: 30 },
+      { header: 'Gencode', key: 'gencode', width: 20 },
+      { header: 'Anpf', key: 'anpf', width: 15 },
+      { header: 'Prix', key: 'prix', width: 15 },
+      { header: 'Stock Système', key: 'stock', width: 15 },
+      { header: 'Quantité Physique', key: 'qteInven', width: 18 },
+      { header: 'Écart d’Inventaire', key: 'ecart', width: 18 },
+      { header: 'Fournisseur', key: 'fournisseur', width: 20 },
+      { header: 'Adresse', key: 'adresse', width: 25 },
+      { header: 'Type', key: 'calcul', width: 20 },
+      { header: 'Vendeur', key: 'nameVendeur', width: 25 },
+      { header: 'Date', key: 'createdAt', width: 20 },
+    ];
+
+    // ✅ استخدام stream لتفادي تحميل كامل البيانات في الذاكرة
+    const cursor = Inventaire.find().sort({ createdAt: -1 }).cursor();
+
+    // 🔁 قراءة البيانات تدريجيًا
+    for await (const p of cursor) {
+      const stock = parseFloat(p.stock) || 0;
+      const qteInven = parseFloat(p.qteInven) || 0;
+      const ecart = qteInven - stock;
+
+      sheet.addRow({
+        libelle: p.libelle,
+        gencode: p.gencode,
+        anpf: p.anpf,
+        prix: p.prix || '—',
+        stock,
+        qteInven,
+        ecart,
+        fournisseur: p.fournisseur || '—',
+        adresse: p.adresse || '—',
+        calcul: p.calcul?.trim() || p['calcul ']?.trim() || '—',
+        nameVendeur: p.nameVendeur || '—',
+        createdAt: p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : '',
+      });
+    }
+
+    // ✅ تهيئة الاستجابة
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader('Content-Disposition', 'attachment; filename=Inventaire_Complet.xlsx');
+
+    // ⚙️ الكتابة مباشرة في الـ stream
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error('❌ Erreur export complet:', err);
+    res.status(500).send({ message: 'Erreur lors de lexport complet', err });
+  }
+}
+
+// 🔹 المسار العام لتصدير كل البيانات
+app.get('/api/exportExcel', async (req, res) => {
+  await exportAllProducts(res);
+});
+
 //جلب جميع بيانات products
 app.get('/api/Produits', async (req, res) => {
   try {
@@ -646,14 +870,14 @@ app.put('/api/inventairePro/:id', async (req, res) => {
 });
 
 // حذف منتج
-app.delete('/api/inventairePro/:id', async (req, res) => {
-  const { id } = req.params;
+app.delete('/api/inventairePro/:vendeur', async (req, res) => {
   try {
-    const deletedProduct = await Inventaire.findByIdAndDelete(id);
-    if (!deletedProduct) return res.status(404).json({ message: 'Product not found' });
-    res.status(200).json({ success: true, message: 'Product deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting product', error });
+    const nameVendeur = req.params.vendeur;
+    const result = await Inventaire.deleteMany({ nameVendeur });
+    res.json({ success: true, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Erreur lors de la suppression', err });
   }
 });
 
@@ -661,13 +885,14 @@ app.delete('/api/inventairePro/:id', async (req, res) => {
 app.delete('/api/inventairePro', async (req, res) => {
   try {
     const result = await Inventaire.deleteMany({});
-    res.status(200).json({
+    res.json({
       success: true,
-      message: `🧹 ${result.deletedCount} produits supprimés avec succès.`,
+      deletedCount: result.deletedCount,
+      message: 'Toutes les données ont été supprimées',
     });
-  } catch (error) {
-    console.error('Erreur lors de la suppression globale:', error);
-    res.status(500).json({ message: 'Erreur lors de la suppression globale', error });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Erreur lors de la suppression globale', err });
   }
 });
 

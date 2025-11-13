@@ -11,6 +11,7 @@ const productSchema = new mongoose.Schema(
     fournisseur: { type: String },
     stock: { type: String },
     prix: { type: String },
+    calcul: { type: String },
     qteInven: { type: String },
     adresse: { type: String },
     nameVendeur: { type: String },

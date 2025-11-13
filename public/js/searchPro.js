@@ -8,6 +8,7 @@ const input = document.getElementById('textSearch');
 const searchBtn = document.getElementById('searchBtn');
 const nameInput = document.getElementById('nameVendeur');
 const inputAdress = document.getElementById('adresse');
+const inputCalcul = document.getElementById('calcul');
 
 // 🔉 صوت المسح
 const beepSound = new Audio('/sounds/beep.mp3'); // ضع الصوت في مجلدك إن أردت
@@ -25,6 +26,15 @@ nameInput.addEventListener('input', () => {
   }
 });
 
+inputCalcul.addEventListener('input', () => {
+  let name = inputCalcul.value.trim().toLowerCase(); // حذف المسافات وتحويل إلى حروف صغيرة
+  if (name) {
+    localStorage.setItem('inputCalcul', name);
+  } else {
+    localStorage.removeItem('inputCalcul');
+  }
+});
+
 inputAdress.addEventListener('input', () => {
   let adresseInv = inputAdress.value.trim().toUpperCase(); // حذف المسافات وتحويل إلى حروف صغيرة
   if (adresseInv) {
@@ -37,12 +47,16 @@ inputAdress.addEventListener('input', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const savedName = localStorage.getItem('nameVendeur');
   const savedAdress = localStorage.getItem('adresseInv');
+  const inputCalcul = localStorage.getItem('inputCalcul');
   if (savedName) {
     document.getElementById('nameVendeur').value = savedName.toLowerCase().trim() || '';
     document.getElementById('nomFichier').value = savedName.toLowerCase().trim() || '';
   }
   if (savedAdress) {
     document.getElementById('adresse').value = savedAdress.toUpperCase().trim() || '';
+  }
+  if (inputCalcul) {
+    document.getElementById('calcul').value = inputCalcul.toUpperCase().trim() || '';
   }
   loadProductsFromDatabase();
   setupEventListeners();
@@ -67,7 +81,7 @@ async function loadProductsFromDatabase() {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
 
-    const url = `/api/inventairePro?nameVendeur=${encodeURIComponent(nameVendeur)}`;
+    const url = `/api/inventaireProo?nameVendeur=${encodeURIComponent(nameVendeur)}`;
     console.debug('Fetching products from:', url);
 
     const response = await fetch(url, { signal: controller.signal });
@@ -204,6 +218,7 @@ async function addProduct() {
     stock: document.getElementById('stock').value.trim(),
     prix: document.getElementById('prix').value.trim(),
     qteInven: document.getElementById('qteInven').value.trim(),
+    calcul: document.getElementById('calcul').value.trim(),
     adresse: document.getElementById('adresse').value.trim().toUpperCase(), // الحروف الكبيرة
     nameVendeur: document.getElementById('nameVendeur').value.toLowerCase().trim(),
   };
@@ -214,6 +229,7 @@ async function addProduct() {
     !product.anpf ||
     !product.adresse ||
     !product.qteInven ||
+    !product.calcul ||
     !product.nameVendeur
   ) {
     showToast('⚠️ Tous les champs sont obligatoires 🆔', 'warning');
@@ -265,6 +281,7 @@ function addProductToTable(product) {
     <td><i class="fa fa-hashtag text-purple"></i> ${product.anpf}</td>
     <td><i class="fa fa-truck text-orange"></i> ${product.fournisseur}</td>
     <td class="price"><i class="fa fa-tags text-green"></i> <strong>${product.prix} DH</strong></td>
+    <td class="price"><i class="fa fa-tags text-green"></i> <strong>${product.calcul} </strong></td>
     <td><i class="fa fa-cubes text-teal"></i> ${product.qteInven || '0'}</td>
     <td><i class="fa fa-map-marker-alt text-red"></i> ${product.adresse?.toUpperCase() || '!'}</td>
     <td class="actions">
@@ -328,8 +345,9 @@ function editProduct(button) {
   const priceText = safeText(row.querySelector('.price strong')).replace(' DH', '').trim();
   document.getElementById('editPrice').value = parseFloat(priceText) || 0;
 
-  document.getElementById('editQteInven').value = safeText(row.children[5]);
-  document.getElementById('editAdresse').value = safeText(row.children[6]);
+  document.getElementById('editCalcul').value = safeText(row.children[5]);
+  document.getElementById('editQteInven').value = safeText(row.children[6]);
+  document.getElementById('editAdresse').value = safeText(row.children[7]);
 
   document.getElementById('editModal').style.display = 'flex';
 }
@@ -344,6 +362,7 @@ async function saveProductChanges() {
     anpf: document.getElementById('editAnpf').value.trim(),
     fournisseur: document.getElementById('editFour').value.trim(),
     prix: parseFloat(document.getElementById('editPrice').value) || 0,
+    calcul: document.getElementById('editCalcul').value.trim(),
     qteInven: document.getElementById('editQteInven').value.trim(),
     adresse: document.getElementById('editAdresse').value.trim().toUpperCase(),
   };
@@ -378,6 +397,9 @@ async function saveProductChanges() {
         <td class="price">
           <i class="fa fa-tags text-green"></i> 
           <strong>${updatedProduct.prix ? updatedProduct.prix + ' DH' : '0 DH'}</strong>
+        </td>
+        <td>
+          <i class="fa fa-cubes text-teal"></i> ${updatedProduct.calcul || ''}
         </td>
         <td>
           <i class="fa fa-cubes text-teal"></i> ${updatedProduct.qteInven || '0'}

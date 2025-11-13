@@ -589,15 +589,18 @@ app.post('/api/inventairePro', async (req, res) => {
 });
 
 // إضافة نقطة GET لعرض البيانات في صفحة HTML
-app.get('/inventairePro', (req, res) => {
+app.get('/inventairePro', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/inventairePro.html')); // ✅ صفحة فارغة مؤقتاً
 });
 
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/vendeur/dashboard.html')); // ✅ صفحة فارغة مؤقتاً
+app.get('/dashboard', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/dashboard.html')); // ✅ صفحة فارغة مؤقتاً
 });
-app.get('/listVendeurs', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/vendeur/List-Vendeurs.html')); // ✅ صفحة فارغة مؤقتاً
+app.get('/listVendeurs', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/List-Vendeurs.html')); // ✅ صفحة فارغة مؤقتاً
+});
+app.get('/produitTotal', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/produitTotal.html')); // ✅ صفحة فارغة مؤقتاً
 });
 
 app.get('/api/inventairePro', async (req, res) => {
@@ -619,8 +622,29 @@ app.get('/api/inventairePro', async (req, res) => {
     res.status(500).send({ message: 'Error loading products', error });
   }
 });
+// ✅ جلب جميع بيانات المنتجات
+app.get('/api/ProduitsTotal', async (req, res) => {
+  try {
+    const produits = await Inventaire.find().sort({ _id: -1 }); // من الأحدث إلى الأقدم
+    res.json(produits);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'حدث خطأ في الخادم' });
+  }
+});
+//جلب جميع بيانات products
+app.get('/api/Produits', async (req, res) => {
+  try {
+    // جلب عدد المنتجات فقط
+    const produitsCount = await Product.countDocuments(); // بدلاً من find()
 
-
+    // إرجاع العدد
+    res.json({ count: produitsCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'حدث خطأ في الخادم' });
+  }
+});
 
 // API لتحديث منتج
 app.put('/api/inventairePro/:id', async (req, res) => {
