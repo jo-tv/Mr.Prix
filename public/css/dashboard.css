@@ -111,7 +111,7 @@ body {
 }
 #adressTable,
 #extraAdressTable,
-#sharedTableType{
+#sharedTableType {
   text-align: center;
   font-weight: 800;
   font-size: 20px;
@@ -120,4 +120,30 @@ body {
 
 #extraAdressTable td {
   font-size: 26px;
+}
+/* لمنع تضخّم الرسم البياني */
+.chartRound {
+  max-width: 600px; /* أقصى عرض */
+  margin: 0 auto; /* وسط */
+}
+
+#countProduct {
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* في الشاشات الكبيرة جداً */
+@media (min-width: 1200px) {
+  .chartRound {
+    max-width: 500px; /* قلل الحجم أكثر إذا أردت */
+  }
+
+  .card.chart {
+    max-width: 550px;
+    margin: auto;
+  }
+  .containeer {
+    zoom: 2;
+    
+  }
 }

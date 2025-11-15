@@ -103,7 +103,7 @@ async function initDashboard() {
     async function showAdressesStats(produits) {
       const jsonAdresses = await loadAdressesJSON(); // نفس دالة JSON
       const extra = getExtraAdresses(produits, jsonAdresses);
-
+      console.log(jsonAdresses);
       fillExtraAdressTable(extra);
       initExtraAdressTable();
 
@@ -345,23 +345,10 @@ async function initDashboard() {
       Réserve: { regex: /^R-/i, objectif: 52 },
       TêteCaisse: { regex: /^TC-/i, objectif: 3 },
     };
-    // 🔥 إزالة التكرار حسب adresse والاحتفاظ بمنتج واحد فقط لكل adresse
-    const produitsParAdresseUnique = Object.values(
-      produits.reduce((acc, item) => {
-        const adr = item.adresse || '';
-        if (!acc[adr]) acc[adr] = item; // نحتفظ بأول منتج فقط لكل adresse
-        return acc;
-      }, {})
-    );
-
     const rayonNames = Object.keys(rayons);
-
-const rayonCounts = rayonNames.map((r) =>
-  produitsParAdresseUnique.filter(
-    (p) => p.adresse && rayons[r].regex.test(p.adresse)
-  ).length
-);
-    console.log(rayonCounts);
+    const rayonCounts = rayonNames.map(
+      (r) => produits.filter((p) => p.adresse && rayons[r].regex.test(p.adresse)).length
+    );
     const rayonObjectifs = rayonNames.map((r) => rayons[r].objectif);
 
     window._charts.rayonChart = new Chart(ctx, {
