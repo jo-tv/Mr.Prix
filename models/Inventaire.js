@@ -1,6 +1,3 @@
-
-
-// تعريف الـ schema الخاص بالمنتجات (Inventaire)
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema(
@@ -16,12 +13,7 @@ const productSchema = new mongoose.Schema(
     adresse: { type: String },
     nameVendeur: { type: String },
   },
-  { timestamps: true }
-); // ⬅️ هذا السطر يضيف createdAt و updatedAt تلقائياً
+  { timestamps: true } // ⬅️ createdAt و updatedAt تلقائياً
+);
 
 module.exports = mongoose.model('Inventaire', productSchema);
-
-// إنشاء الموديل باستخدام الـ schema
-const Product = mongoose.model('Inventaire', productSchema);
-
-module.exports = Product;

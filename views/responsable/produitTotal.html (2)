@@ -89,41 +89,45 @@
     <div class="container-fluid py-4">
       <!-- 🔹 Barre de contrôle -->
       <div class="row mb-3 align-items-center">
-        <div class="col-md-3 mb-2">
+        <div class="col-md-4 mb-2">
           <input
             type="text"
             id="searchInput"
             class="form-control"
-            placeholder="🔍 Rechercher un produit par Libellé, ANPF, Gencode ou Adresse..."
+            placeholder="🔍 Rechercher un produit..."
           />
         </div>
-        <div class="col-md-2 mb-2">
-          <button
-            class="btn btn-primary w-100"
-            id="btnSearch"
-          >
-            <i class="fas fa-search"></i> Rechercher
-          </button>
-        </div>
-        <div class="col-md-3 mb-2">
+        <div class="col-md-4 mb-2">
           <select
             id="rowsPerPage"
             class="form-select"
           >
-            <option value="10" selected>10 produits / page</option>
+            <option value="10">10 produits / page</option>
             <option value="25">25 produits / page</option>
-            <option
-              value="50"
-              
-            >
-              50 produits / page
-            </option>
+            <option value="50">50 produits / page</option>
             <option value="100">100 produits / page</option>
           </select>
         </div>
-        <div class="col-md-4 text-end mb-2">
+        <div class="mb-3">
+          <label
+            for="mergeMode"
+            class="form-label"
+            >Mode de fusion:</label
+          >
+          <select
+            class="form-select"
+            id="mergeMode"
+          >
+            <option value="none">Pas de fusion</option>
+            <option value="anpf">ANPF seulement</option>
+            <option value="adresse">Adresse seulement</option>
+            <option value="anpf-adresse">ANPF + Adresse</option>
+            <option value="all">ANPF + Adresse + Calcul</option>
+          </select>
+        </div>
+        <div class="bott col-md-4 text-end mb-2">
           <button
-            class="btn btn-success"
+            class="btn btn-success me-2"
             id="btnExcel"
           >
             <i class="fas fa-file-excel"></i> Excel
@@ -140,7 +144,9 @@
               <th>Gencode</th>
               <th>ANPF</th>
               <th>Fournisseur</th>
+              <th>Stock System</th>
               <th>Quantité Réel</th>
+              <th>Ecar</th>
               <th>Adresse</th>
               <th>Vendeur</th>
               <th>L'emplacement</th>
@@ -170,7 +176,7 @@
     </div>
     <!-- ✅ Toast Bootstrap -->
     <div
-      class="position-fixed top-0 end-0 p-3"
+      class="position-fixed top-0 end-0 p-3 h-100"
       style="z-index: 9999"
     >
       <div

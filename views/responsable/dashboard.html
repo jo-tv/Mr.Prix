@@ -154,59 +154,55 @@
       </div>
 
       <!-- Chart -->
-      <div class="container-fluid my-5">
-        <div class="card chart border-0 rounded-4">
-          <div class="card-body">
-            <h5 class="card-title text-center mb-4">
-              <i class="fas fa-map-marker-alt text-success"></i>
-              Statistiques des adresses utilisées
-            </h5>
-            <div style="height: 400px; overflow-x: auto">
-              <canvas
-                id="adressChart"
-                style="max-height: 400px; width: 100%"
-              ></canvas>
+      <div class="group-chart">
+        <div class="container-fluid my-5 chart-group">
+          <div class="card chart border-0 rounded-4">
+            <div class="card-body">
+              <h5 class="card-title text-center mb-4">
+                <i class="fas fa-map-marker-alt text-success"></i>
+                Statistiques des adresses utilisées
+              </h5>
+              <div>
+                <canvas id="adressChart"></canvas>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="container-fluid my-5">
-        <div class="card chart border-0 rounded-4">
-          <div class="card-body">
-            <h5 class="card-title text-center mb-4">
-              <i class="fas fa-chart-bar text-primary"></i> Comparaison entre le nombre total de
-              produits et les produits extraits
-            </h5>
-            <div class="chart-container chartRound">
-              <canvas id="countProduct"></canvas>
+        <div class="container-fluid my-5 chart-group2">
+          <div class="card chart border-0 rounded-4">
+            <div class="card-body">
+              <h5 class="card-title text-center mb-4">
+                <i class="fas fa-chart-bar text-primary"></i>
+                Comparaison entre le nombre total de produits et les produits extraits
+              </h5>
+              <div>
+                <canvas id="countProduct"></canvas>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="container-fluid my-5">
-        <div class="card chart border-0 rounded-4">
-          <div class="card-body">
-            <h5 class="card-title text-center mb-4">
-              <i class="fas fa-chart-bar text-primary"></i> Comparaison des adresses réelles et de
-              l’objectif par rayon
-            </h5>
-            <div class="chart-container">
-              <canvas id="rayonChart"></canvas>
+        <div class="container-fluid my-5 chart-group">
+          <div class="card chart border-0 rounded-4">
+            <div class="card-body">
+              <h5 class="card-title text-center mb-4">
+                <i class="fas fa-chart-bar text-primary"></i> Comparaison des adresses réelles et de
+                l’objectif par rayon
+              </h5>
+              <div>
+                <canvas id="rayonChart"></canvas>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="container-fluid my-5">
-        <div class="card chart border-0 rounded-4">
-          <div class="card-body">
-            <h5 class="card-title text-center mb-4">
-              <i class="fas fa-chart-bar text-primary"></i> Top 10 vendeurs par nombre de produits
-            </h5>
-            <div style="height: 400px; overflow-x: auto">
-              <canvas
-                id="vendeurChart"
-                style="max-height: 400px; width: 100%"
-              ></canvas>
+        <div class="container-fluid my-5 chart-group">
+          <div class="card chart border-0 rounded-4">
+            <div class="card-body">
+              <h5 class="card-title text-center mb-4">
+                <i class="fas fa-chart-bar text-primary"></i> Top 10 vendeurs par nombre de produits
+              </h5>
+              <div>
+                <canvas id="vendeurChart"></canvas>
+              </div>
             </div>
           </div>
         </div>

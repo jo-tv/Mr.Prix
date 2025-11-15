@@ -356,11 +356,10 @@ async function initDashboard() {
 
     const rayonNames = Object.keys(rayons);
 
-const rayonCounts = rayonNames.map((r) =>
-  produitsParAdresseUnique.filter(
-    (p) => p.adresse && rayons[r].regex.test(p.adresse)
-  ).length
-);
+    const rayonCounts = rayonNames.map(
+      (r) =>
+        produitsParAdresseUnique.filter((p) => p.adresse && rayons[r].regex.test(p.adresse)).length
+    );
     console.log(rayonCounts);
     const rayonObjectifs = rayonNames.map((r) => rayons[r].objectif);
 

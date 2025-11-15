@@ -1,149 +1,142 @@
+/* عام */
 html,
 body {
   height: 100%;
   margin: 0;
   padding: 0;
-}
-body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #f8f9fa;
 }
-.chart-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
-.dashboard-header {
-  margin-top: 20px;
-}
-
+/* Cards إحصائية */
 .card {
   border: none;
   border-radius: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  padding: 1rem;
 }
 
 .card i {
   font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
-
-.data-section {
-  margin-top: 30px;
-}
-.hh {
-  margin-bottom: 150px;
-}
-#sharedTable tr td,
-#sharedTable tr th {
-  font-size: 20px;
-  text-align: center;
-  font-weight: 700;
-  vertical-align: center;
-}
-#topLoad {
+.group-chart {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-around;
   align-items: center;
-  display: none; /* مخفي افتراضياً */
-
-  inset: 0; /* يغطي كامل الصفحة */
-  background: rgba(0, 0, 0, 0.7);
-  width: 100vw;
-  height: 100vh;
-  z-index: 1000;
 }
-#loading {
-  /* محاذاة المحتوى في منتصف الشاشة */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative; /* يغطي كل الصفحة */
 
-  /* خلفية سوداء شفافة */
+canvas {
+  width: 100%;
+  height: 80%;
+  margin: auto;
+}
 
-  /* نص التحميل */
-  font-size: 2rem;
-  font-weight: bold;
-  color: #ffffff;
+/* Tables */
+.table-responsive {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
   text-align: center;
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
-
-  /* تموضع العنصر بدقة في منتصف الشاشة */
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
-@media (max-width: 768px) {
-  .card i {
-    font-size: 1.5rem;
-  }
-  .chart {
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-  }
+table th,
+table td {
+  padding: 10px;
+  vertical-align: middle;
+  font-weight: 600;
 }
 
-/*  نص موديل */
+/* Scroll داخل المودال */
+.custom-modal-content {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* المودال */
 .custom-modal {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
+  width: 95%;
   max-width: 900px;
   background: white;
-  z-index: 1001;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  border-radius: 15px;
+  display: none;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
 }
 
+/* Overlay */
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: none;
 }
-#adressTable,
-#extraAdressTable,
-#sharedTableType {
+
+/* Loader */
+#topLoad {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+}
+
+#loading {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
   text-align: center;
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: 0.8px;
 }
 
-#extraAdressTable td {
-  font-size: 26px;
-}
-/* لمنع تضخّم الرسم البياني */
-.chartRound {
-  max-width: 600px; /* أقصى عرض */
-  margin: 0 auto; /* وسط */
-}
-
-#countProduct {
-  width: 100% !important;
-  height: auto !important;
+/* Responsive */
+@media (max-width: 1200px) {
+  canva {
+    width: 100%;
+    height: 100%;
+  }
+  .chart-group {
+    height: 600px !important;
+  }
 }
 
-/* في الشاشات الكبيرة جداً */
-@media (min-width: 1200px) {
-  .chartRound {
-    max-width: 500px; /* قلل الحجم أكثر إذا أردت */
+@media (max-width: 768px) {
+  .card i {
+    font-size: 1.5rem;
+  }
+  canva {
+    width: 100%;
+    height: 100%;
+  }
+  .chart-group {
+    height: 300px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  table th,
+  table td {
+    font-size: 14px;
+    padding: 5px;
   }
 
-  .card.chart {
-    max-width: 550px;
-    margin: auto;
-  }
-  .containeer {
-    zoom: 2;
-    
+  .custom-modal-content {
+    padding: 10px;
   }
 }
