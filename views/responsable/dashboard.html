@@ -154,63 +154,69 @@
       </div>
 
       <!-- Chart -->
-      <div class="group-chart">
-        <div class="container-fluid my-5 chart-group">
-          <div class="card chart border-0 rounded-4">
-            <div class="card-body">
-              <h5 class="card-title text-center mb-4">
-                <i class="fas fa-map-marker-alt text-success"></i>
-                Statistiques des adresses utilisées
-              </h5>
-              <div>
-                <canvas id="adressChart"></canvas>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 col-md-6 col-lg-6 my-3 chart-group">
+            <div class="card chart border-0 rounded-4 h-100">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title text-center mb-4">
+                  <i class="fas fa-map-marker-alt text-success"></i>
+                  Statistiques des adresses utilisées
+                </h5>
+                <div class="flex-grow-1">
+                  <canvas id="adressChart"></canvas>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="container-fluid my-5 chart-group2">
-          <div class="card chart border-0 rounded-4">
-            <div class="card-body">
-              <h5 class="card-title text-center mb-4">
-                <i class="fas fa-chart-bar text-primary"></i>
-                Comparaison entre le nombre total de produits et les produits extraits
-              </h5>
-              <div>
-                <canvas id="countProduct"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="container-fluid my-5 chart-group">
-          <div class="card chart border-0 rounded-4">
-            <div class="card-body">
-              <h5 class="card-title text-center mb-4">
-                <i class="fas fa-chart-bar text-primary"></i> Comparaison des adresses réelles et de
-                l’objectif par rayon
-              </h5>
-              <div>
-                <canvas id="rayonChart"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="container-fluid my-5 chart-group">
-          <div class="card chart border-0 rounded-4">
-            <div class="card-body">
-              <h5 class="card-title text-center mb-4">
-                <i class="fas fa-chart-bar text-primary"></i> Top 10 vendeurs par nombre de produits
-              </h5>
-              <div>
-                <canvas id="vendeurChart"></canvas>
+
+          <div class="col-12 col-md-6 col-lg-6 my-3 chart-group">
+            <div class="card chart border-0 rounded-4 h-100">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title text-center mb-4">
+                  <i class="fas fa-chart-bar text-primary"></i>
+                  Comparaison entre le nombre total de produits et les produits extraits
+                </h5>
+                <div class="flex-grow-1">
+                  <canvas id="countProduct"></canvas>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      <div class="container-fluid my-3 chart-group">
+        <div class="card chart border-0 rounded-4 h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-center mb-4">
+              <i class="fas fa-chart-bar text-primary"></i>
+              l’objectif par rayon
+            </h5>
+            <div class="flex-grow-1">
+              <canvas id="rayonChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-fluid my-3 chart-group">
+        <div class="card chart border-0 rounded-4 h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-center mb-4">
+              <i class="fas fa-chart-bar text-primary"></i>
+              Top 10 vendeurs par nombre de produits
+            </h5>
+            <div class="flex-grow-1">
+              <canvas id="vendeurChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Tableau des adresses partagées -->
-      <div class="data-section hh">
-        <div class="card p-3">
+      <div class="data-section">
+        <div class="card cart-table p-3">
           <h5 class="mb-3"><i class="fas fa-location-dot text-danger"></i> Adresses partagées</h5>
           <div class="table-responsive">
             <table
@@ -229,10 +235,7 @@
             </table>
           </div>
         </div>
-      </div>
-
-      <div class="data-section hh">
-        <div class="card p-3">
+        <div class="card cart-table p-3">
           <h5 class="mb-3">
             <i class="fa-brands fa-invision text-danger"></i> Détail des adresses avec Casquette /
             FondRayon
@@ -254,9 +257,7 @@
             </table>
           </div>
         </div>
-      </div>
-      <div class="data-section hh">
-        <div class="card p-3">
+        <div class="card cart-table p-3">
           <h5 class="mb-3">
             <i class="fa-solid fa-circle-xmark text-danger"></i> Adresse non référencée
           </h5>
@@ -278,6 +279,7 @@
           </div>
         </div>
       </div>
+
       <!-- مودال عرض العناوين -->
       <div
         id="adressModal"
@@ -334,7 +336,7 @@
     <!--nav FAB Button -->
     <div
       class="containeer"
-      style="zoom: 1.7"
+      style="zoom: 1.4"
     >
       <div class="menu-toggle">
         <span class="fa fa-plus"></span>

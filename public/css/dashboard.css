@@ -16,22 +16,16 @@ body {
   text-align: center;
   padding: 1rem;
 }
+.cart-table {
+  margin: 50px auto;
+}
+.data-section {
+  margin-bottom: 30px !important;
+}
 
 .card i {
   font-size: 2rem;
   margin-bottom: 0.5rem;
-}
-.group-chart {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-}
-
-canvas {
-  width: 100%;
-  height: 80%;
-  margin: auto;
 }
 
 /* Tables */
@@ -42,7 +36,7 @@ canvas {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 16px;
+  font-size: 26px;
   text-align: center;
 }
 
@@ -76,7 +70,6 @@ table td {
   display: none;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
 }
-
 /* Overlay */
 .overlay {
   position: fixed;
@@ -84,61 +77,30 @@ table td {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(215, 155, 155, 0.5);
   z-index: 9999;
   display: none;
 }
-
 /* Loader */
 #topLoad {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(150, 148, 156, 0.537);
   z-index: 10000;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
 
 #loading {
   font-size: 2rem;
   font-weight: bold;
-  color: #fff;
+  color: #d0ff00;
   text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
-  canva {
-    width: 100%;
-    height: 100%;
-  }
-  .chart-group {
-    height: 600px !important;
-  }
-}
-
-@media (max-width: 768px) {
-  .card i {
-    font-size: 1.5rem;
-  }
-  canva {
-    width: 100%;
-    height: 100%;
-  }
-  .chart-group {
-    height: 300px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  table th,
-  table td {
-    font-size: 14px;
-    padding: 5px;
-  }
-
-  .custom-modal-content {
-    padding: 10px;
-  }
-}

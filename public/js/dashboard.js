@@ -562,7 +562,7 @@ async function initDashboard() {
       window._charts.adress = new Chart(ctxA, {
         type: 'bar',
         data: {
-          labels: ['Adresses utilisées', 'Capacité totale'],
+          labels: [' utilisées', ' totale'],
           datasets: [
             {
               label: 'Adresses',
@@ -635,7 +635,11 @@ async function reloadDashboard() {
    Event Listeners
 ========================= */
 document.addEventListener('DOMContentLoaded', initDashboard);
-document.getElementById('reloadBtn')?.addEventListener('click', reloadDashboard);
+
+// الزر لم يعد يعيد تحميل البيانات، بل يفتح صفحة جديدة
+document.getElementById('reloadBtn')?.addEventListener('click', () => {
+  window.location.href = '/dashboard'; // أو أي صفحة تريدها
+});
 
 // روابط الصفحات
 document
