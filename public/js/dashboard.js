@@ -76,7 +76,8 @@ async function initDashboard() {
       'productsCount'
     ).textContent = `${produitsUniques.length} / ${data.count}`;
 
-    document.getElementById('adressCount').textContent = `${adressesUnique.length} / 738`;
+    document.getElementById('adressCount').textContent =
+    `${adressesUnique.length} / 744`;
 
     /* =========================
    🔹 تحميل ملف JSON (مثلاً من نفس المجلد)
@@ -337,7 +338,7 @@ async function initDashboard() {
       Quin: { regex: /^Q-/i, objectif: 78 },
       Bois: { regex: /^B-/i, objectif: 11 },
       Jardin: { regex: /^J-/i, objectif: 97 },
-      Décorations: { regex: /^D-/i, objectif: 143 },
+      Décorations: { regex: /^D-/i, objectif: 149 },
       Cuisine: { regex: /^C-/i, objectif: 48 },
       TG: { regex: /^TG-/i, objectif: 17 },
       Podiome: { regex: /^P-/i, objectif: 34 },
@@ -557,7 +558,7 @@ async function initDashboard() {
     destroyChart(window._charts.adress);
     const ctxA = document.getElementById('adressChart')?.getContext('2d');
     if (ctxA) {
-      const totalAdresses = 738;
+      const totalAdresses = 744;
       const percentageUsed = ((adressesUnique.length / totalAdresses) * 100).toFixed(2);
       window._charts.adress = new Chart(ctxA, {
         type: 'bar',
