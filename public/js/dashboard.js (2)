@@ -63,19 +63,7 @@ async function initDashboard() {
     const adressesUnique = Array.from(new Set(produits.map((p) => p.adresse).filter(Boolean)));
 
     document.getElementById('usersCount').textContent = vendeursUnique.length;
-    // 🔥 إزالة التكرار حسب ANPF والاحتفاظ بمنتج واحد فقط
-    const produitsUniques = Object.values(
-      produits.reduce((acc, item) => {
-        if (!acc[item.anpf]) acc[item.anpf] = item; // نضيفه فقط أول مرة
-        return acc;
-      }, {})
-    );
-
-    // 🔥 تحديث عدد المنتجات بعد حذف التكرار
-    document.getElementById(
-      'productsCount'
-    ).textContent = `${produitsUniques.length} / ${data.count}`;
-
+    document.getElementById('productsCount').textContent = `${produits.length} / ${data.count}`;
     document.getElementById('adressCount').textContent = `${adressesUnique.length} / 738`;
 
     /* =========================
@@ -277,7 +265,7 @@ async function initDashboard() {
     ========================= */
     destroyChart(window._charts.countProduct);
     const ctxB = document.getElementById('countProduct').getContext('2d');
-    const dataCount = Math.min(produitsUniques.length, data.count || 0);
+    const dataCount = Math.min(produits.length, data.count || 0);
     const remainder = (data.count || 0) - dataCount;
     const dataCountPercentage = data.count > 0 ? (dataCount / data.count) * 100 : 0;
 
