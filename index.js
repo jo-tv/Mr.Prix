@@ -597,7 +597,7 @@ app.post('/api/inventairePro', async (req, res) => {
 });
 
 // إضافة نقطة GET لعرض البيانات في صفحة HTML
-app.get('/inventairePro', isAuthenticated, isVendeur, (req, res) => {
+app.get('/InvSmartManager', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/inventairePro.html')); // ✅ صفحة فارغة مؤقتاً
 });
 
@@ -726,7 +726,7 @@ async function exportExcelByVendeur(nameVendeur, res) {
       { header: 'Écart d’Inventaire', key: 'ecart', width: 18 },
       { header: 'Fournisseur', key: 'fournisseur', width: 20 },
       { header: 'Adresse', key: 'adresse', width: 30 },
-      { header: 'Type', key: 'calcul', width: 20 },
+      { header: 'Lemplacement', key: 'calcul', width: 20 },
       { header: 'Date', key: 'createdAt', width: 20 },
     ];
 
@@ -772,8 +772,6 @@ app.get('/api/exportExcel/:vendeur', async (req, res) => {
   await exportExcelByVendeur(req.params.vendeur, res);
 });
 
-    
-
 // 🔹 دالة عامة لتصدير جميع البيانات
 async function exportAllProducts(res) {
   try {
@@ -792,7 +790,7 @@ async function exportAllProducts(res) {
       { header: 'Écart d’Inventaire', key: 'ecart', width: 18 },
       { header: 'Fournisseur', key: 'fournisseur', width: 20 },
       { header: 'Adresse', key: 'adresse', width: 25 },
-      { header: 'Type', key: 'calcul', width: 20 },
+      { header: 'Lemplacement', key: 'calcul', width: 20 },
       { header: 'Vendeur', key: 'nameVendeur', width: 25 },
       { header: 'Date', key: 'createdAt', width: 20 },
     ];

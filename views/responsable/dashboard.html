@@ -120,6 +120,37 @@
             <h3 id="sharedAddresses">0</h3>
           </div>
         </div>
+        <div class="col-md-3 col-6 mb-3">
+          <div class="card text-bg-info p-3">
+            <i class="fas fa-database mb-2"></i>
+            <h5>N° des Adresse Magasin</h5>
+            <h3 id="jsonAdressesCount">0</h3>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-6 mb-3">
+          <div class="card text-bg-success p-3">
+            <i class="fas fa-map-marker-alt mb-2"></i>
+            <h5>N° des Adresse comptée</h5>
+            <h3 id="dbAdressesCount">0</h3>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-6 mb-3">
+          <div class="card text-bg-warning p-3">
+            <i class="fas fa-exclamation-circle mb-2"></i>
+            <h5>Adresse Non comptée</h5>
+            <h3 id="missingCount">0</h3>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-6 mb-3 refe">
+          <div class="card text-bg-danger p-3">
+            <i class="fas fa-exclamation-triangle mb-2"></i>
+            <h5>Adresse non référencée</h5>
+            <h3 id="extraCount">0</h3>
+          </div>
+        </div>
       </div>
 
       <!-- Chart -->
@@ -228,6 +259,80 @@
           </div>
         </div>
       </div>
+      <div class="data-section hh">
+        <div class="card p-3">
+          <h5 class="mb-3">
+            <i class="fa-solid fa-circle-xmark text-danger"></i> Adresse non référencée
+          </h5>
+          <div class="table-responsive">
+            <table
+              class="table table-bordered"
+              id="extraAdressTable"
+            >
+              <thead class="table-dark">
+                <tr>
+                  <th>Adresse</th>
+                  <th>Vendeur</th>
+                  <th>Statut</th>
+                  <th>Date d’enregistrement</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- مودال عرض العناوين -->
+      <div
+        id="adressModal"
+        class="custom-modal"
+        style="display: none"
+      >
+        <div class="custom-modal-content">
+          <button
+            id="closeAdressModal"
+            class="btn btn-danger btn-sm"
+            style="float: right"
+          >
+            Fermer ×
+          </button>
+
+          <h4 class="mb-3 text-center">Détails des Adresses</h4>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Filtrer les adresses :</label>
+            <select
+              id="filterAdress"
+              class="form-select w-50"
+            >
+              <option value="all">Toutes</option>
+              <option value="non">Non comptée</option>
+              <option value="oui">Déjà comptée</option>
+            </select>
+          </div>
+
+          <table
+            id="adressTable"
+            class="table table-bordered table-striped"
+            style="width: 100%"
+          >
+            <thead>
+              <tr>
+                <th>Adresse</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- خلفية رمادية -->
+      <div
+        id="overlay"
+        class="overlay"
+        style="display: none"
+      ></div>
     </div>
 
     <!--nav FAB Button -->
@@ -310,19 +415,6 @@
         </div>
         <div
           class="btn-app"
-          data-label="Inventaire Fournisseurs"
-        >
-          <div class="fa">
-            <a href="cmd"
-              ><i
-                class="far fa-file-excel"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
           data-label="Prix Vente"
         >
           <div class="fa">
@@ -339,7 +431,6 @@
     <!--fin FAB Button -->
 
     <!-- ✅ Chart.js (يمكن أن يبقى في أي مكان بعد jQuery) -->
-
 
     <script src="js/dashboard.js"></script>
     <script src="js/main2.js"></script>

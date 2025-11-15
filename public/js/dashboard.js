@@ -59,12 +59,206 @@ async function initDashboard() {
 
     // --- إحصائيات عامة ---
     const vendeursUnique = Array.from(new Set(produits.map((p) => p.nameVendeur).filter(Boolean)));
-    
+
     const adressesUnique = Array.from(new Set(produits.map((p) => p.adresse).filter(Boolean)));
 
     document.getElementById('usersCount').textContent = vendeursUnique.length;
     document.getElementById('productsCount').textContent = `${produits.length} / ${data.count}`;
-    document.getElementById('adressCount').textContent = `${adressesUnique.length} / 686`;
+    document.getElementById('adressCount').textContent = `${adressesUnique.length} / 738`;
+
+    /* =========================
+   🔹 تحميل ملف JSON (مثلاً من نفس المجلد)
+========================= */
+
+    async function loadAdressesJSON() {
+      try {
+        const response = await fetch('adresse.json'); // مسار ملف JSON
+        if (!response.ok) throw new Error('Erreur lors du chargement du fichier JSON');
+        const jsonData = await response.json();
+
+        return jsonData
+          .map((item) => item.ADRESSE) // ← استخدم ADRESSE كما في JSON
+          .filter(Boolean); // استخراج العناوين
+      } catch (err) {
+        console.error(err);
+        return [];
+      }
+    }
+
+    // 🔹 حساب الإحصائيات
+    let adressDT; // نجعلها global لكي لا يتم تدميرها كل مرة
+
+    async function showAdressesStats(produits) {
+      const jsonAdresses = await loadAdressesJSON(); // نفس دالة JSON
+      const extra = getExtraAdresses(produits, jsonAdresses);
+      console.log(jsonAdresses);
+      fillExtraAdressTable(extra);
+      initExtraAdressTable();
+
+      // 🟢 العناوين المحسوبة فعلاً (casquette أو fondRayon)
+      const computedAdresses = Array.from(
+        new Set(
+          produits
+            .filter((p) => (p.calcul || '').trim() !== '')
+            .map((p) => p.adresse)
+            .filter(Boolean)
+        )
+      );
+
+      // 🔴 العناوين الموجودة في JSON ولم تُحسب بعد
+      const missingInDB = jsonAdresses.filter((a) => !computedAdresses.includes(a));
+
+      // 🟡 العناوين المحسوبة داخل قاعدة البيانات
+      const extraInDB = computedAdresses;
+
+      // تحديث الكروت
+      document.getElementById('dbAdressesCount').innerText = computedAdresses.length;
+      document.getElementById('jsonAdressesCount').innerText = jsonAdresses.length;
+      document.getElementById('missingCount').innerText = missingInDB.length;
+
+      document.getElementById('adressCount').onclick = () =>
+        openAdressModal(missingInDB, extraInDB);
+    }
+
+    function openAdressModal(missingInDB, extraInDB) {
+      document.getElementById('adressModal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+
+      fillAdressTable(missingInDB, extraInDB);
+
+      // 🔄 إذا كان الجدول مهيأ مسبقاً، دمره ثم أنشئه مرة أخرى
+      if ($.fn.DataTable.isDataTable('#adressTable')) {
+        adressDT.destroy();
+      }
+
+      adressDT = $('#adressTable').DataTable({
+        dom: 'Blfrtip',
+        buttons: ['excelHtml5'],
+        pageLength: 10,
+        lengthMenu: [5, 10, 20, 50, 100],
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
+      });
+
+      // ✔️ فلترة حسب data-type (موثوقة 100%)
+      document.getElementById('filterAdress').onchange = () => {
+        const filter = document.getElementById('filterAdress').value;
+
+        $.fn.dataTable.ext.search = [];
+        if (filter !== 'all') {
+          $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            if (settings.nTable.id !== 'adressTable') return true;
+            const rowType = settings.aoData[dataIndex].nTr.getAttribute('data-type');
+            return rowType === filter;
+          });
+        }
+        adressDT.draw();
+      };
+    }
+    // 🔹 زر إغلاق النافذة
+    document.getElementById('closeAdressModal').onclick = () => {
+      document.getElementById('adressModal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    };
+
+    function fillAdressTable(missing, extra) {
+      const tbody = document.querySelector('#adressTable tbody');
+
+      // مسح الجدول
+      tbody.innerHTML = '';
+
+      // 🔴 التعامل مع العناوين غير المحسوبة
+      missing.forEach((a) => {
+        const tr = document.createElement('tr');
+        tr.dataset.type = 'non';
+        tr.innerHTML = `
+      <td>${a}</td>
+      <td><span class="badge bg-danger w-100 p-2">Non comptée</span></td>
+    `;
+        tbody.appendChild(tr);
+      });
+
+      // 🟢 التعامل مع العناوين المحسوبة
+      extra.forEach((a) => {
+        const tr = document.createElement('tr');
+        tr.dataset.type = 'oui';
+        tr.innerHTML = `
+      <td>${a}</td>
+      <td><span class="badge bg-success w-100 p-2">Déjà comptée</span></td>
+    `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 🔹 مثال استخدام
+    showAdressesStats(produits);
+
+    function getExtraAdresses(dbProducts, jsonAdresses) {
+      return dbProducts
+        .filter((p) => p.adresse && !jsonAdresses.includes(p.adresse))
+        .map((p) => ({
+          adresse: p.adresse,
+          vendeur: p.nameVendeur,
+          date: p.createdAt || 'Inconnu',
+        }));
+    }
+
+    function fillExtraAdressTable(extraList) {
+      const tbody = document.querySelector('#extraAdressTable tbody');
+      tbody.innerHTML = '';
+
+      document.getElementById('extraCount').innerText = extraList.length;
+
+      extraList.forEach((item) => {
+        const d = new Date(item.date);
+        const formattedDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+          2,
+          '0'
+        )}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(
+          2,
+          '0'
+        )}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+
+        tbody.innerHTML += `
+      <tr>
+        <td><span class="badge bg-primary p-2 w-100">${item.adresse}</span></td>
+        <td><span class="badge bg-success p-2 w-100">${item.vendeur.toUpperCase()}</span></td>
+        <td><span class="badge bg-danger p-2 w-100">Adresse inconnue</span></td>
+        <td><span class="badge bg-primary p-2 w-100">${formattedDate}</span></td>
+      </tr>
+    `;
+      });
+    }
+
+    let extraDT = null;
+
+    function initExtraAdressTable() {
+      if ($.fn.DataTable.isDataTable('#extraAdressTable')) {
+        extraDT.destroy();
+      }
+
+      extraDT = $('#extraAdressTable').DataTable({
+        dom: 'Bflrtip',
+        buttons: [
+          {
+            extend: 'excelHtml5',
+            text: '📥 Télécharger Excel',
+            title: 'Adresses_Inconnues',
+          },
+          {
+            extend: 'print',
+            text: '🖨️ Imprimer',
+          },
+        ],
+        pageLength: 10,
+        lengthMenu: [
+          [5, 10, 20, 50, -1],
+          [5, 10, 20, 50, 'Tout'],
+        ],
+        language: {
+          url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json',
+        },
+      });
+    }
 
     /* =========================
        1️⃣ Doughnut chart produits extraits
@@ -128,14 +322,16 @@ async function initDashboard() {
       Électricité: { regex: /^E-/i, objectif: 105 },
       Sanitaire: { regex: /^S-/i, objectif: 59 },
       Outillage: { regex: /^O-/i, objectif: 81 },
-      Quin: { regex: /^Q-/i, objectif: 80 },
-      Bois: { regex: /^B-/i, objectif: 8 },
-      Jardin: { regex: /^J-/i, objectif: 102 },
-      Décorations: { regex: /^D-/i, objectif: 142 },
+      Quin: { regex: /^Q-/i, objectif: 78 },
+      Bois: { regex: /^B-/i, objectif: 11 },
+      Jardin: { regex: /^J-/i, objectif: 97 },
+      Décorations: { regex: /^D-/i, objectif: 143 },
       Cuisine: { regex: /^C-/i, objectif: 48 },
       TG: { regex: /^TG-/i, objectif: 17 },
-      Podiome: { regex: /^P-/i, objectif: 32 },
+      Podiome: { regex: /^P-/i, objectif: 34 },
       Persentoir: { regex: /^PR-/i, objectif: 9 },
+      Réserve: { regex: /^R-/i, objectif: 52 },
+      TêteCaisse: { regex: /^TC-/i, objectif: 3 },
     };
     const rayonNames = Object.keys(rayons);
     const rayonCounts = rayonNames.map(
@@ -254,7 +450,7 @@ async function initDashboard() {
     $('#sharedTableType').DataTable({
       pageLength: 5,
       responsive: true,
-      lengthMenu: [5, 10, 25,100],
+      lengthMenu: [5, 10, 25, 100],
       language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
       columnDefs: [{ targets: '_all', className: 'text-center' }],
       dom: 'Bflrtip',
@@ -337,7 +533,7 @@ async function initDashboard() {
     destroyChart(window._charts.adress);
     const ctxA = document.getElementById('adressChart')?.getContext('2d');
     if (ctxA) {
-      const totalAdresses = 686;
+      const totalAdresses = 738;
       const percentageUsed = ((adressesUnique.length / totalAdresses) * 100).toFixed(2);
       window._charts.adress = new Chart(ctxA, {
         type: 'bar',
@@ -427,3 +623,6 @@ document
 document
   .querySelector('.Adresses')
   ?.addEventListener('click', () => (window.location.href = '#sharedTable'));
+document
+  .querySelector('.refe')
+  ?.addEventListener('click', () => (window.location.href = '#extraAdressTable'));
