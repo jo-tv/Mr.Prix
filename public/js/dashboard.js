@@ -132,90 +132,115 @@ async function initDashboard() {
         openAdressModal(missingInDB, extraInDB);
     }
 
+    let AdressDT = null; // متغير DataTable العام
+
     function openAdressModal(missingInDB, extraInDB) {
       document.getElementById('adressModal').style.display = 'block';
       document.getElementById('overlay').style.display = 'block';
 
+      // تعبئة الجدول
       fillAdressTable(missingInDB, extraInDB);
 
-      // 🔄 إذا كان الجدول مهيأ مسبقاً، دمره ثم أنشئه مرة أخرى
+      // إذا كان الجدول مهيأ مسبقاً → دمره أولاً
       if ($.fn.DataTable.isDataTable('#adressTable')) {
-        adressDT.destroy();
+        AdressDT.destroy();
       }
 
+      // إعادة تهيئة DataTable من جديد
       AdressDT = $('#adressTable').DataTable({
-        dom: 'Blfrtip', // يمكن ترك 'p' هنا
+        dom: 'Blfrtip',
         buttons: ['excelHtml5'],
         pageLength: 10,
         lengthMenu: [5, 10, 20, 50, 100],
-        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
-
-        // 🆕 التعديل المطلوب للتحكم في أزرار الترقيم:
+        language: {
+          url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json',
+        },
         pagingType: 'full_numbers',
-        // الخيارات المتاحة: 'simple', 'simple_numbers', 'full', 'full_numbers'
       });
 
-      // ✔️ فلترة حسب data-type (موثوقة 100%)
+      // 🔥 فلترة حسب data-type
       document.getElementById('filterAdress').onchange = () => {
         const filter = document.getElementById('filterAdress').value;
 
-        $.fn.dataTable.ext.search = [];
+        // امسح أي فلاتر سابقة
+        $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(
+          (f) => f._isAdressFilter !== true
+        );
+
         if (filter !== 'all') {
-          $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+          const filterFn = function (settings, data, dataIndex) {
             if (settings.nTable.id !== 'adressTable') return true;
             const rowType = settings.aoData[dataIndex].nTr.getAttribute('data-type');
             return rowType === filter;
-          });
+          };
+
+          // علامة للتمييز
+          filterFn._isAdressFilter = true;
+
+          $.fn.dataTable.ext.search.push(filterFn);
         }
-        adressDT.draw();
+
+        AdressDT.draw();
       };
     }
-    // 🔹 زر إغلاق النافذة
+
+    // زر الإغلاق
     document.getElementById('closeAdressModal').onclick = () => {
       document.getElementById('adressModal').style.display = 'none';
       document.getElementById('overlay').style.display = 'none';
     };
 
+    // تعبئة جدول العناوين
     function fillAdressTable(missing, extra) {
       const tbody = document.querySelector('#adressTable tbody');
-
-      // مسح الجدول
       tbody.innerHTML = '';
 
-      // 🔴 التعامل مع العناوين غير المحسوبة
+      // العناوين غير المحسوبة
       missing.forEach((a) => {
-        const tr = document.createElement('tr');
-        tr.dataset.type = 'non';
-        tr.innerHTML = `
-      <td>${a}</td>
-      <td><span class="badge bg-danger w-100 p-2">Non comptée</span></td>
+        tbody.innerHTML += `
+      <tr data-type="non">
+        <td>${a}</td>
+        <td><span class="badge bg-danger w-100 p-2">Non comptée</span></td>
+      </tr>
     `;
-        tbody.appendChild(tr);
       });
 
-      // 🟢 التعامل مع العناوين المحسوبة
+      // العناوين المحسوبة
       extra.forEach((a) => {
-        const tr = document.createElement('tr');
-        tr.dataset.type = 'oui';
-        tr.innerHTML = `
-      <td>${a}</td>
-      <td><span class="badge bg-success w-100 p-2">Déjà comptée</span></td>
+        tbody.innerHTML += `
+      <tr data-type="oui">
+        <td>${a}</td>
+        <td><span class="badge bg-success w-100 p-2">Déjà comptée</span></td>
+      </tr>
     `;
-        tbody.appendChild(tr);
       });
     }
-
     // 🔹 مثال استخدام
     showAdressesStats(produits);
 
-    function getExtraAdresses(dbProducts, jsonAdresses) {
-      return dbProducts
-        .filter((p) => p.adresse && !jsonAdresses.includes(p.adresse))
-        .map((p) => ({
-          adresse: p.adresse,
-          vendeur: p.nameVendeur,
-          date: p.createdAt || 'Inconnu',
-        }));
+    function getExtraAdresses(dbProducts, jsonAddresses) {
+      const map = {};
+
+      dbProducts.forEach((p) => {
+        if (!p.adresse || jsonAddresses.includes(p.adresse)) return;
+
+        if (!map[p.adresse]) {
+          map[p.adresse] = {
+            adresse: p.adresse,
+            vendeur: p.nameVendeur,
+            count: 0,
+            lastDate: p.createdAt || 'Inconnu',
+          };
+        }
+
+        map[p.adresse].count++;
+
+        if (p.createdAt && p.createdAt > map[p.adresse].lastDate) {
+          map[p.adresse].lastDate = p.createdAt;
+        }
+      });
+
+      return Object.values(map);
     }
 
     function fillExtraAdressTable(extraList) {
@@ -225,7 +250,7 @@ async function initDashboard() {
       document.getElementById('extraCount').innerText = extraList.length;
 
       extraList.forEach((item) => {
-        const d = new Date(item.date);
+        const d = new Date(item.lastDate);
         const formattedDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
           2,
           '0'
@@ -240,6 +265,7 @@ async function initDashboard() {
         <td><span class="badge bg-success p-2 w-100">${item.vendeur.toUpperCase()}</span></td>
         <td><span class="badge bg-danger p-2 w-100">Adresse inconnue</span></td>
         <td><span class="badge bg-primary p-2 w-100">${formattedDate}</span></td>
+        <td><span class="badge bg-primary p-2 w-100">${item.count}</span></td>
       </tr>
     `;
       });
