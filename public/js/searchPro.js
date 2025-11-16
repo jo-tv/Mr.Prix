@@ -56,7 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('adresse').value = savedAdress.toUpperCase().trim() || '';
   }
   if (inputCalcul) {
-    document.getElementById('calcul').value = inputCalcul.toUpperCase().trim() || '';
+    document.getElementById('calcul').value =
+      inputCalcul.trim() || 'Sélectionnez ce que vous voulez calculer ';
+    console.log(inputCalcul);
   }
   loadProductsFromDatabase();
   setupEventListeners();
@@ -306,15 +308,20 @@ function addProductToTable(product) {
 async function removeProduct(button) {
   const row = button.closest('tr');
   const id = row.dataset.id;
-
+  if (!id) {
+    alert('❌ ID غير موجود!');
+    return;
+  }
   if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
 
   try {
-    const response = await fetch(`/api/inventairePro/${id}`, { method: 'DELETE' });
+    console.log('⏳ إرسال طلب حذف إلى السيرفر...');
+    const response = await fetch(`/api/InvSmartManager/${id}`, { method: 'DELETE' });
     const data = await response.json();
-
-    if (!response.ok || data.success === false)
-      throw new showToast(data.message || '❌ Échec de la suppression du produit', 'error');
+    if (!response.ok || data.success === false) {
+      showToast(data.message || '❌ Échec de la suppression du produit', 'error');
+      return;
+    }
 
     row.remove();
     showToast('🗑️ Produit supprimé avec succès', 'success');

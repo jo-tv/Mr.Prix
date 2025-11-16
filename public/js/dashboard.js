@@ -76,8 +76,7 @@ async function initDashboard() {
       'productsCount'
     ).textContent = `${produitsUniques.length} / ${data.count}`;
 
-    document.getElementById('adressCount').textContent =
-    `${adressesUnique.length} / 744`;
+    document.getElementById('adressCount').textContent = `${adressesUnique.length} / 744`;
 
     /* =========================
    🔹 تحميل ملف JSON (مثلاً من نفس المجلد)
@@ -439,11 +438,12 @@ async function initDashboard() {
     produits.forEach((p) => {
       if (!p.adresse) return;
       if (!groupedByAdresseA[p.adresse])
-        groupedByAdresseA[p.adresse] = { casquette: 0, fondrayon: 0 };
+        groupedByAdresseA[p.adresse] = { casquette: 0, fondrayon: 0, reserve: 0 };
 
       const type = (p.calcul?.trim() || p['calcul ']?.trim() || '').toLowerCase();
       if (type === 'casquette') groupedByAdresseA[p.adresse].casquette++;
       else if (type === 'fondrayon') groupedByAdresseA[p.adresse].fondrayon++;
+      else if (type === 'reserve') groupedByAdresseA[p.adresse].reserve++;
     });
 
     const sharedEntriese = Object.entries(groupedByAdresseA)
@@ -451,9 +451,12 @@ async function initDashboard() {
         adresse,
         casquette: counts.casquette,
         fondrayon: counts.fondrayon,
+        reserve: counts.reserve,
       }))
-      .filter((e) => e.casquette > 0 || e.fondrayon > 0)
-      .sort((a, b) => b.casquette + b.fondrayon - (a.casquette + a.fondrayon));
+      .filter((e) => e.casquette > 0 || e.fondrayon > 0 || e.reserve > 0)
+      .sort(
+        (a, b) => b.casquette + b.fondrayon + b.reserve - (a.casquette + a.fondrayon + a.reserve)
+      );
 
     const tbodyType = document.querySelector('#sharedTableType tbody');
     tbodyType.innerHTML = sharedEntriese
@@ -463,6 +466,7 @@ async function initDashboard() {
         <td>${escapeHtml(r.adresse)}</td>
         <td>${r.casquette}</td>
         <td>${r.fondrayon}</td>
+        <td>${r.reserve}</td>
       </tr>`
       )
       .join('');

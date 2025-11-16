@@ -696,8 +696,8 @@ app.get('/api/ProduitsTotal', async (req, res) => {
           { libelle: { $regex: `^${search}$`, $options: 'i' } },
           { gencode: { $regex: `^${search}$`, $options: 'i' } },
           { anpf: { $regex: `^${search}$`, $options: 'i' } },
-          { adresse: { $regex: `^${search}$`, $options: 'i' } }
-        ]
+          { adresse: { $regex: `^${search}$`, $options: 'i' } },
+        ],
       };
     }
 
@@ -912,6 +912,39 @@ app.delete('/api/inventairePro/:vendeur', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send({ message: 'Erreur lors de la suppression', err });
+  }
+});
+
+// DELETE /api/inventairePro/:id
+const { ObjectId } = require('mongoose').Types;
+app.delete('/api/InvSmartManager/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+
+    // تحقق من صحة ObjectId قبل الحذف
+    if (!ObjectId.isValid(productId)) {
+      return res.status(400).json({ success: false, message: 'ID invalide' });
+    }
+
+    // تحويل إلى ObjectId
+    const objectId = new ObjectId(productId);
+
+    // حذف المنتج
+    const result = await Inventaire.deleteOne({ _id: objectId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: 'Produit non trouvé' });
+    }
+
+    
+    res.json({
+      success: true,
+      message: 'Produit supprimé avec succès',
+      deletedCount: result.deletedCount,
+    });
+  } catch (err) {
+    console.error('❌ Erreur serveur:', err);
+    res.status(500).json({ success: false, message: 'Erreur lors de la suppression', err });
   }
 });
 
