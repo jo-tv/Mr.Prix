@@ -684,11 +684,26 @@ app.get('/api/inventairePro/:vendeur', async (req, res) => {
 app.get('/api/ProduitsTotal', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50; // عدد المنتجات في كل صفحة
+    const limit = parseInt(req.query.limit) || 50;
+    const search = req.query.search?.trim();
 
-    const total = await Inventaire.countDocuments();
-    const produits = await Inventaire.find()
-      .sort({ _id: -1 }) // من الأحدث للأقدم
+    let query = {};
+
+    if (search) {
+      // البحث case-insensitive و exact match
+      query = {
+        $or: [
+          { libelle: { $regex: `^${search}$`, $options: 'i' } },
+          { gencode: { $regex: `^${search}$`, $options: 'i' } },
+          { anpf: { $regex: `^${search}$`, $options: 'i' } },
+          { adresse: { $regex: `^${search}$`, $options: 'i' } },
+        ],
+      };
+    }
+
+    const total = await Inventaire.countDocuments(query);
+    const produits = await Inventaire.find(query)
+      .sort({ _id: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
@@ -711,11 +726,31 @@ async function exportExcelByVendeur(nameVendeur, res) {
   try {
     const produits = await Inventaire.find({ nameVendeur }).sort({ createdAt: -1 });
 
+    // 🔥 دمج المنتجات حسب key = anpf-calcul-adresse
+    const mergedProduits = Object.values(
+      produits.reduce((acc, item) => {
+        const key = `${item.anpf}-${item.calcul}-${item.adresse}`;
+
+        if (!acc[key]) {
+          acc[key] = {
+            ...item.toObject(),
+            qteInven: 0,
+            mergedCount: 0,
+          };
+        }
+
+        acc[key].qteInven += parseFloat(item.qteInven) || 0;
+        acc[key].mergedCount += 1;
+
+        return acc;
+      }, {})
+    );
+
     // إنشاء ملف Excel
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Produits');
 
-    // ✅ تحديد الأعمدة
+    // الأعمدة
     sheet.columns = [
       { header: 'Libelle', key: 'libelle', width: 30 },
       { header: 'Gencode', key: 'gencode', width: 20 },
@@ -728,10 +763,11 @@ async function exportExcelByVendeur(nameVendeur, res) {
       { header: 'Adresse', key: 'adresse', width: 30 },
       { header: 'Lemplacement', key: 'calcul', width: 20 },
       { header: 'Date', key: 'createdAt', width: 20 },
+      { header: 'Nombre Groupés', key: 'mergedCount', width: 15 }, // جديد
     ];
 
-    // ✅ تعبئة البيانات
-    produits.forEach((p) => {
+    // تعبئة البيانات المدمجة
+    mergedProduits.forEach((p) => {
       const stock = parseFloat(p.stock) || 0;
       const qteInven = parseFloat(p.qteInven) || 0;
       const ecart = qteInven - stock;
@@ -748,17 +784,17 @@ async function exportExcelByVendeur(nameVendeur, res) {
         adresse: p.adresse || '—',
         calcul: p.calcul?.trim() || p['calcul ']?.trim() || '—',
         createdAt: p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : '',
+        mergedCount: p.mergedCount,
       });
     });
 
-    // ✅ إعدادات الرد
+    // إعداد الرد
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
     res.setHeader('Content-Disposition', `attachment; filename=${nameVendeur}.xlsx`);
 
-    // ✅ كتابة الملف في الرد مباشرة
     await workbook.xlsx.write(res);
     res.end();
   } catch (err) {
@@ -876,6 +912,39 @@ app.delete('/api/inventairePro/:vendeur', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send({ message: 'Erreur lors de la suppression', err });
+  }
+});
+
+// DELETE /api/inventairePro/:id
+const { ObjectId } = require('mongoose').Types;
+app.delete('/api/InvSmartManager/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+
+    // تحقق من صحة ObjectId قبل الحذف
+    if (!ObjectId.isValid(productId)) {
+      return res.status(400).json({ success: false, message: 'ID invalide' });
+    }
+
+    // تحويل إلى ObjectId
+    const objectId = new ObjectId(productId);
+
+    // حذف المنتج
+    const result = await Inventaire.deleteOne({ _id: objectId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: 'Produit non trouvé' });
+    }
+
+    
+    res.json({
+      success: true,
+      message: 'Produit supprimé avec succès',
+      deletedCount: result.deletedCount,
+    });
+  } catch (err) {
+    console.error('❌ Erreur serveur:', err);
+    res.status(500).json({ success: false, message: 'Erreur lors de la suppression', err });
   }
 });
 

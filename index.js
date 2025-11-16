@@ -530,6 +530,10 @@ app.get('/galerie', isAuthenticated, isResponsable, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/responsable/galerie.html'));
 });
 
+app.get('/totalProduit', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/produitCumil.html')); // ✅ صفحة فارغة مؤقتاً
+});
+
 // صفحة الأسعار الخاصة بالبائع
 app.get('/prixVen', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/prixVen.html'));
@@ -936,7 +940,6 @@ app.delete('/api/InvSmartManager/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Produit non trouvé' });
     }
 
-    
     res.json({
       success: true,
       message: 'Produit supprimé avec succès',

@@ -134,3 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial render
   renderTable(1);
 });
+
+document.getElementById('btnRefresh')?.addEventListener('click', () => {
+  window.location.href = '/produitTotal'; // أو أي صفحة تريدها
+});

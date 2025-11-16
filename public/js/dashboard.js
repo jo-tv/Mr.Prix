@@ -654,6 +654,9 @@ document
   .querySelector('.usersPro')
   ?.addEventListener('click', () => (window.location.href = '/produitTotal'));
 document
+  .querySelector('.totalPro')
+  ?.addEventListener('click', () => (window.location.href = '/totalProduit'));
+document
   .querySelector('.Adresses')
   ?.addEventListener('click', () => (window.location.href = '#sharedTable'));
 document
