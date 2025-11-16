@@ -281,6 +281,18 @@
           </div>
         </div>
       </div>
+      <!-- 🔵 Loader أثناء التحميل -->
+      <div
+        id="adressLoading"
+        
+      >
+        <div
+          class="spinner-border text-primary"
+          role="status"
+          style="width: 3rem; height: 3rem"
+        ></div>
+        <p class="mt-2 fw-bold">Chargement des données...</p>
+      </div>
 
       <!-- مودال عرض العناوين -->
       <div
@@ -310,11 +322,11 @@
               <option value="oui">Déjà comptée</option>
             </select>
           </div>
-
+          <!-- جدول العناوين -->
           <table
             id="adressTable"
             class="table table-bordered table-striped"
-            style="width: 100%"
+            style="width: 100%; display: none"
           >
             <thead>
               <tr>

@@ -78,36 +78,34 @@ async function initDashboard() {
 
     document.getElementById('adressCount').textContent = `${adressesUnique.length} / 744`;
 
-    /* =========================
-   🔹 تحميل ملف JSON (مثلاً من نفس المجلد)
-========================= */
-
+    /* --------------------------------------------------
+   🔵 تحميل ملف JSON للعناوين
+-------------------------------------------------- */
     async function loadAdressesJSON() {
       try {
-        const response = await fetch('adresse.json'); // مسار ملف JSON
+        const response = await fetch('adresse.json');
         if (!response.ok) throw new Error('Erreur lors du chargement du fichier JSON');
+
         const jsonData = await response.json();
 
-        return jsonData
-          .map((item) => item.ADRESSE) // ← استخدم ADRESSE كما في JSON
-          .filter(Boolean); // استخراج العناوين
+        return jsonData.map((item) => item.ADRESSE).filter(Boolean);
       } catch (err) {
         console.error(err);
         return [];
       }
     }
 
-    // 🔹 حساب الإحصائيات
-    let adressDT; // نجعلها global لكي لا يتم تدميرها كل مرة
-
+    /* --------------------------------------------------
+   🔵 حساب الإحصائيات الرئيسية
+-------------------------------------------------- */
     async function showAdressesStats(produits) {
-      const jsonAdresses = await loadAdressesJSON(); // نفس دالة JSON
+      const jsonAdresses = await loadAdressesJSON();
       const extra = getExtraAdresses(produits, jsonAdresses);
 
       fillExtraAdressTable(extra);
       initExtraAdressTable();
 
-      // 🟢 العناوين المحسوبة فعلاً (casquette أو fondRayon)
+      // 🟢 استخراج العناوين المحسوبة
       const computedAdresses = Array.from(
         new Set(
           produits
@@ -117,10 +115,10 @@ async function initDashboard() {
         )
       );
 
-      // 🔴 العناوين الموجودة في JSON ولم تُحسب بعد
+      // 🔴 JSON → DB مفقودة
       const missingInDB = jsonAdresses.filter((a) => !computedAdresses.includes(a));
 
-      // 🟡 العناوين المحسوبة داخل قاعدة البيانات
+      // 🟡 DB → المحسوبة
       const extraInDB = computedAdresses;
 
       // تحديث الكروت
@@ -128,55 +126,70 @@ async function initDashboard() {
       document.getElementById('jsonAdressesCount').innerText = jsonAdresses.length;
       document.getElementById('missingCount').innerText = missingInDB.length;
 
+      // فتح المودال عند الضغط
       document.getElementById('adressCount').onclick = () =>
         openAdressModal(missingInDB, extraInDB);
     }
 
-    let AdressDT = null; // متغير DataTable العام
+    /* --------------------------------------------------
+   🔵 مودال العناوين (with Loader + DataTable)
+-------------------------------------------------- */
+    let AdressDT = null;
 
     function openAdressModal(missingInDB, extraInDB) {
-      document.getElementById('adressModal').style.display = 'block';
-      document.getElementById('overlay').style.display = 'block';
+      const modal = document.getElementById('adressModal');
+      const overlay = document.getElementById('overlay');
+      const loader = document.getElementById('adressLoading');
+      const table = document.getElementById('adressTable');
 
-      // تعبئة الجدول
-      fillAdressTable(missingInDB, extraInDB);
+      modal.style.display = 'block';
+      overlay.style.display = 'block';
 
-      // إذا كان الجدول مهيأ مسبقاً → دمره أولاً
+      loader.style.display = 'block';
+      table.style.display = 'none';
+
+      // تدمير أي جدول سابق
       if ($.fn.DataTable.isDataTable('#adressTable')) {
         AdressDT.destroy();
       }
 
-      // إعادة تهيئة DataTable من جديد
-      AdressDT = $('#adressTable').DataTable({
-        dom: 'Blfrtip',
-        buttons: ['excelHtml5'],
-        pageLength: 10,
-        lengthMenu: [5, 10, 20, 50, 100],
-        language: {
-          url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json',
-        },
-        pagingType: 'full_numbers',
+      // 🔥 تعبئة تدريجية بدون تجميد
+      fillAdressTableAsync(missingInDB, extraInDB, () => {
+        // بعد بناء كل الصفوف → فعّل DataTable
+        setTimeout(() => {
+          AdressDT = $('#adressTable').DataTable({
+            dom: 'Blfrtip',
+            buttons: ['excelHtml5'],
+            pageLength: 10,
+            lengthMenu: [5, 10, 20, 50, 100],
+            language: {
+              url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json',
+            },
+            pagingType: 'full_numbers',
+
+            columnDefs: [{ targets: 2, visible: false, searchable: true }],
+          });
+
+          loader.style.display = 'none';
+          table.style.display = 'table';
+        }, 50);
       });
 
-      // 🔥 فلترة حسب data-type
+      // فلترة data-type
       document.getElementById('filterAdress').onchange = () => {
         const filter = document.getElementById('filterAdress').value;
 
-        // امسح أي فلاتر سابقة
         $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(
           (f) => f._isAdressFilter !== true
         );
 
         if (filter !== 'all') {
-          const filterFn = function (settings, data, dataIndex) {
+          const filterFn = function (settings, data) {
             if (settings.nTable.id !== 'adressTable') return true;
-            const rowType = settings.aoData[dataIndex].nTr.getAttribute('data-type');
-            return rowType === filter;
+            return data[2] === filter; // ← عمود النوع
           };
 
-          // علامة للتمييز
           filterFn._isAdressFilter = true;
-
           $.fn.dataTable.ext.search.push(filterFn);
         }
 
@@ -184,38 +197,77 @@ async function initDashboard() {
       };
     }
 
-    // زر الإغلاق
+    /* --------------------------------------------------
+   🔵 زر الإغلاق
+-------------------------------------------------- */
     document.getElementById('closeAdressModal').onclick = () => {
       document.getElementById('adressModal').style.display = 'none';
       document.getElementById('overlay').style.display = 'none';
+      window.location.href = '/dashboard';
     };
 
-    // تعبئة جدول العناوين
-    function fillAdressTable(missing, extra) {
+    /* --------------------------------------------------
+   🔵 تعبئة جدول العناوين
+-------------------------------------------------- */
+    function fillAdressTableAsync(missing, extra, callback) {
       const tbody = document.querySelector('#adressTable tbody');
       tbody.innerHTML = '';
 
-      // العناوين غير المحسوبة
-      missing.forEach((a) => {
-        tbody.innerHTML += `
-      <tr data-type="non">
-        <td>${a}</td>
-        <td><span class="badge bg-danger w-100 p-2">Non comptée</span></td>
-      </tr>
-    `;
-      });
+      const allRows = [];
 
-      // العناوين المحسوبة
-      extra.forEach((a) => {
-        tbody.innerHTML += `
-      <tr data-type="oui">
-        <td>${a}</td>
-        <td><span class="badge bg-success w-100 p-2">Déjà comptée</span></td>
-      </tr>
-    `;
-      });
+      // تجهيز البيانات
+      missing.forEach((a) => allRows.push({ addr: a, type: 'non' }));
+      extra.forEach((a) => allRows.push({ addr: a, type: 'oui' }));
+
+      let index = 0;
+      const batchSize = 50;
+
+      function processBatch() {
+        const fragment = document.createDocumentFragment();
+
+        for (let i = 0; i < batchSize && index < allRows.length; i++) {
+          const item = allRows[index];
+
+          const tr = document.createElement('tr');
+
+          // عمود 1
+          const tdAddr = document.createElement('td');
+          tdAddr.textContent = item.addr;
+
+          // عمود 2
+          const tdState = document.createElement('td');
+          tdState.innerHTML =
+            item.type === 'non'
+              ? `<span class="badge bg-danger w-100 p-2">Non comptée</span>`
+              : `<span class="badge bg-success w-100 p-2">Déjà comptée</span>`;
+
+          // عمود 3 (مخفي)
+          const tdHidden = document.createElement('td');
+          tdHidden.textContent = item.type;
+
+          tr.appendChild(tdAddr);
+          tr.appendChild(tdState);
+          tr.appendChild(tdHidden);
+
+          fragment.appendChild(tr);
+          index++;
+        }
+
+        tbody.appendChild(fragment);
+
+        if (index < allRows.length) {
+          requestAnimationFrame(processBatch);
+        } else {
+          callback();
+        }
+      }
+
+      requestAnimationFrame(processBatch);
     }
-    // 🔹 مثال استخدام
+
+    /* --------------------------------------------------
+   🔵 بدء العملية
+-------------------------------------------------- */
     showAdressesStats(produits);
 
     function getExtraAdresses(dbProducts, jsonAddresses) {
