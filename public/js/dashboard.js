@@ -143,12 +143,16 @@ async function initDashboard() {
         adressDT.destroy();
       }
 
-      adressDT = $('#adressTable').DataTable({
-        dom: 'Blfrtip',
+      AdressDT = $('#adressTable').DataTable({
+        dom: 'Blfrtip', // يمكن ترك 'p' هنا
         buttons: ['excelHtml5'],
         pageLength: 10,
         lengthMenu: [5, 10, 20, 50, 100],
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
+
+        // 🆕 التعديل المطلوب للتحكم في أزرار الترقيم:
+        pagingType: 'full_numbers',
+        // الخيارات المتاحة: 'simple', 'simple_numbers', 'full', 'full_numbers'
       });
 
       // ✔️ فلترة حسب data-type (موثوقة 100%)
@@ -269,6 +273,9 @@ async function initDashboard() {
         language: {
           url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json',
         },
+        // 🆕 التعديل المطلوب للتحكم في أزرار الترقيم:
+        pagingType: 'full_numbers',
+        // الخيارات المتاحة: 'simple', 'simple_numbers', 'full', 'full_numbers
       });
     }
 
@@ -429,6 +436,7 @@ async function initDashboard() {
       responsive: true,
       lengthMenu: [5, 10, 25],
       language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json' },
+      pagingType: 'full_numbers',
     });
 
     /* =========================
@@ -495,6 +503,7 @@ async function initDashboard() {
           className: 'btn btn-secondary btn-sm',
         },
       ],
+      pagingType: 'full_numbers',
     });
 
     /* =========================
