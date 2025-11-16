@@ -127,7 +127,7 @@ async function initDashboard() {
       document.getElementById('missingCount').innerText = missingInDB.length;
 
       // فتح المودال عند الضغط
-      document.getElementById('adressCount').onclick = () =>
+      document.querySelector('.adressCount').onclick = () =>
         openAdressModal(missingInDB, extraInDB);
     }
 
