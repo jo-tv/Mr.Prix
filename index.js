@@ -260,9 +260,10 @@ app.post('/api/products', async (req, res) => {
         $or: [
           { LIBELLE: { $regex: searchValue, $options: 'i' } },
           { GENCOD_P: { $regex: searchValue, $options: 'i' } },
-          { ANPF: { $regex: searchValue, $options: 'i' } },
+          { ANPF: { $regex: `^${searchValue}$`, $options: 'i' } },
           { PV_TTC: { $regex: searchValue, $options: 'i' } },
           { FOURNISSEUR_P: { $regex: searchValue, $options: 'i' } },
+          { REFFOUR_P: { $regex: searchValue } },
           { STOCK: { $regex: searchValue, $options: 'i' } },
         ],
       }

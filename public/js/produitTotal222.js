@@ -33,38 +33,20 @@ document.addEventListener('DOMContentLoaded', () => {
     totalPages = data.totalPages;
 
     tableBody.innerHTML = data.produits
-      .map((p) => {
-        // منطق التلوين الشرطي لـ ecar
-        const ecarValue =  p.qteInven - p.stock;
-        let cellStyle;
-
-        if (ecarValue === 0) {
-          cellStyle = 'background-color: #dee2e6; color: #495057;';
-        } else if (ecarValue < 0) {
-          cellStyle = 'background-color: #dc3545; color: white; font-weight: bold;';
-        } else {
-          cellStyle = 'background-color: #198754; color: white; font-weight: bold;';
-        }
-
-        return `
-            <tr>
-                <td>${p.libelle || ''}</td>          
-                <td>${p.gencode || ''}</td>          
-                <td>${p.anpf || ''}</td>             
-                <td>${p.fournisseur || ''}</td>      
-                <td>${p.stock || 0}</td>             
-                <td>${p.qteInven || 0}</td>          
-                <td style="padding: 0;">
-                  <div style="${cellStyle} height: 100%; display: flex; align-items: center; justify-content: center; padding: 0.5rem 0;">
-                    ${ecarValue || 0}
-                  </div>
-                </td>              
-                <td>${p.adresse || ''}</td>          
-                <td>${p.nameVendeur || ''}</td>      
-                <td>${p.calcul || ''}</td>      
-                <td>${p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : ''}</td>
-            </tr>`;
-      })
+      .map(
+        (p) => `
+      <tr>
+        <td>${p.libelle || ''}</td>
+        <td>${p.gencode || ''}</td>
+        <td>${p.anpf || ''}</td>
+        <td>${p.fournisseur || ''}</td>
+        <td>${p.qteInven || ''}</td>
+        <td>${p.adresse || ''}</td>
+        <td>${p.nameVendeur || ''}</td>
+        <td>${p.calcul || ''}</td>
+        <td>${p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : ''}</td>
+      </tr>`
+      )
       .join('');
 
     // Pagination

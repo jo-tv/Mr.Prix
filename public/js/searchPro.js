@@ -300,6 +300,60 @@ function addProductToTable(product) {
   } else {
     tbody.appendChild(row);
   }
+  paginateTable();
+}
+
+let currentPage = 1;
+let rowsPerPage = 10; // عدد الصفوف في كل صفحة
+
+function paginateTable() {
+  const table = document.querySelector('#produitTable tbody');
+  const rows = table.querySelectorAll('tr');
+
+  const totalRows = rows.length;
+  const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+  // إخفاء كل الصفوف
+  rows.forEach((row, index) => {
+    row.style.display =
+      index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
+        ? ''
+        : 'none';
+  });
+
+  const pagination = document.getElementById('paginationControls');
+  pagination.innerHTML = '';
+
+  // زر Previous
+  const prevBtn = document.createElement('button');
+  prevBtn.innerText = '◀';
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.onclick = () => {
+    if (currentPage > 1) {
+      currentPage--;
+      paginateTable();
+    }
+  };
+  pagination.appendChild(prevBtn);
+
+  // عرض رقم الصفحة
+  const pageDisplay = document.createElement('span');
+  pageDisplay.innerText = ` Page ${currentPage} / ${totalPages} `;
+  pageDisplay.style.fontWeight = 'bold';
+  pageDisplay.style.margin = '0 10px';
+  pagination.appendChild(pageDisplay);
+
+  // زر Next
+  const nextBtn = document.createElement('button');
+  nextBtn.innerText = '▶';
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.onclick = () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      paginateTable();
+    }
+  };
+  pagination.appendChild(nextBtn);
 }
 
 // ====================

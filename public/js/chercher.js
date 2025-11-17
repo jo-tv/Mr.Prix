@@ -24,26 +24,27 @@ $(document).ready(function () {
     autoWidth: true,
     select: true,
     paging: true,
-    dom: 'Bfrtip',
+    dom: 'Bflrtip',
     buttons: [
       {
         extend: 'colvis',
         text: '<i class="fa fa-eye-slash"></i> Colonnes',
-        className: 'btn btn-danger',
+        className: 'btn btn-danger btn-show',
       },
       {
         extend: 'copyHtml5',
         text: '<i class="fa fa-copy"></i> Copier',
-        className: 'btn btn-primary',
+        className: 'btn btn-primary btn-show',
       },
       {
         extend: 'excelHtml5',
         text: '<i class="fa fa-file-excel-o"></i> Excel',
-        className: 'btn btn-success',
+        className: 'btn btn-success btn-show',
       },
       {
         text: '<i class="fa fa-whatsapp"></i> WhatsApp',
-        className: 'btn btn-info',
+        className: 'btn btn-info btn-show',
+
         action: function () {
           var selectedData = table.rows({ selected: true }).data().toArray();
           if (selectedData.length === 0) {
@@ -63,6 +64,11 @@ $(document).ready(function () {
         attr: { id: 'whatsappButton' },
       },
     ],
+  });
+  document.getElementById('searche').addEventListener('click', () => {
+    clearTimeout(typingTimerFournisseur);
+    clearTimeout(typingTimerGlobal);
+    table.ajax.reload();
   });
 
   // تأخير إعادة التحميل عند كتابة البحث
