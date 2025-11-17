@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.utils.book_append_sheet(wb, ws, 'Inventaire_Mدمج');
 
         // 5. كتابة الملف وتنزيله
-        XLSX.writeFile(wb, 'Inventaire_Mدمج_ومحسوب.xlsx');
+        XLSX.writeFile(wb, 'TotalProduit.xlsx');
 
         const toastEl = document.getElementById('excelToast');
         if (toastEl) new bootstrap.Toast(toastEl).show();

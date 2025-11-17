@@ -701,6 +701,8 @@ app.get('/api/ProduitsTotal', async (req, res) => {
           { gencode: { $regex: `^${search}$`, $options: 'i' } },
           { anpf: { $regex: `^${search}$`, $options: 'i' } },
           { adresse: { $regex: `^${search}$`, $options: 'i' } },
+          { calcul: { $regex: `^${search}$`, $options: 'i' } },
+          { nameVendeur: { $regex: `^${search}$`, $options: 'i' } },
         ],
       };
     }
