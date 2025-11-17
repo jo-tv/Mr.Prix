@@ -82,44 +82,44 @@ table td {
   display: none;
 }
 /* Loader */
- #topLoad {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        display: none; /* مخفي افتراضياً */
+#topLoad {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none; /* مخفي افتراضياً */
 
-        inset: 0; /* يغطي كامل الصفحة */
-        background: rgb(224, 221, 221, 0.6);
-        width: 100vw;
-        height: 100vh;
-        z-index: 9999;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      #loading {
-        /* محاذاة المحتوى في منتصف الشاشة */
-        /* نص التحميل */
-        font-size: 3rem;
-        font-weight: bold;
-        color: #3734cee1;
-        font-weight: 700;
-        text-shadow: 3px 5px 2px rgba(128, 0, 0, 0.69);
-        text-align: center;
-        text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
-        /* تموضع العنصر بدقة في منتصف الشاشة */
-      }
-      #loading i {
-        font-size: 150px;
-        margin-right: 30px;
-        color: #41c72de1;
-      }
+  inset: 0; /* يغطي كامل الصفحة */
+  background: rgb(224, 221, 221, 0.6);
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#loading {
+  /* محاذاة المحتوى في منتصف الشاشة */
+  /* نص التحميل */
+  font-size: 3rem;
+  font-weight: bold;
+  color: #3734cee1;
+  font-weight: 700;
+  text-shadow: 3px 5px 2px rgba(128, 0, 0, 0.69);
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  /* تموضع العنصر بدقة في منتصف الشاشة */
+}
+#loading i {
+  font-size: 150px;
+  margin-right: 30px;
+  color: #41c72de1;
+}
 
 #adressLoading {
   display: none;
@@ -138,4 +138,7 @@ table td {
   box-shadow:
     rgba(0, 0, 0, 0.16) 0px 3px 6px,
     rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+.chart-group3 {
+  height: 400px;
 }
