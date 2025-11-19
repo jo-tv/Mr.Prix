@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let vendeurs = [];
   let filtered = [];
+  
 
   const ITEMS_PER_PAGE = 10;
   let currentPage = 1;
@@ -166,9 +167,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function showUserProducts(nameVendeur, page = 1) {
   try {
     const res = await fetch(
-      `/api/inventairePro/${encodeURIComponent(nameVendeur)}?page=${page}&limit=50`
+      `/api/inventairePro/${encodeURIComponent(nameVendeur)}`
     );
-    const { produits, total, limit } = await res.json();
+
+    const { produits } = await res.json();
 
     if (!produits.length) {
       showToast(`Aucun produit trouvé pour ${nameVendeur}`, 'info');
@@ -204,7 +206,7 @@ async function showUserProducts(nameVendeur, page = 1) {
         return acc;
       }, {})
     );
-
+    
     mergedProduits.forEach((p) => {
       const stock = parseFloat(p.stock) || 0;
       const qteInven = parseFloat(p.qteInven) || 0;
@@ -395,8 +397,10 @@ async function confirmDeleteUser() {
   }
 
   // تأكيد الحذف
-  if (!confirm(`⚠️ Voulez-vous vraiment supprimer tous les produits de
-  ${currentVendeur.split('@')[0]} ?`))
+  if (
+    !confirm(`⚠️ Voulez-vous vraiment supprimer tous les produits de
+  ${currentVendeur.split('@')[0]} ?`)
+  )
     return;
 
   try {

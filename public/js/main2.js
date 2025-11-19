@@ -79,7 +79,7 @@ async function loadPagePasswords() {
 
 document.addEventListener('DOMContentLoaded', loadPagePasswords);
 
-console.log(passDeletOneVendeur);
+
 
 async function protectPage(path) {
   const pagePassword = PROTECTED_PAGES[path];

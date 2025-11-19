@@ -23,10 +23,17 @@ app.set('view engine', 'ejs');
 // إعداد مسار الـ views
 app.set('views', path.join(__dirname, 'views'));
 
-// الاتصال بقاعدة بيانات MongoDB
+// تفعيل ضغط GZIP لتحسين الأداء
+app.use(compression());
+
+// الاتصال بقاعدة البيانات MongoDB مع تفعيل ضغط zlib
 async function connectDB() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI, {
+      compressors: 'zlib', // تفعيل ضغط البيانات
+      socketTimeoutMS: 30000, // زيادة مهلة الاتصال
+      connectTimeoutMS: 30000,
+    });
     console.log('✅ تم الاتصال بقاعدة البيانات MongoDB');
   } catch (err) {
     console.error('❌ فشل الاتصال بـ MongoDB:', err);
@@ -37,8 +44,6 @@ async function connectDB() {
 // استدعاء الاتصال عند بدء السيرفر
 connectDB();
 
-// تفعيل ضغط GZIP لتحسين الأداء
-app.use(compression());
 
 
 // إعدادات استضافة الملفات الثابتة

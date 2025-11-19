@@ -540,7 +540,7 @@ async function exportToExcel() {
 
   try {
     const response = await fetch(
-      `/api/inventairePro?nameVendeur=${encodeURIComponent(nameVendeur)}`
+      `/api/inventaireProoo?nameVendeur=${encodeURIComponent(nameVendeur)}`
     );
     if (!response.ok) throw new Error('Erreur lors du chargement des produits');
 
