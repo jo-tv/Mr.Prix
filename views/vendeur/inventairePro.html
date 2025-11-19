@@ -236,7 +236,10 @@
       <thead></thead>
       <tbody></tbody>
     </table>
-    <div id="paginationControls" class="pagination"></div>
+    <div
+      id="paginationControls"
+      class="pagination"
+    ></div>
 
     <!--nav FAB Button -->
     <div class="containeer">
@@ -313,7 +316,7 @@
             ></a>
           </div>
         </div>
-        <div
+                <div
           class="btn-app"
           data-label="InvSmart Manager"
         >
@@ -542,9 +545,65 @@
         </div>
       </div>
     </div>
-
     <!--- ______fin code nav bar_________  -->
+        <!-- خلفية تغطي الشاشة -->
+    <div
+      id="passwordOverlay"
+      style="
+        position: fixed;
+        inset: 0;
+        background: rgb(128, 120, 120);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 25px;
+          border-radius: 10px;
+          width: 80%;
+          margin: 0 auto;
+          text-align: center;
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <h3>🔐 Accès protégé</h3>
+        <p>Veuillez entrer le mot de passe :</p>
+        <input
+          id="passwordInput"
+          type="password"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+          "
+        />
+        <button
+          onclick="submitPassword()"
+          style="
+            padding: 10px;
+            width: 100%;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+          "
+        >
+          Entrer
+        </button>
 
+        <p
+          id="errorMsg"
+          style="color: red; margin-top: 10px"
+        ></p>
+      </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="js/codebar.min.js"></script>

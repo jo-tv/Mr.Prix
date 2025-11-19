@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <img src="${imageURL}" loading="lazy" class="card-img-top rounded-top-4"
                style="height: 200px; object-fit: cover;">
           <span class="badge bg-primary position-absolute top-0 start-0 m-2 fs-5">
-            <i class="fas fa-user-circle"></i> ${data.nameVendeur.toUpperCase()}
+            <i class="fas fa-user-circle"></i> ${data.nameVendeur.toUpperCase().split('@')[0]}
           </span>
         </div>
 
@@ -100,12 +100,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }')">
               <i class="fas fa-eye"></i> Voir
             </button>
-
-            <button class="btn btn-danger btn-sm flex-fill" onclick="deleteUserProducts('${
-              data.nameVendeur
-            }')">
-              <i class="fas fa-trash"></i> Supprimer
-            </button>
+               <button class="btn btn-danger btn-sm flex-fill" onclick="showDeleteUserOverlay('${
+                 data.nameVendeur
+               }')">
+                 <i class="fas fa-trash"></i> Supprimer
+               </button>
           </div>
         </div>
       </div>
@@ -176,8 +175,8 @@ async function showUserProducts(nameVendeur, page = 1) {
       return;
     }
 
-    document.getElementById('modalVendeurName').textContent = nameVendeur;
-    document.querySelector('title').textContent = nameVendeur;
+    document.getElementById('modalVendeurName').textContent = nameVendeur.split('@')[0];
+    document.querySelector('title').textContent = nameVendeur.split('@')[0];
 
     const tbody = $('#modalProductsTable tbody');
 
@@ -290,30 +289,64 @@ async function showUserProducts(nameVendeur, page = 1) {
 }
 
 //// 🔹 حذف جميع منتجات بائع محدد مع كلمة سر
-async function deleteUserProducts(nameVendeur) {
-  // طلب كلمة السر من المستخدم
-  const password = prompt(
-    `⚠️ Entrez le mot de passe pour supprimer tous les produits de ${nameVendeur} :`
-  );
+let currentVendeur = ''; // لتخزين اسم البائع الذي سيتم حذفه
+
+// عرض Overlay
+function showDeleteUserOverlay(nameVendeur) {
+  currentVendeur = nameVendeur;
+  document.getElementById('deleteUserPasswordInput').value = '';
+  document.getElementById('deleteUserErrorMsg').innerText = '';
+  document.getElementById(
+    'deleteUserMsg'
+  ).innerText = `Entrez le mot de passe pour supprimer tous les produits de ${
+    nameVendeur.split('@')[0]
+  } :`;
+  document.getElementById('deleteUserOverlay').style.display = 'flex';
+}
+
+// إغلاق Overlay
+function closeDeleteUserOverlay() {
+  document.getElementById('deleteUserOverlay').style.display = 'none';
+}
+
+// تأكيد الحذف بعد إدخال كلمة السر
+async function confirmDeleteUser() {
+  const msg = document.getElementById('deleteUserErrorMsg');
+  const input = document.getElementById('deleteUserPasswordInput').value.trim();
+
+  try {
+    // جلب كلمات السر من قاعدة البيانات مباشرة
+    const resPasswords = await fetch('/get-passwords');
+    const data = await resPasswords.json();
+
+    // تحديث المتغيرات العالمية
+    passDeletOneVendeur = data.passDeletOneVendeur;
+    passDeletAllVendeur = data.passDeletAllVendeur;
+  } catch (err) {
+    console.error('❌ فشل في جلب كلمات السر:', err);
+    msg.innerText = '⚠️ Erreur serveur, veuillez réessayer';
+    return;
+  }
 
   // التحقق من كلمة السر
-  if (password !== '654321') {
-    showToast('❌ Mot de passe incorrect', 'error', 4000);
+  if (input !== passDeletOneVendeur) {
+    msg.innerText = '❌ Mot de passe incorrect';
     return;
   }
 
   // تأكيد الحذف
-  if (!confirm(`⚠️ Voulez-vous vraiment supprimer tous les produits de ${nameVendeur} ?`)) return;
+  if (!confirm(`⚠️ Voulez-vous vraiment supprimer tous les produits de ${currentVendeur} ?`))
+    return;
 
   try {
-    const res = await fetch(`/api/inventairePro/${encodeURIComponent(nameVendeur)}`, {
+    const res = await fetch(`/api/inventairePro/${encodeURIComponent(currentVendeur)}`, {
       method: 'DELETE',
     });
     const result = await res.json();
 
     if (result.success) {
       showToast(
-        `✅ Tous les produits de ${nameVendeur} ont été supprimés (${result.deletedCount})`,
+        `✅ Tous les produits de ${currentVendeur} ont été supprimés (${result.deletedCount})`,
         'success',
         4000
       );
@@ -324,23 +357,98 @@ async function deleteUserProducts(nameVendeur) {
   } catch (err) {
     console.error(err);
     showToast('❌ Erreur lors de la suppression des produits', 'error', 4000);
+  } finally {
+    closeDeleteUserOverlay();
   }
 }
 
 // 🔹 حذف جميع المنتجات مع كلمة سر
-async function deleteAllProducts() {
-  // طلب كلمة السر من المستخدم
-  const password = prompt('⚠️ Entrez le mot de passe pour supprimer toutes les données :');
+// عرض Overlay
+function showDeleteOverlay() {
+  document.getElementById('deletePasswordInput').value = '';
+  document.getElementById('deleteErrorMsg').innerText = '';
+  document.getElementById('deleteOverlay').style.display = 'flex';
+}
+// تأكيد الحذف بعد إدخال كلمة السر
+async function confirmDeleteUser() {
+  const msg = document.getElementById('deleteUserErrorMsg');
+  const input = document.getElementById('deleteUserPasswordInput').value.trim();
+
+  try {
+    // جلب كلمات السر من قاعدة البيانات مباشرة
+    const resPasswords = await fetch('/get-passwords');
+    const data = await resPasswords.json();
+
+    // تحديث المتغيرات العالمية
+    passDeletOneVendeur = data.passDeletOneVendeur;
+    passDeletAllVendeur = data.passDeletAllVendeur;
+  } catch (err) {
+    console.error('❌ فشل في جلب كلمات السر:', err);
+    msg.innerText = '⚠️ Erreur serveur, veuillez réessayer';
+    return;
+  }
 
   // التحقق من كلمة السر
-  if (password !== '654321') {
-    showToast('❌ Mot de passe incorrect', 'error', 4000);
+  if (input !== passDeletOneVendeur) {
+    msg.innerText = '❌ Mot de passe incorrect';
     return;
   }
 
   // تأكيد الحذف
-  if (!confirm('⚠️ Voulez-vous vraiment supprimer toutes les données de tous les vendeurs ?'))
+  if (!confirm(`⚠️ Voulez-vous vraiment supprimer tous les produits de
+  ${currentVendeur.split('@')[0]} ?`))
     return;
+
+  try {
+    const res = await fetch(`/api/inventairePro/${encodeURIComponent(currentVendeur)}`, {
+      method: 'DELETE',
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      showToast(
+        `✅ Tous les produits de ${currentVendeur} ont été supprimés (${result.deletedCount})`,
+        'success',
+        4000
+      );
+      location.reload();
+    } else {
+      showToast('Aucune donnée supprimée', 'warning', 4000);
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('❌ Erreur lors de la suppression des produits', 'error', 4000);
+  } finally {
+    closeDeleteUserOverlay();
+  }
+}
+
+// إغلاق Overlay
+function closeDeleteOverlay() {
+  document.getElementById('deleteOverlay').style.display = 'none';
+}
+
+const deleteAll = document.querySelector('#deleteAll');
+const deleteOverlay = document.querySelector('#deleteOverlay');
+
+deleteAll.onclick = () => {
+  deleteOverlay.style.display = 'block';
+};
+
+// دالة تأكيد الحذف بعد إدخال كلمة السر
+async function confirmDeleteAll() {
+  const input = document.getElementById('deletePasswordInput').value.trim();
+  const msg = document.getElementById('deleteErrorMsg');
+
+  if (input !== passDeletAllVendeur) {
+    msg.innerText = '❌ Mot de passe incorrect';
+    return;
+  }
+
+  // تأكيد نهائي
+  if (!confirm('⚠️ Voulez-vous vraiment supprimer toutes les données de tous les vendeurs ?')) {
+    return;
+  }
 
   try {
     const res = await fetch('/api/inventairePro', { method: 'DELETE' });
@@ -355,15 +463,7 @@ async function deleteAllProducts() {
   } catch (err) {
     console.error(err);
     showToast('❌ Erreur lors de la suppression globale', 'error', 4000);
+  } finally {
+    closeDeleteOverlay();
   }
-}
-
-// 🔹 دالة الرسائل
-function showToast(message, type = 'info', duration = 3000) {
-  const toast = document.getElementById('toast');
-  toast.textContent = message;
-  toast.className = `toast ${type} show`;
-  setTimeout(() => {
-    toast.className = `toast ${type}`;
-  }, duration);
 }

@@ -1,0 +1,306 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>لوحة تعديل كلمات سر الصفحات</title>
+    <!-- ✅ استدعاء مكتبة Bootstrap + FontAwesome + Excel -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/navb.css"
+    />
+    <style>
+      body {
+        background: #f8f9fa;
+        text-align: center;
+      }
+      .password-box {
+        letter-spacing: 3px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+         <!-- خلفية تغطي الشاشة -->
+    <div
+      id="passwordOverlay"
+      style="
+        position: fixed;
+        inset: 0;
+        background: rgb(128, 120, 120);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 25px;
+          border-radius: 10px;
+          width: 80%;
+          margin: 0 auto;
+          text-align: center;
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <h3>🔐 Accès protégé</h3>
+        <p>Veuillez entrer le mot de passe :</p>
+        <input
+          id="passwordInput"
+          type="password"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+          "
+        />
+        <button
+          onclick="submitPassword()"
+          style="
+            padding: 10px;
+            width: 100%;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+          "
+        >
+          Entrer
+        </button>
+
+        <p
+          id="errorMsg"
+          style="color: red; margin-top: 10px"
+        ></p>
+      </div>
+    </div>
+    <div class="container mt-5">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center fs-4">
+          <i class="bi bi-shield-lock-fill me-2"></i>
+          Panneau de gestion des mots de passe des pages
+        </div>
+
+        <div class="card-body">
+          <!-- جدول عرض كلمات السر -->
+          <h5 class="mb-3 text-secondary">
+            <i class="bi bi-table me-1"></i>
+            Tableau des mots de passe actuels
+          </h5>
+
+          <table class="table table-bordered align-middle text-center">
+            <thead class="table-light">
+              <tr>
+                <th><i class="bi bi-eye-fill"></i> Afficher</th>
+                <th><i class="bi bi-key-fill"></i> Mot de passe</th>
+                <th><i class="bi bi-file-earmark-text"></i> Nom de la page</th>
+              </tr>
+            </thead>
+            <tbody id="passwordTable"></tbody>
+          </table>
+
+          <hr />
+
+          <!-- نموذج تعديل كلمات السر -->
+          <h5 class="text-secondary">
+            <i class="bi bi-pencil-square me-1"></i>
+            Modifier les mots de passe
+          </h5>
+
+          <form
+            id="passForm"
+            class="row g-3 mt-3"
+          >
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="bi bi-upload me-1"></i>
+                Mot de passe — Page Upload
+              </label>
+              <input
+                name="pasPageUploade"
+                id="pasPageUploade"
+                class="form-control"
+                placeholder="Changer PasseWord Page Upload"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="bi bi-archive me-1"></i>
+                Mot de passe — Page Inventaire
+              </label>
+              <input
+                name="pasPageInventaire"
+                id="pasPageInventaire"
+                class="form-control"
+                placeholder="Changer PasseWord Page Inventaire"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="bi bi-person-dash me-1"></i>
+                Mot de passe — Suppression d’un vendeur
+              </label>
+              <input
+                name="passDeletOneVendeur"
+                id="passDeletOneVendeur"
+                class="form-control"
+                placeholder="Changer PasseWord Suppression d’un vendeur"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="bi bi-people-fill me-1"></i>
+                Mot de passe — Suppression de tous les vendeurs
+              </label>
+              <input
+                name="passDeletAllVendeur"
+                id="passDeletAllVendeur"
+                class="form-control"
+                placeholder="Changer PasseWord Suppression de tous les vendeurs"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="bi bi-people-fill me-1"></i>
+                Page — Panneau des mots de passe
+              </label>
+              <input
+                name="PanneauMotss"
+                id="PanneauMotss"
+                class="form-control"
+                placeholder="Changer PasseWord Page Panneau des mots de passe"
+              />
+            </div>
+
+            <div class="col-12 mt-4">
+              <button class="btn btn-success w-100">
+                <i class="bi bi-save me-2"></i>
+                Sauvegarder les modifications
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!--nav FAB Button -->
+    <div class="containeer">
+      <div class="menu-toggle">
+        <span class="fa fa-plus"></span>
+      </div>
+      <div class="menu-round">
+        <div
+          class="btn-app"
+          data-label="Dashboard"
+        >
+          <div class="fa">
+            <a href="/dashboard"
+              ><i
+                class="fa-solid fa-circle-left"
+                style="color: white"
+              ></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      async function loadPasswords() {
+        const res = await fetch('/get-passwords');
+        const data = await res.json();
+
+        const table = document.getElementById('passwordTable');
+
+        const fields = [
+          { key: 'pasPageUploade', label: 'Page Upload' },
+          { key: 'pasPageInventaire', label: 'Page Inventaire' },
+          { key: 'passDeletOneVendeur', label: 'Suppression d’un vendeur' },
+          { key: 'passDeletAllVendeur', label: 'Suppression de tous les vendeurs' },
+          { key: 'PanneauMotss', label: 'Panneau des mots de passe' },
+        ];
+
+        table.innerHTML = '';
+
+        fields.forEach((item) => {
+          const tr = document.createElement('tr');
+
+          tr.innerHTML = `
+      <td>
+        <button class="btn btn-sm btn-outline-primary" onclick="togglePassword('${item.key}', '${
+          data[item.key]
+        }')">
+          👁
+        </button>
+      </td>
+      <td>
+        <span class="password-box" id="pw_${item.key}">****</span>
+      </td>
+      <td>${item.label}</td>
+    `;
+
+          table.appendChild(tr);
+        });
+
+        // تعبئة الفورم بالقيم
+        document.querySelector('#pasPageUploade').value = '';
+        document.querySelector('#pasPageInventaire').value = '';
+        document.querySelector('#passDeletOneVendeur').value = '';
+        document.querySelector('#passDeletAllVendeur').value = '';
+        document.querySelector('#PanneauMotss').value = '';
+      }
+
+      // زر إظهار / إخفاء كلمة السر
+      function togglePassword(key, value) {
+        const span = document.getElementById('pw_' + key);
+        span.textContent = span.textContent === '****' ? value : '****';
+      }
+
+      // إرسال التعديل للخادم
+      document.getElementById('passForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = Object.fromEntries(new FormData(e.target).entries());
+
+        const res = await fetch('/update-passwords', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+
+        alert(await res.text());
+        loadPasswords();
+      });
+
+      // تحميل البيانات عند فتح الصفحة
+      loadPasswords();
+    </script>
+    <script src="js/main2.js"></script>
+  </body>
+</html>

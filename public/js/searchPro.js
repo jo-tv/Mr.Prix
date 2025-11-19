@@ -50,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCalcul = localStorage.getItem('inputCalcul');
   if (savedName) {
     document.getElementById('nameVendeur').value = savedName.toLowerCase().trim() || '';
-    document.getElementById('nomFichier').value = savedName.toLowerCase().trim() || '';
+    document.getElementById('nomFichier').value =
+    savedName.toLowerCase().trim().split('@')[0] || '';
   }
   if (savedAdress) {
     document.getElementById('adresse').value = savedAdress.toUpperCase().trim() || '';
@@ -58,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (inputCalcul) {
     document.getElementById('calcul').value =
       inputCalcul.trim() || 'Sélectionnez ce que vous voulez calculer ';
-    console.log(inputCalcul);
   }
   loadProductsFromDatabase();
   setupEventListeners();
@@ -225,6 +225,10 @@ async function addProduct() {
     nameVendeur: document.getElementById('nameVendeur').value.toLowerCase().trim(),
   };
 
+  // Regex لاسم المستخدم (غير حساس لحالة الأحرف)
+  const usernameRegex = /^[A-Z]\.[a-z]+@[0-9]{4}$/i;
+
+  // التحقق من الحقول
   if (
     !product.libelle ||
     !product.gencode ||
@@ -239,6 +243,19 @@ async function addProduct() {
     ajouterBtn.textContent = 'Ajouter le produit';
     return;
   }
+
+  // التحقق من صيغة اسم المستخدم
+  if (!usernameRegex.test(product.nameVendeur)) {
+    showToast(
+      '⚠️ Nom Vendeur invalide ! Utilisez le format: LettreInitiale.Nom@1234 (ex: Y.Semlali@2025)',
+      'warning'
+    );
+    ajouterBtn.disabled = false;
+    ajouterBtn.textContent = 'Ajouter le produit';
+    return;
+  }
+
+  // إذا كل شيء صحيح، يمكن إرسال البيانات
 
   try {
     const response = await fetch('/api/inventairePro', {
@@ -316,9 +333,7 @@ function paginateTable() {
   // إخفاء كل الصفوف
   rows.forEach((row, index) => {
     row.style.display =
-      index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage
-        ? ''
-        : 'none';
+      index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage ? '' : 'none';
   });
 
   const pagination = document.getElementById('paginationControls');

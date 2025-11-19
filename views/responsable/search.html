@@ -38,6 +38,11 @@
     />
   </head>
   <body>
+    <!-- مكان الرسائل -->
+    <div
+      id="toast"
+      class="toast"
+    ></div>
     <h1>Gestion des Produits</h1>
     <div class="search-bar">
       <input
@@ -196,11 +201,10 @@
     </table>
 
     <!--nav FAB Button -->
-       <div class="containeer">
+    <div class="containeer">
       <div class="menu-toggle">
         <span class="fa fa-plus"></span>
       </div>
-
       <div class="menu-round">
         <div
           class="btn-app"
@@ -218,10 +222,11 @@
         <div
           class="btn-app"
           data-label="mis à jour Data"
+          id="upload"
         >
           <div class="fa">
-            <a href="upload"
-              ><i
+            <a href="upload">
+              <i
                 class="fas fa-file-arrow-up"
                 style="color: white"
               ></i

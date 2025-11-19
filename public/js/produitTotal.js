@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   </div>
                 </td>              
                 <td>${p.adresse || ''}</td>          
-                <td>${p.nameVendeur || ''}</td>      
+                <td>${p.nameVendeur.split('@')[0] || ''}</td>      
                 <td>${p.calcul || ''}</td>      
                 <td>${p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : ''}</td>
             </tr>`;

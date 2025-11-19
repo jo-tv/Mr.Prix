@@ -61,7 +61,7 @@
         <span class="navbar-brand mb-0 h1"> <i class="fas fa-users"></i> Liste des vendeurs </span>
         <button
           class="btn btn-sm btn-danger"
-          onclick="deleteAllProducts()"
+          id="deleteAll"
         >
           <i class="fas fa-trash-alt"></i> Supprimer tout
         </button>
@@ -90,10 +90,10 @@
         <!-- الكروت ستُضاف هنا ديناميكيًا -->
       </div>
     </div>
-        <div
-          id="pagination"
-          class="d-flex justify-content-center mt-4"
-        ></div>
+    <div
+      id="pagination"
+      class="d-flex justify-content-center mt-4"
+    ></div>
 
     <div
       class="modal fade"
@@ -320,23 +320,187 @@
       <div class="menu-toggle">
         <span class="fa fa-plus"></span>
       </div>
+
       <div class="menu-round">
         <div
           class="btn-app"
-          data-label="Dashboard"
+          data-label="dashboard"
         >
           <div class="fa">
             <a href="/dashboard"
               ><i
                 class="fa-solid fa-circle-left"
                 style="color: white"
-              ></i>
-            </a>
+              ></i
+            ></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-line">
+        <div
+          class="btn-app"
+          data-label="Panneau des mots de passe"
+          id="PanneauMots"
+        >
+          <div class="fa">
+            <a href="/infoPassPage">
+              <i
+                class="fas fa-shield-alt"
+                style="color: white"
+              ></i
+            ></a>
           </div>
         </div>
       </div>
     </div>
     <!--fin FAB Button -->
+    <!-- Overlay لكلمة السر -->
+    <div
+      id="deleteOverlay"
+      style="
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 25px;
+          border-radius: 10px;
+          width: 400px;
+          text-align: center;
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        "
+      >
+        <h3>⚠️ Supprimer toutes les données</h3>
+        <p>Entrez le mot de passe pour confirmer :</p>
+        <input
+          id="deletePasswordInput"
+          type="password"
+          placeholder="Mot de passe"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+          "
+        />
+        <div style="display: flex; gap: 10px; justify-content: center">
+          <button
+            onclick="confirmDeleteAll()"
+            style="
+              padding: 10px 15px;
+              background: #d33;
+              color: white;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+            "
+          >
+            Supprimer
+          </button>
+          <button
+            onclick="closeDeleteOverlay()"
+            style="
+              padding: 10px 15px;
+              background: #555;
+              color: white;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+            "
+          >
+            Annuler
+          </button>
+        </div>
+        <p
+          id="deleteErrorMsg"
+          style="color: red; margin-top: 10px"
+        ></p>
+      </div>
+    </div>
+    <!-- Overlay لحذف بائع واحد -->
+    <div
+      id="deleteUserOverlay"
+      style="
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 25px;
+          border-radius: 10px;
+          width: 350px;
+          text-align: center;
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <h3>⚠️ Supprimer les produits</h3>
+        <p id="deleteUserMsg">Entrez le mot de passe pour confirmer :</p>
+        <input
+          id="deleteUserPasswordInput"
+          type="password"
+          placeholder="Mot de passe"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+          "
+        />
+        <div style="display: flex; gap: 10px; justify-content: center">
+          <button
+            onclick="confirmDeleteUser()"
+            style="
+              padding: 10px 15px;
+              background: #d33;
+              color: white;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+            "
+          >
+            Supprimer
+          </button>
+          <button
+            onclick="closeDeleteUserOverlay()"
+            style="
+              padding: 10px 15px;
+              background: #555;
+              color: white;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+            "
+          >
+            Annuler
+          </button>
+        </div>
+        <p
+          id="deleteUserErrorMsg"
+          style="color: red; margin-top: 10px"
+        ></p>
+      </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
@@ -360,7 +524,7 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
-    <script src="js/List-Vendeurs.js"></script>
     <script src="js/main2.js"></script>
+    <script src="js/List-Vendeurs.js"></script>
   </body>
 </html>

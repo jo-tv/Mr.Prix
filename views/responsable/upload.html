@@ -55,6 +55,11 @@
     <title>Programe prix Mr bricolage</title>
   </head>
   <body>
+    <!-- مكان الرسائل -->
+    <div
+      id="toast"
+      class="toast"
+    ></div>
     <!-- From Uiverse.io by andrew-demchenk0 -->
     <div class="info">
       <div class="info__icon">
@@ -177,10 +182,11 @@
         <div
           class="btn-app"
           data-label="mis à jour Data"
+          id="upload"
         >
           <div class="fa">
-            <a href="upload"
-              ><i
+            <a href="upload">
+              <i
                 class="fas fa-file-arrow-up"
                 style="color: white"
               ></i
@@ -293,7 +299,65 @@
         class="text"
       ></div>
     </div>
+    <!-- خلفية تغطي الشاشة -->
+    <div
+      id="passwordOverlay"
+      style="
+        position: fixed;
+        inset: 0;
+        background: rgb(128, 120, 120);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 25px;
+          border-radius: 10px;
+          width: 80%;
+          margin: 0 auto;
+          text-align: center;
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <h3>🔐 Accès protégé</h3>
+        <p>Veuillez entrer le mot de passe :</p>
+        <input
+          id="passwordInput"
+          type="password"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+          "
+        />
+        <button
+          onclick="submitPassword()"
+          style="
+            padding: 10px;
+            width: 100%;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+          "
+        >
+          Entrer
+        </button>
 
+        <p
+          id="errorMsg"
+          style="color: red; margin-top: 10px"
+        ></p>
+      </div>
+    </div>
+    <script src="js/main2.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
       const fileInput = document.getElementById('file');
@@ -410,13 +474,6 @@
       window.addEventListener('load', () => {
         const loader = document.getElementById('wifi-loader');
         if (loader) loader.style.display = 'none';
-      });
-
-      // فتح وغلق القائمة
-      $('.menu-toggle').click(function () {
-        $('.menu-toggle').toggleClass('open');
-        $('.menu-round').toggleClass('open');
-        $('.menu-line').toggleClass('open');
       });
     </script>
   </body>

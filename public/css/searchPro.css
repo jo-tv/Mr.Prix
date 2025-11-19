@@ -124,44 +124,7 @@
   }
 }
 
-/* تصميم نافذة منبثقة */
-.toast {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  min-width: 200px;
-  max-width: 350px;
-  padding: 15px 20px;
-  border-radius: 8px;
-  color: #fff;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(20px);
-  transition: all 0.4s ease;
-  z-index: 9999;
-}
 
-/* أنواع الرسائل */
-.toast.success {
-  background-color: #4caf50;
-}
-.toast.error {
-  background-color: #f44336;
-}
-.toast.info {
-  background-color: #2196f3;
-}
-.toast.warning {
-  background-color: #eaa641;
-}
-/* عند الظهور */
-.toast.show {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
 .pagination {
   margin-top: 15px;
   text-align: center;

@@ -3,7 +3,6 @@ const readerDiv = document.getElementById('reader');
 const input = document.querySelector('.input');
 const ticket = document.querySelector('.ticket');
 const btnFermer = document.querySelector('.fermer');
-
 let html5QrCode = null;
 let isScanning = false;
 
@@ -176,7 +175,7 @@ document.querySelector('.Subscribe-btn').addEventListener('click', function () {
       let prixPromo = document.querySelector('#promo');
       let prixTotal = document.querySelector('#prixTotal');
       let imgPromo = document.querySelector('.imgPromo');
-      console.log(prixPromo.textContent);
+
       if (parseInt(prixPromo.textContent) === 0) {
         imgPromo.style.display = 'none';
         divPromo.style.display = 'none';
@@ -275,10 +274,4 @@ window.addEventListener('load', function () {
 
   // إخفاء الـ Loader
   loader.style.display = 'none';
-});
-
-$('.menu-toggle').click(function () {
-  $('.menu-toggle').toggleClass('open');
-  $('.menu-round').toggleClass('open');
-  $('.menu-line').toggleClass('open');
 });

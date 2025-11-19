@@ -12,6 +12,7 @@ const serverless = require('serverless-http');
 // استدعاء نموذج المستخدم - تأكد من المسار الصحيح
 const User = require('./models/user.js');
 const Inventaire = require('./models/Inventaire.js');
+const PagePasswords = require('./models/PagePasswords.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,11 +23,17 @@ app.set('view engine', 'ejs');
 // إعداد مسار الـ views
 app.set('views', path.join(__dirname, 'views'));
 
-// الاتصال بقاعدة بيانات MongoDB
+// تفعيل ضغط GZIP لتحسين الأداء
+app.use(compression());
 
+// الاتصال بقاعدة البيانات MongoDB مع تفعيل ضغط zlib
 async function connectDB() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI, {
+      compressors: 'zlib', // تفعيل ضغط البيانات
+      socketTimeoutMS: 30000, // زيادة مهلة الاتصال
+      connectTimeoutMS: 30000,
+    });
     console.log('✅ تم الاتصال بقاعدة البيانات MongoDB');
   } catch (err) {
     console.error('❌ فشل الاتصال بـ MongoDB:', err);
@@ -37,8 +44,7 @@ async function connectDB() {
 // استدعاء الاتصال عند بدء السيرفر
 connectDB();
 
-// تفعيل ضغط GZIP لتحسين الأداء
-app.use(compression());
+
 
 // إعدادات استضافة الملفات الثابتة
 app.use(express.static(path.join(__dirname, 'public')));
@@ -119,7 +125,10 @@ function isVendeur(req, res, next) {
   return res.status(403).json({ error: 'هذه الصفحة مخصصة للبائع فقط' });
 }
 
+const http = require('http');
 const axios = require('axios');
+
+const agent = new http.Agent({ keepAlive: true });
 
 const { v2: cloudinary } = require('cloudinary');
 
@@ -442,7 +451,6 @@ const resetAttempts = (username) => {
 };
 
 // مسار تسجيل الدخول
-// مسار تسجيل الدخول
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -533,6 +541,10 @@ app.get('/galerie', isAuthenticated, isResponsable, (req, res) => {
 
 app.get('/totalProduit', isAuthenticated, isResponsable, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/responsable/produitCumil.html')); // ✅ صفحة فارغة مؤقتاً
+});
+
+app.get('/infoPassPage', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/info.html')); // ✅ صفحة فارغة مؤقتاً
 });
 
 // صفحة الأسعار الخاصة بالبائع
@@ -967,6 +979,56 @@ app.delete('/api/inventairePro', async (req, res) => {
     console.error(err);
     res.status(500).send({ message: 'Erreur lors de la suppression globale', err });
   }
+});
+
+// --------------------------------------
+//   API لجلب كلمات السر
+// --------------------------------------
+app.get('/get-passwords', async (req, res) => {
+  let data = await PagePasswords.findOne();
+
+  // لو لم توجد بيانات يتم إنشاء واحدة تلقائياً
+  if (!data) {
+    data = new PagePasswords({
+      pasPageUploade: '',
+      pasPageInventaire: '',
+      passDeletOneVendeur: '',
+      passDeletAllVendeur: '',
+      PanneauMots: '',
+    });
+    await data.save();
+  }
+
+  res.json(data);
+});
+
+// --------------------------------------
+//   API لتحديث كلمات السر
+// --------------------------------------
+app.post('/update-passwords', async (req, res) => {
+  const {
+    pasPageUploade,
+    pasPageInventaire,
+    passDeletOneVendeur,
+    passDeletAllVendeur,
+    PanneauMotss,
+  } = req.body;
+
+  let data = await PagePasswords.findOne();
+
+  if (!data) {
+    data = new PagePasswords();
+  }
+
+  data.pasPageUploade = pasPageUploade;
+  data.pasPageInventaire = pasPageInventaire;
+  data.passDeletOneVendeur = passDeletOneVendeur;
+  data.passDeletAllVendeur = passDeletAllVendeur;
+  data.PanneauMotss = PanneauMotss;
+
+  await data.save();
+
+  res.send('تم تحديث كلمات سر الصفحات بنجاح');
 });
 
 app.listen(PORT, () => {

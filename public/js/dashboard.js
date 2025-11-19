@@ -271,29 +271,32 @@ async function initDashboard() {
     showAdressesStats(produits);
 
     function getExtraAdresses(dbProducts, jsonAddresses) {
-      const map = {};
+  const map = {};
 
-      dbProducts.forEach((p) => {
-        if (!p.adresse || jsonAddresses.includes(p.adresse)) return;
+  dbProducts.forEach((p) => {
+    if (!p.adresse || jsonAddresses.includes(p.adresse)) return;
 
-        if (!map[p.adresse]) {
-          map[p.adresse] = {
-            adresse: p.adresse,
-            vendeur: p.nameVendeur,
-            count: 0,
-            lastDate: p.createdAt || 'Inconnu',
-          };
-        }
+    // المفتاح الجديد: adresse + vendeur
+    const key = `${p.adresse}__${p.nameVendeur}`;
 
-        map[p.adresse].count++;
-
-        if (p.createdAt && p.createdAt > map[p.adresse].lastDate) {
-          map[p.adresse].lastDate = p.createdAt;
-        }
-      });
-
-      return Object.values(map);
+    if (!map[key]) {
+      map[key] = {
+        adresse: p.adresse,
+        vendeur: p.nameVendeur,
+        count: 0,
+        lastDate: p.createdAt || 'Inconnu',
+      };
     }
+
+    map[key].count++;
+
+    if (p.createdAt && p.createdAt > map[key].lastDate) {
+      map[key].lastDate = p.createdAt;
+    }
+  });
+
+  return Object.values(map);
+}
 
     function fillExtraAdressTable(extraList) {
       const tbody = document.querySelector('#extraAdressTable tbody');
@@ -314,7 +317,9 @@ async function initDashboard() {
         tbody.innerHTML += `
       <tr>
         <td><span class="badge bg-primary p-2 w-100">${item.adresse}</span></td>
-        <td><span class="badge bg-success p-2 w-100">${item.vendeur.toUpperCase()}</span></td>
+        <td><span class="badge bg-success p-2 w-100">${
+          item.vendeur.toUpperCase().split('@')[0]
+        }</span></td>
         <td><span class="badge bg-danger p-2 w-100">Adresse inconnue</span></td>
         <td><span class="badge bg-primary p-2 w-100">${formattedDate}</span></td>
         <td><span class="badge bg-primary p-2 w-100">${item.count}</span></td>
@@ -502,7 +507,10 @@ async function initDashboard() {
           `<tr><td class="text-bg-danger">${escapeHtml(
             r.adresse
           )}</td><td class="text-bg-primary">${escapeHtml(
-            r.vendeurs.join(' ; ').toUpperCase()
+            r.vendeurs
+              .map((v) => v.split('@')[0]) // استخراج الاسم فقط
+              .join(' ; ')
+              .toUpperCase()
           )}</td><td class="text-bg-danger">${r.vendeursCount}</td></tr>`
       )
       .join('');
@@ -590,7 +598,7 @@ async function initDashboard() {
     const vendeursCountMap = {};
     produits.forEach((p) => {
       if (p.nameVendeur)
-        vendeursCountMap[p.nameVendeur] = (vendeursCountMap[p.nameVendeur] || 0) + 1;
+        vendeursCountMap[p.nameVendeur.split('@')[0]] = (vendeursCountMap[p.nameVendeur] || 0) + 1;
     });
     const top10 = Object.entries(vendeursCountMap)
       .sort((a, b) => b[1] - a[1])

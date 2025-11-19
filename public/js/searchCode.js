@@ -22,4 +22,3 @@ document.querySelectorAll('.copy-btn').forEach((button) => {
   });
 });
 
-
