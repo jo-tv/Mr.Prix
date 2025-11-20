@@ -8,6 +8,12 @@ const XLSX = require('xlsx');
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const serverless = require('serverless-http');
+const http = require('http');
+const axios = require('axios');
+
+const agent = new http.Agent({ keepAlive: true });
+
+const { v2: cloudinary } = require('cloudinary');
 
 // استدعاء نموذج المستخدم - تأكد من المسار الصحيح
 const User = require('./models/user.js');
@@ -53,6 +59,7 @@ app.use(
     index: false, // يمنع التحميل التلقائي للـ index.html
   })
 );
+app.use(express.static('public'));
 
 // تمكين استقبال بيانات POST (form data و json) مع تحديد حدود الحجم
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -76,7 +83,9 @@ app.use(
     },
   })
 );
+// ====================================
 // التحقق من أن المستخدم مسجل الدخول
+// ====================================
 function isAuthenticated(req, res, next) {
   // هل توجد جلسة وفيها بيانات المستخدم؟
   if (req.session && req.session.user) {
@@ -92,8 +101,9 @@ function isAuthenticated(req, res, next) {
   // إذا كان الطلب من JavaScript (fetch أو AJAX)
   return res.status(401).json({ error: 'يجب تسجيل الدخول' });
 }
-
+// ====================================
 // التحقق من أن المستخدم مسؤول (responsable)
+// ====================================
 function isResponsable(req, res, next) {
   // التأكد أن المستخدم موجود وأنه من نوع "responsable"
   if (req.session.user && req.session.user.role === 'responsable') {
@@ -107,8 +117,9 @@ function isResponsable(req, res, next) {
 
   return res.status(403).json({ error: 'هذه الصفحة مخصصة للمسؤول فقط' });
 }
-
+// ====================================
 // التحقق من أن المستخدم بائع (vendeur)
+// ====================================
 function isVendeur(req, res, next) {
   // التأكد أن المستخدم موجود وأنه من نوع "vendeur"
   if (req.session.user && req.session.user.role === 'vendeur') {
@@ -122,13 +133,15 @@ function isVendeur(req, res, next) {
 
   return res.status(403).json({ error: 'هذه الصفحة مخصصة للبائع فقط' });
 }
-
-const http = require('http');
-const axios = require('axios');
-
-const agent = new http.Agent({ keepAlive: true });
-
-const { v2: cloudinary } = require('cloudinary');
+// ====================================
+// ميدلوير نهائي للتعامل مع حالات الرفض (إن وُجد)
+// ====================================
+app.use((req, res, next) => {
+  if (req.rejectedAccess) {
+    return res.status(403).json({ error: 'هذه الصفحة مخصصة للمسؤول فقط' });
+  }
+  next();
+});
 
 // ===================
 // إعداد Cloudinary
@@ -165,7 +178,7 @@ async function insertInBatches(data, batchSize = 20000) {
 // ===================
 // مسار معالجة ملف Cloudinary
 // ===================
-app.post('/process-cloudinary-file', async (req, res) => {
+app.post('/process-cloudinary-file', isAuthenticated, async (req, res) => {
   try {
     const { url } = req.body;
     if (!url) {
@@ -235,7 +248,7 @@ app.post('/process-cloudinary-file', async (req, res) => {
   }
 });
 
-app.post('/clear-old-files', async (req, res) => {
+app.post('/clear-old-files', isAuthenticated, async (req, res) => {
   try {
     // استدعاء Cloudinary API لحذف الملفات القديمة
     const resources = await cloudinary.api.resources({ type: 'upload', prefix: 'excel_files/' });
@@ -254,7 +267,7 @@ app.post('/clear-old-files', async (req, res) => {
 });
 
 // API لخدمة DataTables server-side
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', isAuthenticated, async (req, res) => {
   const draw = Number(req.body.draw);
   const start = Number(req.body.start);
   const length = Number(req.body.length);
@@ -309,7 +322,7 @@ app.post('/api/products', async (req, res) => {
 });
 
 // نقطة البحث في قاعدة بيانات المنتجات (API)
-app.get('/api/search', async (req, res) => {
+app.get('/api/search', isAuthenticated, async (req, res) => {
   const { q } = req.query;
   if (!q) return res.status(400).send('يرجى إرسال كلمة للبحث');
 
@@ -332,8 +345,7 @@ app.get('/api/search', async (req, res) => {
 });
 
 // GET /api/produit/:code → جلب السعر حسب GENCOD_P
-
-app.get('/api/Produit/:code', async (req, res) => {
+app.get('/api/Produit/:code', isAuthenticated, async (req, res) => {
   try {
     const code = req.params.code;
     const produit = await Product.findOne({
@@ -350,7 +362,7 @@ app.get('/api/Produit/:code', async (req, res) => {
 });
 
 // نقطة بحث أخرى (معادلة لنقطة /api/search) إن أردت
-app.get('/search', async (req, res) => {
+app.get('/search', isAuthenticated, async (req, res) => {
   const { q } = req.query;
   if (!q) return res.status(400).send('يرجى إرسال كلمة للبحث');
 
@@ -368,7 +380,7 @@ app.get('/search', async (req, res) => {
 });
 
 // نقطة تسجيل مستخدم جديد
-app.post('/register', async (req, res) => {
+app.post('/register', isAuthenticated, async (req, res) => {
   const { username, password, role } = req.body;
 
   if (!username || !password || !role) {
@@ -480,17 +492,11 @@ app.post('/login', async (req, res) => {
 });
 
 // جلب بيانات الدور الحالي للمستخدم
-app.get('/get-role', (req, res) => {
+app.get('/get-role', isAuthenticated, (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ error: 'غير مصرح' });
   }
   res.json({ role: req.session.user.role });
-});
-
-app.use(express.static('public'));
-
-app.get('/offline.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/login-register/offline.html'));
 });
 
 // صفحة تسجيل الدخول (إذا كان مسجلاً يتم منعه من الدخول إليها)
@@ -510,7 +516,10 @@ app.get('/tassgile', (req, res) => {
   res.sendFile(path.join(__dirname, 'views/login-register/register.html'));
 });
 
+// ===================
 // الصفحة الرئيسية الخاصة بالمسؤول
+// ===================
+
 app.get('/', isAuthenticated, isResponsable, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/responsable/index.html'));
 });
@@ -544,17 +553,38 @@ app.get('/totalProduit', isAuthenticated, isResponsable, (req, res) => {
 app.get('/infoPassPage', isAuthenticated, isResponsable, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/responsable/info.html')); // ✅ صفحة فارغة مؤقتاً
 });
+
 app.get('/pageUser', isAuthenticated, isResponsable, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/responsable/pageUser.html')); // ✅ صفحة فارغة مؤقتاً
 });
 
+app.get('/dashboard', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/dashboard.html')); // ✅ صفحة فارغة مؤقتاً
+});
+
+app.get('/listVendeurs', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/List-Vendeurs.html')); // ✅ صفحة فارغة مؤقتاً
+});
+
+app.get('/produitTotal', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/produitTotal.html')); // ✅ صفحة فارغة مؤقتاً
+});
+// ===================
+//fin الصفحة الرئيسية الخاصة بالمسؤول
+// ===================
+
+// ===================
 // صفحة الأسعار الخاصة بالبائع
+// ===================
+
 app.get('/prixVen', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/prixVen.html'));
 });
+
 app.get('/serchCode', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/searchCode.html'));
 });
+
 app.get('/inventaire', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/inventaire.html'));
 });
@@ -587,71 +617,29 @@ app.get('/affiche', isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/affiche.html'));
 });
 
+// إضافة نقطة GET لعرض البيانات في صفحة HTML
+app.get('/InvSmartManager', isAuthenticated, isVendeur, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/inventairePro.html')); // ✅ صفحة فارغة مؤقتاً
+});
+// ================================
+//fin صفحة الأسعار الخاصة بالبائع
+// =================================
+
+// ===================
 // تسجيل الخروج وتدمير الجلسة
+// ===================
+
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/login');
   });
 });
 
-// ميدلوير نهائي للتعامل مع حالات الرفض (إن وُجد)
-app.use((req, res, next) => {
-  if (req.rejectedAccess) {
-    return res.status(403).json({ error: 'هذه الصفحة مخصصة للمسؤول فقط' });
-  }
-  next();
-});
-
+// ===================
 // API لاستقبال المنتجات وحفظها في قاعدة البيانات
-app.post('/api/inventairePro', async (req, res) => {
-  try {
-    const productData = req.body;
-    const product = new Inventaire(productData);
-    await product.save();
-    res.status(201).send(product);
-  } catch (error) {
-    res.status(500).send({ message: 'Error saving product', error });
-  }
-});
-
-// إضافة نقطة GET لعرض البيانات في صفحة HTML
-app.get('/InvSmartManager', isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/vendeur/inventairePro.html')); // ✅ صفحة فارغة مؤقتاً
-});
-
-app.get('/dashboard', isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/responsable/dashboard.html')); // ✅ صفحة فارغة مؤقتاً
-});
-app.get('/listVendeurs', isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/responsable/List-Vendeurs.html')); // ✅ صفحة فارغة مؤقتاً
-});
-app.get('/produitTotal', isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/responsable/produitTotal.html')); // ✅ صفحة فارغة مؤقتاً
-});
-
-// GET /api/dashboard
-app.get('/api/inventaireProo', async (req, res) => {
-  try {
-    const { nameVendeur } = req.query;
-    let filter = {};
-
-    // إذا تم إرسال اسم بائع، نبحث فقط عن منتجاته
-    if (nameVendeur) {
-      filter.nameVendeur = nameVendeur;
-    }
-
-    // 🔽 ترتيب تنازلي حسب تاريخ الإنشاء (الأحدث أولاً)
-    const products = await Inventaire.find(filter).sort({ createdAt: -1 });
-
-    res.json(products);
-  } catch (error) {
-    console.error('Error loading products:', error);
-    res.status(500).send({ message: 'Error loading products', error });
-  }
-});
-
+// ===================
 // 🔹 ملخص البائعين
-app.get('/api/inventairePro', async (req, res) => {
+app.get('/api/inventairePro', isAuthenticated, async (req, res) => {
   try {
     const result = await Inventaire.aggregate([
       { $sort: { createdAt: -1 } },
@@ -678,8 +666,19 @@ app.get('/api/inventairePro', async (req, res) => {
   }
 });
 
+app.post('/api/inventairePro', isAuthenticated, async (req, res) => {
+  try {
+    const productData = req.body;
+    const product = new Inventaire(productData);
+    await product.save();
+    res.status(201).send(product);
+  } catch (error) {
+    res.status(500).send({ message: 'Error saving product', error });
+  }
+});
+
 // 🔹 جلب منتجات بائع مع Pagination
-app.get('/api/inventairePro/:vendeur', async (req, res) => {
+app.get('/api/inventairePro/:vendeur', isAuthenticated, async (req, res) => {
   try {
     const { page, limit } = req.query;
     const nameVendeur = req.params.vendeur;
@@ -717,18 +716,65 @@ app.get('/api/inventairePro/:vendeur', async (req, res) => {
       page: pageNumber,
       limit: limitNumber,
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).send({
       message: 'Erreur lors du chargement des produits du vendeur',
-      err
+      err,
     });
   }
 });
 
+// GET /api/dashboard
+app.get('/api/inventaireProo', isAuthenticated, async (req, res) => {
+  try {
+    const { nameVendeur } = req.query;
+    let filter = {};
+
+    // إذا تم إرسال اسم بائع، نبحث فقط عن منتجاته
+    if (nameVendeur) {
+      filter.nameVendeur = nameVendeur;
+    }
+
+    // 🔽 ترتيب تنازلي حسب تاريخ الإنشاء (الأحدث أولاً)
+    const products = await Inventaire.find(filter).sort({ createdAt: -1 });
+
+    res.json(products);
+  } catch (error) {
+    console.error('Error loading products:', error);
+    res.status(500).send({ message: 'Error loading products', error });
+  }
+});
+// GET /api/inventairePro?nameVendeur=xxx
+app.get('/api/inventaireProoo', isAuthenticated, async (req, res) => {
+  const { nameVendeur } = req.query;
+
+  if (!nameVendeur) {
+    return res.status(400).json({ error: 'Nom du vendeur requis' });
+  }
+
+  try {
+    const produits = await Inventaire.find({
+      nameVendeur: { $regex: new RegExp(nameVendeur, 'i') },
+    });
+
+    // 🔹 تعديل الاسم قبل الإرسال (إزالة @ وما بعدها)
+    const produitsModifies = produits.map((prod) => {
+      const obj = prod.toObject();
+      if (obj.nameVendeur && obj.nameVendeur.includes('@')) {
+        obj.nameVendeur = obj.nameVendeur.split('@')[0];
+      }
+      return obj;
+    });
+
+    res.json(produitsModifies);
+  } catch (error) {
+    console.error('Erreur serveur :', error);
+    res.status(500).json({ error: 'Erreur serveur interne' });
+  }
+});
 // ✅ جلب جميع بيانات المنتجات
-app.get('/api/ProduitsTotal', async (req, res) => {
+app.get('/api/ProduitsTotal', isAuthenticated, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 50;
@@ -768,7 +814,9 @@ app.get('/api/ProduitsTotal', async (req, res) => {
   }
 });
 
-// get data to excel
+// --------------------------------------
+//   // get data to excel
+// --------------------------------------
 
 // ✅ دالة عامة لتوليد ملف Excel لأي بائع
 async function exportExcelByVendeur(nameVendeur, res) {
@@ -854,7 +902,7 @@ async function exportExcelByVendeur(nameVendeur, res) {
 }
 
 // ✅ المسار العام لتصدير ملف Excel لأي بائع
-app.get('/api/exportExcel/:vendeur', async (req, res) => {
+app.get('/api/exportExcel/:vendeur', isResponsable, async (req, res) => {
   await exportExcelByVendeur(req.params.vendeur, res);
 });
 
@@ -883,7 +931,7 @@ async function exportAllProducts(res) {
 
     // ✅ استخدام stream لتفادي تحميل كامل البيانات في الذاكرة
     const cursor = Inventaire.find().sort({ createdAt: -1 }).cursor();
-    
+
     // 🔁 قراءة البيانات تدريجيًا
     for await (const p of cursor) {
       const stock = parseFloat(p.stock) || 0;
@@ -923,12 +971,16 @@ async function exportAllProducts(res) {
 }
 
 // 🔹 المسار العام لتصدير كل البيانات
-app.get('/api/exportExcel', async (req, res) => {
+app.get('/api/exportExcel', isAuthenticated, async (req, res) => {
   await exportAllProducts(res);
 });
 
+// --------------------------------------
+// fin  // get data to excel
+// --------------------------------------
+
 //جلب جميع بيانات products
-app.get('/api/Produits', async (req, res) => {
+app.get('/api/Produits', isAuthenticated, async (req, res) => {
   try {
     // جلب عدد المنتجات فقط
     const produitsCount = await Product.countDocuments(); // بدلاً من find()
@@ -941,8 +993,12 @@ app.get('/api/Produits', async (req, res) => {
   }
 });
 
+// ========================================
+//   function delete/put/deleteAll  products
+// ========================================
+
 // API لتحديث منتج
-app.put('/api/inventairePro/:id', async (req, res) => {
+app.put('/api/inventairePro/:id', isAuthenticated, async (req, res) => {
   const { id } = req.params;
   try {
     const updatedProduct = await Inventaire.findByIdAndUpdate(id, req.body, { new: true });
@@ -954,7 +1010,7 @@ app.put('/api/inventairePro/:id', async (req, res) => {
 });
 
 // حذف منتج
-app.delete('/api/inventairePro/:vendeur', async (req, res) => {
+app.delete('/api/inventairePro/:vendeur', isAuthenticated, async (req, res) => {
   try {
     const nameVendeur = req.params.vendeur;
     const result = await Inventaire.deleteMany({ nameVendeur });
@@ -967,7 +1023,7 @@ app.delete('/api/inventairePro/:vendeur', async (req, res) => {
 
 // DELETE /api/inventairePro/:id
 const { ObjectId } = require('mongoose').Types;
-app.delete('/api/InvSmartManager/:id', async (req, res) => {
+app.delete('/api/InvSmartManager/:id', isAuthenticated, async (req, res) => {
   try {
     const productId = req.params.id;
 
@@ -998,7 +1054,7 @@ app.delete('/api/InvSmartManager/:id', async (req, res) => {
 });
 
 // ✅ مسح كل المنتجات من جميع المستخدمين
-app.delete('/api/inventairePro', async (req, res) => {
+app.delete('/api/inventairePro', isAuthenticated, async (req, res) => {
   try {
     const result = await Inventaire.deleteMany({});
     res.json({
@@ -1012,10 +1068,17 @@ app.delete('/api/inventairePro', async (req, res) => {
   }
 });
 
+// ========================================
+// fin  function delete/put/deleteAll  products
+// ========================================
+
+// ========================================
+//   function manager password
+// ========================================
 // --------------------------------------
 //   API لجلب كلمات السر
 // --------------------------------------
-app.get('/get-passwords', async (req, res) => {
+app.get('/get-passwords', isAuthenticated, async (req, res) => {
   let data = await PagePasswords.findOne();
 
   // لو لم توجد بيانات يتم إنشاء واحدة تلقائياً
@@ -1036,7 +1099,7 @@ app.get('/get-passwords', async (req, res) => {
 // --------------------------------------
 //   API لتحديث كلمات السر
 // --------------------------------------
-app.post('/update-passwords', async (req, res) => {
+app.post('/update-passwords', isAuthenticated,isResponsable, async (req, res) => {
   const {
     pasPageUploade,
     pasPageInventaire,
@@ -1062,35 +1125,9 @@ app.post('/update-passwords', async (req, res) => {
   res.send('تم تحديث كلمات سر الصفحات بنجاح');
 });
 
-// GET /api/inventairePro?nameVendeur=xxx
-app.get('/api/inventaireProoo', async (req, res) => {
-  const { nameVendeur } = req.query;
-
-  if (!nameVendeur) {
-    return res.status(400).json({ error: 'Nom du vendeur requis' });
-  }
-
-  try {
-    const produits = await Inventaire.find({
-      nameVendeur: { $regex: new RegExp(nameVendeur, 'i') },
-    });
-
-    // 🔹 تعديل الاسم قبل الإرسال (إزالة @ وما بعدها)
-    const produitsModifies = produits.map((prod) => {
-      const obj = prod.toObject();
-      if (obj.nameVendeur && obj.nameVendeur.includes('@')) {
-        obj.nameVendeur = obj.nameVendeur.split('@')[0];
-      }
-      return obj;
-    });
-
-    res.json(produitsModifies);
-    
-  } catch (error) {
-    console.error('Erreur serveur :', error);
-    res.status(500).json({ error: 'Erreur serveur interne' });
-  }
-});
+// ========================================
+//  fin function manager password
+// ========================================
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);

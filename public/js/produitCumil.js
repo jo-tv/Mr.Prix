@@ -243,3 +243,9 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('btnRefresh')?.addEventListener('click', () => {
   window.location.href = '/totalProduit'; // أو أي صفحة تريدها
 });
+
+$('.menu-toggle').click(function () {
+  $('.menu-toggle').toggleClass('open');
+  $('.menu-round').toggleClass('open');
+  $('.menu-line').toggleClass('open');
+});

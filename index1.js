@@ -544,6 +544,9 @@ app.get('/totalProduit', isAuthenticated, isResponsable, (req, res) => {
 app.get('/infoPassPage', isAuthenticated, isResponsable, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/responsable/info.html')); // ✅ صفحة فارغة مؤقتاً
 });
+app.get('/pageUser', isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/responsable/pageUser.html')); // ✅ صفحة فارغة مؤقتاً
+});
 
 // صفحة الأسعار الخاصة بالبائع
 app.get('/prixVen', isAuthenticated, isVendeur, (req, res) => {

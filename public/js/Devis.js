@@ -183,3 +183,9 @@ function getFormattedDate() {
 
 // مثال استخدام
 document.querySelector('#date').textContent = 'MARRAKECH LE : ' + getFormattedDate();
+
+$('.menu-toggle').click(function () {
+  $('.menu-toggle').toggleClass('open');
+  $('.menu-round').toggleClass('open');
+  $('.menu-line').toggleClass('open');
+});

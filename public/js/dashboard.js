@@ -766,3 +766,10 @@ document
 document
   .querySelector('.refe')
   ?.addEventListener('click', () => (window.location.href = '#extraAdressTable'));
+
+
+$('.menu-toggle').click(function () {
+  $('.menu-toggle').toggleClass('open');
+  $('.menu-round').toggleClass('open');
+  $('.menu-line').toggleClass('open');
+});
