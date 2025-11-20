@@ -40,34 +40,25 @@ function getCookie(name) {
   return null;
 }
 
-// متغيرات عالمية
-
-let passDeletOneVendeur = '';
-let passDeletAllVendeur = '';
-
 async function loadPagePasswords() {
   try {
     const res = await fetch('/get-passwords');
     const data = await res.json();
-
-    // جعل الكلمات متاحة عالميًا
-    passDeletOneVendeur = data.passDeletOneVendeur;
-    passDeletAllVendeur = data.passDeletAllVendeur;
-
     // تخزين كل كلمات السر في كائن واحد
     PASSWORDS = {
       pasPageUploade: data.pasPageUploade,
       pasPageInventaire: data.pasPageInventaire,
-      passDeletOneVendeur: passDeletOneVendeur, // نستخدم المتغيرات العالمية
-      passDeletAllVendeur: passDeletAllVendeur,
+      passDeletAllVendeur: data.passDeletAllVendeur,
       PanneauMots: data.PanneauMotss,
     };
+    
 
     // الصفحات المحمية
     PROTECTED_PAGES = {
       '/upload': PASSWORDS.pasPageUploade,
       '/InvSmartManager': PASSWORDS.pasPageInventaire,
       '/infoPassPage': PASSWORDS.PanneauMots,
+      '/pageUser': PASSWORDS.PanneauMots,
     };
 
     // حماية الصفحة الحالية
@@ -78,8 +69,6 @@ async function loadPagePasswords() {
 }
 
 document.addEventListener('DOMContentLoaded', loadPagePasswords);
-
-
 
 async function protectPage(path) {
   const pagePassword = PROTECTED_PAGES[path];
@@ -174,7 +163,7 @@ function showToast(message, type = 'info', duration = 3000) {
   }, duration);
 }
 
-document.querySelectorAll('.delete-all-btn').forEach(btn => {
+document.querySelectorAll('.delete-all-btn').forEach((btn) => {
   btn.addEventListener('click', async () => {
     if (!passDeletAllVendeur) await loadPagePasswords();
     showDeleteAllOverlay(); // modal للتحقق من كلمة السر

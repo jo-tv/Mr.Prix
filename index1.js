@@ -44,8 +44,6 @@ async function connectDB() {
 // استدعاء الاتصال عند بدء السيرفر
 connectDB();
 
-
-
 // إعدادات استضافة الملفات الثابتة
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -680,20 +678,49 @@ app.get('/api/inventairePro', async (req, res) => {
 // 🔹 جلب منتجات بائع مع Pagination
 app.get('/api/inventairePro/:vendeur', async (req, res) => {
   try {
-    const { page = 1, limit = 50 } = req.query;
+    const { page, limit } = req.query;
     const nameVendeur = req.params.vendeur;
 
-    const produits = await Inventaire.find({ nameVendeur })
+    let produits;
+
+    // إذا لم يُرسل limit → رجّع كل النتائج بدون pagination
+    if (!limit) {
+      produits = await Inventaire.find({ nameVendeur }).sort({ createdAt: -1 });
+
+      const total = produits.length;
+
+      return res.json({
+        produits,
+        total,
+        page: null,
+        limit: null,
+      });
+    }
+
+    // إذا limit موجود → نفّذ pagination عادي
+    const pageNumber = parseInt(page) || 1;
+    const limitNumber = parseInt(limit);
+
+    produits = await Inventaire.find({ nameVendeur })
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit));
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber);
 
     const total = await Inventaire.countDocuments({ nameVendeur });
 
-    res.json({ produits, total, page: parseInt(page), limit: parseInt(limit) });
+    res.json({
+      produits,
+      total,
+      page: pageNumber,
+      limit: limitNumber,
+    });
+
   } catch (err) {
     console.error(err);
-    res.status(500).send({ message: 'Erreur lors du chargement des produits du vendeur', err });
+    res.status(500).send({
+      message: 'Erreur lors du chargement des produits du vendeur',
+      err
+    });
   }
 });
 
@@ -812,7 +839,8 @@ async function exportExcelByVendeur(nameVendeur, res) {
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
-    res.setHeader('Content-Disposition', `attachment; filename=${nameVendeur}.xlsx`);
+    let name = nameVendeur.split('@')[0];
+    res.setHeader('Content-Disposition', `attachment; filename=${name}.xlsx`);
 
     await workbook.xlsx.write(res);
     res.end();
@@ -852,7 +880,7 @@ async function exportAllProducts(res) {
 
     // ✅ استخدام stream لتفادي تحميل كامل البيانات في الذاكرة
     const cursor = Inventaire.find().sort({ createdAt: -1 }).cursor();
-
+    
     // 🔁 قراءة البيانات تدريجيًا
     for await (const p of cursor) {
       const stock = parseFloat(p.stock) || 0;
@@ -870,7 +898,7 @@ async function exportAllProducts(res) {
         fournisseur: p.fournisseur || '—',
         adresse: p.adresse || '—',
         calcul: p.calcul?.trim() || p['calcul ']?.trim() || '—',
-        nameVendeur: p.nameVendeur || '—',
+        nameVendeur: p.nameVendeur.split('@')[0] || '—',
         createdAt: p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : '',
       });
     }
@@ -1029,6 +1057,36 @@ app.post('/update-passwords', async (req, res) => {
   await data.save();
 
   res.send('تم تحديث كلمات سر الصفحات بنجاح');
+});
+
+// GET /api/inventairePro?nameVendeur=xxx
+app.get('/api/inventaireProoo', async (req, res) => {
+  const { nameVendeur } = req.query;
+
+  if (!nameVendeur) {
+    return res.status(400).json({ error: 'Nom du vendeur requis' });
+  }
+
+  try {
+    const produits = await Inventaire.find({
+      nameVendeur: { $regex: new RegExp(nameVendeur, 'i') },
+    });
+
+    // 🔹 تعديل الاسم قبل الإرسال (إزالة @ وما بعدها)
+    const produitsModifies = produits.map((prod) => {
+      const obj = prod.toObject();
+      if (obj.nameVendeur && obj.nameVendeur.includes('@')) {
+        obj.nameVendeur = obj.nameVendeur.split('@')[0];
+      }
+      return obj;
+    });
+
+    res.json(produitsModifies);
+    
+  } catch (error) {
+    console.error('Erreur serveur :', error);
+    res.status(500).json({ error: 'Erreur serveur interne' });
+  }
 });
 
 app.listen(PORT, () => {

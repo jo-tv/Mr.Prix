@@ -1,3 +1,4 @@
+
 /* =========================
    Helpers & Globals
 ========================= */
@@ -271,38 +272,41 @@ async function initDashboard() {
     showAdressesStats(produits);
 
     function getExtraAdresses(dbProducts, jsonAddresses) {
-  const map = {};
+      const map = {};
 
-  dbProducts.forEach((p) => {
-    if (!p.adresse || jsonAddresses.includes(p.adresse)) return;
+      dbProducts.forEach((p) => {
+        if (!p.adresse || jsonAddresses.includes(p.adresse)) return;
 
-    // المفتاح الجديد: adresse + vendeur
-    const key = `${p.adresse}__${p.nameVendeur}`;
+        // المفتاح الجديد: adresse + vendeur
+        const key = `${p.adresse}__${p.nameVendeur}`;
 
-    if (!map[key]) {
-      map[key] = {
-        adresse: p.adresse,
-        vendeur: p.nameVendeur,
-        count: 0,
-        lastDate: p.createdAt || 'Inconnu',
-      };
+        if (!map[key]) {
+          map[key] = {
+            adresse: p.adresse,
+            vendeur: p.nameVendeur,
+            count: 0,
+            lastDate: p.createdAt || 'Inconnu',
+          };
+        }
+
+        map[key].count++;
+
+        if (p.createdAt && p.createdAt > map[key].lastDate) {
+          map[key].lastDate = p.createdAt;
+        }
+      });
+
+      return Object.values(map);
     }
-
-    map[key].count++;
-
-    if (p.createdAt && p.createdAt > map[key].lastDate) {
-      map[key].lastDate = p.createdAt;
-    }
-  });
-
-  return Object.values(map);
-}
 
     function fillExtraAdressTable(extraList) {
       const tbody = document.querySelector('#extraAdressTable tbody');
       tbody.innerHTML = '';
 
       document.getElementById('extraCount').innerText = extraList.length;
+      if (extraList.length > 0) {
+        document.querySelector('.refe').classList.add('jello-vertical');
+      }
 
       extraList.forEach((item) => {
         const d = new Date(item.lastDate);
@@ -450,7 +454,7 @@ async function initDashboard() {
       (r) =>
         produitsParAdresseUnique.filter((p) => p.adresse && rayons[r].regex.test(p.adresse)).length
     );
-    console.log(rayonCounts);
+
     const rayonObjectifs = rayonNames.map((r) => rayons[r].objectif);
 
     window._charts.rayonChart = new Chart(ctx, {
@@ -499,6 +503,11 @@ async function initDashboard() {
       .filter((e) => e.vendeursCount > 1)
       .sort((a, b) => b.vendeursCount - a.vendeursCount || b.produitsCount - a.produitsCount);
     document.getElementById('sharedAddresses').textContent = sharedEntries.length;
+
+    if (sharedEntries.length > 0) {
+      
+      document.querySelector('.Adresses').classList.add('jello-vertical');
+    }
 
     const tbody = document.querySelector('#sharedTable tbody');
     tbody.innerHTML = sharedEntries

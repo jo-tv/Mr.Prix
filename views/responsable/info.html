@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0"
+      content="width=device-width, initial-scale=0.5"
     />
     <title>لوحة تعديل كلمات سر الصفحات</title>
     <!-- ✅ استدعاء مكتبة Bootstrap + FontAwesome + Excel -->
@@ -36,10 +36,13 @@
         letter-spacing: 3px;
         font-weight: bold;
       }
+      input {
+        border: solid 1px red !important;
+      }
     </style>
   </head>
   <body>
-         <!-- خلفية تغطي الشاشة -->
+    <!-- خلفية تغطي الشاشة -->
     <div
       id="passwordOverlay"
       style="
@@ -100,14 +103,14 @@
     <div class="container mt-5">
       <div class="card shadow-lg">
         <div class="card-header bg-primary text-white text-center fs-4">
-          <i class="bi bi-shield-lock-fill me-2"></i>
+          <i class="bi bi-shield-lock-fill me-2 fs-4"></i>
           Panneau de gestion des mots de passe des pages
         </div>
 
         <div class="card-body">
           <!-- جدول عرض كلمات السر -->
           <h5 class="mb-3 text-secondary">
-            <i class="bi bi-table me-1"></i>
+            <i class="bi bi-table me-1 fs-3"></i>
             Tableau des mots de passe actuels
           </h5>
 
@@ -126,7 +129,7 @@
 
           <!-- نموذج تعديل كلمات السر -->
           <h5 class="text-secondary">
-            <i class="bi bi-pencil-square me-1"></i>
+            <i class="bi bi-pencil-square me-1 fs-3"></i>
             Modifier les mots de passe
           </h5>
 
@@ -136,8 +139,8 @@
           >
             <div class="col-md-6">
               <label class="form-label">
-                <i class="bi bi-upload me-1"></i>
-                Mot de passe — Page Upload
+                <i class="bi bi-upload me-1 fs-3"></i>
+                Mot de passe — <span class="fs-4 text-info"> Page Upload</span>
               </label>
               <input
                 name="pasPageUploade"
@@ -149,8 +152,8 @@
 
             <div class="col-md-6">
               <label class="form-label">
-                <i class="bi bi-archive me-1"></i>
-                Mot de passe — Page Inventaire
+                <i class="bi bi-archive me-1 fs-3"></i>
+                Mot de passe — <span class="fs-4 text-info">Page Inventaire </span>
               </label>
               <input
                 name="pasPageInventaire"
@@ -162,8 +165,8 @@
 
             <div class="col-md-6">
               <label class="form-label">
-                <i class="bi bi-person-dash me-1"></i>
-                Mot de passe — Suppression d’un vendeur
+                <i class="bi bi-person-dash me-1 fs-3"></i>
+                Mot de passe — <span class="fs-4 text-info">Suppression d’un vendeur </span>
               </label>
               <input
                 name="passDeletOneVendeur"
@@ -175,8 +178,8 @@
 
             <div class="col-md-6">
               <label class="form-label">
-                <i class="bi bi-people-fill me-1"></i>
-                Mot de passe — Suppression de tous les vendeurs
+                <i class="bi bi-people-fill me-1 fs-3"></i>
+                Mot de passe — <span class="fs-4 text-info">Suppression de tous les vendeurs </span>
               </label>
               <input
                 name="passDeletAllVendeur"
@@ -187,8 +190,8 @@
             </div>
             <div class="col-md-6">
               <label class="form-label">
-                <i class="bi bi-people-fill me-1"></i>
-                Page — Panneau des mots de passe
+                <i class="bi bi-people-fill me-1 fs-3"></i>
+                Page — <span class="fs-4 text-info">Panneau de gestion des mots </span>
               </label>
               <input
                 name="PanneauMotss"
@@ -209,7 +212,10 @@
       </div>
     </div>
     <!--nav FAB Button -->
-    <div class="containeer">
+    <div
+      class="containeer"
+      style="zoom: 1.7"
+    >
       <div class="menu-toggle">
         <span class="fa fa-plus"></span>
       </div>
