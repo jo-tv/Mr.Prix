@@ -1,335 +1,165 @@
 /* From Uiverse.io by Yaya12085 */
 .container {
-    height: 40%;
-    width: 80%;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    gap: 5px;
-    background-color: rgba(0, 110, 255, 0.041);
-    box-shadow:
-        rgba(0, 0, 0, 0.25) 0px 14px 28px,
-        rgba(0, 0, 0, 0.22) 0px 10px 10px;
-    position: absolute;
-    top: 30%;
+  height: 40%;
+  width: 80%;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  gap: 5px;
+  background-color: rgba(0, 110, 255, 0.041);
+  box-shadow:
+    rgba(0, 0, 0, 0.25) 0px 14px 28px,
+    rgba(0, 0, 0, 0.22) 0px 10px 10px;
+  position: absolute;
+  top: 30%;
 }
 
 .header {
-    flex: 1;
-    width: 100%;
-    border: 2px dashed royalblue;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+  flex: 1;
+  width: 100%;
+  border: 2px dashed royalblue;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .header svg {
-    height: 100px;
+  height: 100px;
 }
 
 .header p {
-    text-align: center;
-    color: #1b12e1;
-    font-size: 19px;
-    font-weight: 900;
+  text-align: center;
+  color: #1b12e1;
+  font-size: 19px;
+  font-weight: 900;
 }
 
 .footer {
-    background-color: rgba(0, 110, 255, 0.075);
-    width: 100%;
-    height: 40px;
-    padding: 8px;
-    border-radius: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    color: black;
-    border: none;
+  background-color: rgba(0, 110, 255, 0.075);
+  width: 100%;
+  height: 40px;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: black;
+  border: none;
 }
 
 .footer svg {
-    height: 130%;
-    fill: royalblue;
-    background-color: rgba(70, 66, 66, 0.103);
-    border-radius: 50%;
-    padding: 2px;
-    cursor: pointer;
-    box-shadow: 0 2px 30px rgba(0, 0, 0, 0.205);
+  height: 130%;
+  fill: royalblue;
+  background-color: rgba(70, 66, 66, 0.103);
+  border-radius: 50%;
+  padding: 2px;
+  cursor: pointer;
+  box-shadow: 0 2px 30px rgba(0, 0, 0, 0.205);
 }
 
 .footer p {
-    flex: 1;
-    text-align: center;
+  flex: 1;
+  text-align: center;
 }
 
 #file {
-    display: none;
+  display: none;
 }
 
 /* From Uiverse.io by andrew-demchenk0 */
 .info {
-    font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Oxygen,
-        Ubuntu,
-        Cantarell,
-        "Open Sans",
-        "Helvetica Neue",
-        sans-serif;
-    width: 80%;
-    padding: 12px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: start;
-    background: #509af8;
-    border-radius: 8px;
-    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
-    position: absolute;
-    top: 10%;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif;
+  width: 80%;
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+  background: #509af8;
+  border-radius: 8px;
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+  position: absolute;
+  top: 10%;
 }
 
 .info__icon {
-    width: 20px;
-    height: 20px;
-    transform: translateY(-2px);
-    margin-right: 8px;
+  width: 20px;
+  height: 20px;
+  transform: translateY(-2px);
+  margin-right: 8px;
 }
 
 .info__icon path {
-    fill: #fff;
+  fill: #fff;
 }
 
 .info__title {
-    font-weight: 500;
-    font-size: 14px;
-    color: #fff;
+  font-weight: 500;
+  font-size: 14px;
+  color: #fff;
 }
 
 .info__close {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    margin-left: auto;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin-left: auto;
 }
 
 .info__close path {
-    fill: #fff;
+  fill: #fff;
 }
 
-/* تغطية الشاشة كاملة */
-/* From Uiverse.io by paesjr */
-#wifi-loader {
-    --background: #62abff;
-    --front-color: #ef4d86;
-    --front-color-in: #fbb216;
-    --back-color: #c3c8de;
-    --text-color: #414856;
-    width: 64px;
-    height: 64px;
-    border-radius: 50px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 999999999999;
+#topLoad {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  inset: 0; /* يغطي كامل الصفحة */
+  background-image: linear-gradient(-60deg, #ff5858 0%, #f09819 100%);
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
-
-#wifi-loader svg {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+#loading {
+  /* محاذاة المحتوى في منتصف الشاشة */
+  /* نص التحميل */
+  font-size: 2rem;
+  font-weight: bold;
+  color: #3734cee1;
+  font-weight: 700;
+  text-shadow: 3px 5px 2px rgba(128, 0, 0, 0.69);
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  /* تموضع العنصر بدقة في منتصف الشاشة */
 }
-
-#wifi-loader svg circle {
-    position: absolute;
-    fill: none;
-    stroke-width: 6px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transform: rotate(-100deg);
-    transform-origin: center;
-}
-
-#wifi-loader svg circle.back {
-    stroke: var(--back-color);
-}
-
-#wifi-loader svg circle.front {
-    stroke: var(--front-color);
-}
-
-#wifi-loader svg.circle-outer {
-    height: 86px;
-    width: 86px;
-}
-
-#wifi-loader svg.circle-outer circle {
-    stroke-dasharray: 62.75 188.25;
-}
-
-#wifi-loader svg.circle-outer circle.back {
-    animation: circle-outer135 1.8s ease infinite 0.3s;
-}
-
-#wifi-loader svg.circle-outer circle.front {
-    animation: circle-outer135 1.8s ease infinite 0.15s;
-}
-
-#wifi-loader svg.circle-middle {
-    height: 60px;
-    width: 60px;
-}
-
-#wifi-loader svg.circle-middle circle {
-    stroke: var(--front-color-in);
-    stroke-dasharray: 42.5 127.5;
-}
-
-#wifi-loader svg.circle-middle circle.back {
-    animation: circle-middle6123 1.8s ease infinite 0.25s;
-}
-
-#wifi-loader svg.circle-middle circle.front {
-    animation: circle-middle6123 1.8s ease infinite 0.1s;
-}
-
-#wifi-loader svg.circle-inner {
-    height: 34px;
-    width: 34px;
-}
-
-#wifi-loader svg.circle-inner circle {
-    stroke-dasharray: 22 66;
-}
-
-#wifi-loader svg.circle-inner circle.back {
-    animation: circle-inner162 1.8s ease infinite 0.2s;
-}
-
-#wifi-loader svg.circle-inner circle.front {
-    animation: circle-inner162 1.8s ease infinite 0.05s;
-}
-
-#wifi-loader .text {
-    position: absolute;
-    bottom: -40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-transform: lowercase;
-    font-weight: 500;
-    font-size: 14px;
-    letter-spacing: 0.2px;
-}
-
-#wifi-loader .text::before,
-#wifi-loader .text::after {
-    content: attr(data-text);
-}
-
-#wifi-loader .text::before {
-    color: var(--text-color);
-}
-
-#wifi-loader .text::after {
-    color: var(--front-color-in);
-    animation: text-animation76 3.6s ease infinite;
-    position: absolute;
-    left: 0;
-}
-
-@keyframes circle-outer135 {
-    0% {
-        stroke-dashoffset: 25;
-    }
-
-    25% {
-        stroke-dashoffset: 0;
-    }
-
-    65% {
-        stroke-dashoffset: 301;
-    }
-
-    80% {
-        stroke-dashoffset: 276;
-    }
-
-    100% {
-        stroke-dashoffset: 276;
-    }
-}
-
-@keyframes circle-middle6123 {
-    0% {
-        stroke-dashoffset: 17;
-    }
-
-    25% {
-        stroke-dashoffset: 0;
-    }
-
-    65% {
-        stroke-dashoffset: 204;
-    }
-
-    80% {
-        stroke-dashoffset: 187;
-    }
-
-    100% {
-        stroke-dashoffset: 187;
-    }
-}
-
-@keyframes circle-inner162 {
-    0% {
-        stroke-dashoffset: 9;
-    }
-
-    25% {
-        stroke-dashoffset: 0;
-    }
-
-    65% {
-        stroke-dashoffset: 106;
-    }
-
-    80% {
-        stroke-dashoffset: 97;
-    }
-
-    100% {
-        stroke-dashoffset: 97;
-    }
-}
-
-@keyframes text-animation76 {
-    0% {
-        clip-path: inset(0 100% 0 0);
-    }
-
-    50% {
-        clip-path: inset(0);
-    }
-
-    100% {
-        clip-path: inset(0 0 0 100%);
-    }
+#loading i {
+  font-size: 100px;
+  margin-right: 30px;
+  color: #41c72de1;
 }

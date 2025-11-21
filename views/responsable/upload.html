@@ -42,6 +42,10 @@
       rel="stylesheet"
       href="css/upload.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+    />
     <!-- ===== Boxicons CSS ===== -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script
@@ -250,55 +254,6 @@
         </div>
       </div>
     </div>
-
-    <!-- From Uiverse.io by paesjr -->
-    <div id="wifi-loader">
-      <svg
-        viewBox="0 0 86 86"
-        class="circle-outer"
-      >
-        <circle
-          r="40"
-          cy="43"
-          cx="43"
-          class="back"
-        ></circle>
-        <circle
-          r="40"
-          cy="43"
-          cx="43"
-          class="front"
-        ></circle>
-        <circle
-          r="40"
-          cy="43"
-          cx="43"
-          class="new"
-        ></circle>
-      </svg>
-      <svg
-        viewBox="0 0 60 60"
-        class="circle-middle"
-      >
-        <circle
-          r="27"
-          cy="30"
-          cx="30"
-          class="back"
-        ></circle>
-        <circle
-          r="27"
-          cy="30"
-          cx="30"
-          class="front"
-        ></circle>
-      </svg>
-
-      <div
-        data-text="Loading..."
-        class="text"
-      ></div>
-    </div>
     <!-- خلفية تغطي الشاشة -->
     <div
       id="passwordOverlay"
@@ -356,6 +311,9 @@
           style="color: red; margin-top: 10px"
         ></p>
       </div>
+    </div>
+    <div id="topLoad">
+      <div id="loading"><i class="bi bi-battery-charging"></i> Chargement des données...</div>
     </div>
     <script src="js/main2.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

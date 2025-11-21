@@ -1,4 +1,3 @@
-
 /* =========================
    Helpers & Globals
 ========================= */
@@ -77,7 +76,7 @@ async function initDashboard() {
       'productsCount'
     ).textContent = `${produitsUniques.length} / ${data.count}`;
 
-    document.getElementById('adressCount').textContent = `${adressesUnique.length} / 744`;
+    document.getElementById('adressCount').textContent = `${adressesUnique.length} / 738`;
 
     /* --------------------------------------------------
    🔵 تحميل ملف JSON للعناوين
@@ -505,7 +504,6 @@ async function initDashboard() {
     document.getElementById('sharedAddresses').textContent = sharedEntries.length;
 
     if (sharedEntries.length > 0) {
-      
       document.querySelector('.Adresses').classList.add('jello-vertical');
     }
 
@@ -666,7 +664,7 @@ async function initDashboard() {
     destroyChart(window._charts.adress);
     const ctxA = document.getElementById('adressChart')?.getContext('2d');
     if (ctxA) {
-      const totalAdresses = 744;
+      const totalAdresses = 738;
       const percentageUsed = ((adressesUnique.length / totalAdresses) * 100).toFixed(2);
       window._charts.adress = new Chart(ctxA, {
         type: 'bar',
@@ -766,7 +764,6 @@ document
 document
   .querySelector('.refe')
   ?.addEventListener('click', () => (window.location.href = '#extraAdressTable'));
-
 
 $('.menu-toggle').click(function () {
   $('.menu-toggle').toggleClass('open');

@@ -51,7 +51,6 @@ async function loadPagePasswords() {
       passDeletAllVendeur: data.passDeletAllVendeur,
       PanneauMots: data.PanneauMotss,
     };
-    
 
     // الصفحات المحمية
     PROTECTED_PAGES = {
@@ -123,7 +122,6 @@ async function submitPassword() {
     setCookie('pw_lock_time', 0, 1);
 
     document.getElementById('passwordOverlay').style.display = 'none';
-    document.body.style.visibility = 'visible';
     msg.innerText = '';
     showToast('✔ Accès autorisé.');
   } else {
@@ -151,7 +149,13 @@ async function submitPassword() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadPagePasswords);
+function showCharge() {
+  setTimeout(() => {
+    document.getElementById('topLoad').style.display = 'none';
+  }, 1500);
+}
+
+document.addEventListener('DOMContentLoaded', loadPagePasswords, showCharge());
 
 // 🔹 دالة الرسائل
 function showToast(message, type = 'info', duration = 3000) {
@@ -162,10 +166,3 @@ function showToast(message, type = 'info', duration = 3000) {
     toast.className = `toast ${type}`;
   }, duration);
 }
-
-document.querySelectorAll('.delete-all-btn').forEach((btn) => {
-  btn.addEventListener('click', async () => {
-    if (!passDeletAllVendeur) await loadPagePasswords();
-    showDeleteAllOverlay(); // modal للتحقق من كلمة السر
-  });
-});

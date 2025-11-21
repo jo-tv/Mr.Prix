@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=0.5"
     />
-    <title>  Gestion des vendeurs — Inventaire  </title>
+    <title>Détails des vendeurs — Name / Status</title>
     <!-- ✅ استدعاء مكتبة Bootstrap + FontAwesome + Excel -->
     <link
       rel="stylesheet"
@@ -39,9 +39,60 @@
       input {
         border: solid 1px red !important;
       }
+      #btn {
+        height: 50px;
+        box-shadow:
+          rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
+          rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
+          rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+        font-size: 20px;
+      }
+      #btn i {
+        font-size: 25px;
+        font-weight: 700;
+      }
+      #topLoad {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        inset: 0; /* يغطي كامل الصفحة */
+        background-image: linear-gradient(-60deg, #ff5858 0%, #f09819 100%);
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      #loading {
+        /* محاذاة المحتوى في منتصف الشاشة */
+        /* نص التحميل */
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #3734cee1;
+        font-weight: 700;
+        text-shadow: 3px 5px 2px rgba(128, 0, 0, 0.69);
+        text-align: center;
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        /* تموضع العنصر بدقة في منتصف الشاشة */
+      }
+      #loading i {
+        font-size: 120px;
+        margin-right: 30px;
+        color: #41c72de1;
+      }
     </style>
   </head>
   <body>
+    <div id="topLoad">
+      <div id="loading"><i class="bi bi-battery-charging"></i> Chargement des données...</div>
+    </div>
     <!-- خلفية تغطي الشاشة -->
     <div
       id="passwordOverlay"
@@ -202,7 +253,10 @@
             </div>
 
             <div class="col-12 mt-4">
-              <button class="btn btn-success w-100">
+              <button
+                id="btn"
+                class="btn btn-success w-100"
+              >
                 <i class="bi bi-save me-2"></i>
                 Sauvegarder les modifications
               </button>
@@ -222,10 +276,10 @@
       <div class="menu-round">
         <div
           class="btn-app"
-          data-label="Dashboard"
+          data-label="Data Vendeurs"
         >
           <div class="fa">
-            <a href="/dashboard"
+            <a href="/listVendeurs"
               ><i
                 class="fa-solid fa-circle-left"
                 style="color: white"
@@ -237,76 +291,7 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      async function loadPasswords() {
-        const res = await fetch('/get-passwords');
-        const data = await res.json();
-
-        const table = document.getElementById('passwordTable');
-
-        const fields = [
-          { key: 'pasPageUploade', label: 'Page Upload' },
-          { key: 'pasPageInventaire', label: 'Page Inventaire' },
-          { key: 'passDeletOneVendeur', label: 'Suppression d’un vendeur' },
-          { key: 'passDeletAllVendeur', label: 'Suppression de tous les vendeurs' },
-          { key: 'PanneauMotss', label: 'Panneau des mots de passe' },
-        ];
-
-        table.innerHTML = '';
-
-        fields.forEach((item) => {
-          const tr = document.createElement('tr');
-
-          tr.innerHTML = `
-      <td>
-        <button class="btn btn-sm btn-outline-primary" onclick="togglePassword('${item.key}', '${
-          data[item.key]
-        }')">
-          👁
-        </button>
-      </td>
-      <td>
-        <span class="password-box" id="pw_${item.key}">****</span>
-      </td>
-      <td>${item.label}</td>
-    `;
-
-          table.appendChild(tr);
-        });
-
-        // تعبئة الفورم بالقيم
-        document.querySelector('#pasPageUploade').value = '';
-        document.querySelector('#pasPageInventaire').value = '';
-        document.querySelector('#passDeletOneVendeur').value = '';
-        document.querySelector('#passDeletAllVendeur').value = '';
-        document.querySelector('#PanneauMotss').value = '';
-      }
-
-      // زر إظهار / إخفاء كلمة السر
-      function togglePassword(key, value) {
-        const span = document.getElementById('pw_' + key);
-        span.textContent = span.textContent === '****' ? value : '****';
-      }
-
-      // إرسال التعديل للخادم
-      document.getElementById('passForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = Object.fromEntries(new FormData(e.target).entries());
-
-        const res = await fetch('/update-passwords', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
-
-        alert(await res.text());
-        loadPasswords();
-      });
-
-      // تحميل البيانات عند فتح الصفحة
-      loadPasswords();
-    </script>
     <script src="js/main2.js"></script>
+    <script src="js/info.js"></script>
   </body>
 </html>

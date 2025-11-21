@@ -73,67 +73,106 @@
         font-weight: 600;
         letter-spacing: 1px;
       }
+      #topLoad {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        inset: 0; /* يغطي كامل الصفحة */
+        background-image: linear-gradient(-60deg, #ff5858 0%, #f09819 100%);
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      #loading {
+        /* محاذاة المحتوى في منتصف الشاشة */
+        /* نص التحميل */
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #3734cee1;
+        font-weight: 700;
+        text-shadow: 3px 5px 2px rgba(128, 0, 0, 0.69);
+        text-align: center;
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        /* تموضع العنصر بدقة في منتصف الشاشة */
+      }
+      #loading i {
+        font-size: 120px;
+        margin-right: 30px;
+        color: #41c72de1;
+      }
     </style>
   </head>
-  <!-- خلفية تغطي الشاشة -->
-  <div
-    id="passwordOverlay"
-    style="
-      position: fixed;
-      inset: 0;
-      background: rgb(128, 120, 120);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    "
-  >
+  <body class="bg-light">
+    <div id="topLoad">
+      <div id="loading"><i class="bi bi-battery-charging"></i> Chargement des données...</div>
+    </div>
+    <!-- خلفية تغطي الشاشة -->
     <div
+      id="passwordOverlay"
       style="
-        background: white;
-        padding: 25px;
-        border-radius: 10px;
-        width: 80%;
-        margin: 0 auto;
-        text-align: center;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        position: fixed;
+        inset: 0;
+        background: rgb(128, 120, 120);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
       "
     >
-      <h3>🔐 Accès protégé</h3>
-      <p>Veuillez entrer le mot de passe :</p>
-      <input
-        id="passwordInput"
-        type="password"
+      <div
         style="
-          width: 100%;
-          padding: 10px;
-          margin: 10px 0;
-          border-radius: 8px;
-          border: 1px solid #aaa;
-        "
-      />
-      <button
-        onclick="submitPassword()"
-        style="
-          padding: 10px;
-          width: 100%;
-          background: #007bff;
-          color: white;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
+          background: white;
+          padding: 25px;
+          border-radius: 10px;
+          width: 80%;
+          margin: 0 auto;
+          text-align: center;
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
         "
       >
-        Entrer
-      </button>
+        <h3>🔐 Accès protégé</h3>
+        <p>Veuillez entrer le mot de passe :</p>
+        <input
+          id="passwordInput"
+          type="password"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+          "
+        />
+        <button
+          onclick="submitPassword()"
+          style="
+            padding: 10px;
+            width: 100%;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+          "
+        >
+          Entrer
+        </button>
 
-      <p
-        id="errorMsg"
-        style="color: red; margin-top: 10px"
-      ></p>
+        <p
+          id="errorMsg"
+          style="color: red; margin-top: 10px"
+        ></p>
+      </div>
     </div>
-  </div>
-  <body class="bg-light">
     <div class="card p-4 shadow-sm mt-4">
       <h4 class="mb-3 text-primary">
         <i class="fa-brands fa-invision text-danger"></i>
@@ -178,10 +217,10 @@
       <div class="menu-round">
         <div
           class="btn-app"
-          data-label="Dashboard"
+          data-label="Data Vendeurs"
         >
           <div class="fa">
-            <a href="/dashboard"
+            <a href="/listVendeurs"
               ><i
                 class="fa-solid fa-circle-left"
                 style="color: white"
@@ -192,163 +231,6 @@
       </div>
     </div>
     <script src="js/main2.js"></script>
-    <script>
-      function formatTimeAgo(date) {
-        const now = new Date();
-        const diffMs = now - new Date(date);
-        const diffSec = Math.floor(diffMs / 1000);
-
-        if (diffSec < 60) return `${diffSec} sec`; // أقل من دقيقة
-        const diffMin = Math.floor(diffSec / 60);
-        if (diffMin < 60) return `${diffMin} min ${diffSec % 60} sec`; // أقل من ساعة
-        const diffHrs = Math.floor(diffMin / 60);
-        if (diffHrs < 24) return `${diffHrs} h ${diffMin % 60} min`; // أقل من يوم
-        const diffDays = Math.floor(diffHrs / 24);
-        if (diffDays < 7) return `${diffDays} jour${diffDays > 1 ? 's' : ''}`; // أقل من أسبوع
-        const diffWeeks = Math.floor(diffDays / 7);
-        if (diffWeeks < 4) return `${diffWeeks} semaine${diffWeeks > 1 ? 's' : ''}`; // أقل من شهر
-        const diffMonths = Math.floor(diffDays / 30);
-        if (diffMonths < 12) return `${diffMonths} mois`; // أقل من سنة
-        const diffYears = Math.floor(diffDays / 365);
-        return `${diffYears} an${diffYears > 1 ? 's' : ''}`; // سنة أو أكثر
-      }
-
-      async function loadPagePasswords() {
-        try {
-          const res = await fetch('/api/inventaireProo');
-          const vendeurs = await res.json();
-
-          // 🔹 Récupérer le dernier createdAt pour chaque vendeur
-          const latestBySeller = new Map();
-
-          vendeurs.forEach((item) => {
-            const seller = item.nameVendeur;
-            const time = new Date(item.createdAt);
-
-            if (!latestBySeller.has(seller) || time > latestBySeller.get(seller).time) {
-              latestBySeller.set(seller, { seller, time });
-            }
-          });
-
-          const filtered = Array.from(latestBySeller.values());
-          const now = new Date();
-
-          // 🔹 Compter le nombre des produits par vendeur
-          const sellerCount = {};
-
-          vendeurs.forEach((item) => {
-            const seller = item.nameVendeur;
-            sellerCount[seller] = (sellerCount[seller] || 0) + 1;
-          });
-
-          // 🔹 Calculer les informations
-          filtered.forEach((s) => {
-            s.totalProducts = sellerCount[s.seller];
-
-            const last = new Date(s.time);
-            const diffMs = now - last;
-            const diffSec = Math.floor(diffMs / 1000);
-            const diffMin = Math.floor(diffSec / 60);
-
-            if (diffSec <= 30) {
-              s.status = 'En ligne';
-              s.color = 'green';
-            } else if (diffMin >= 10) {
-              s.status = 'Hors ligne';
-              s.color = 'red';
-            } else {
-              s.status = 'Actif récemment';
-              s.color = 'orange';
-            }
-
-            filtered.forEach((s) => {
-              s.totalProducts = sellerCount[s.seller];
-
-              // حساب آخر اتصال
-              s.timeAgo = formatTimeAgo(s.time);
-
-              // حساب الحالة
-              const diffSec = Math.floor((new Date() - new Date(s.time)) / 1000);
-              const diffMin = Math.floor(diffSec / 60);
-
-              if (diffSec <= 30) {
-                s.status = 'En ligne';
-                s.color = 'green';
-              } else if (diffMin >= 10) {
-                s.status = 'Hors ligne';
-                s.color = 'red';
-              } else {
-                s.status = 'Actif récemment';
-                s.color = 'orange';
-              }
-            });
-          });
-
-          // 🟦 Remplir le tableau
-          const tbody = document.querySelector('#sharedTableType tbody');
-          tbody.innerHTML = filtered
-            .map(
-              (r) => `
-            <tr>
-              <td>${r.seller}</td>
-              <td>${r.totalProducts}</td>
-
-              <td>
-                <span style="
-                    display:inline-flex;
-                    align-items:center;
-                    gap:6px;
-                ">
-                  <span style="
-                      width:12px;
-                      height:12px;
-                      border-radius:50%;
-                      background:${r.color};
-                      display:inline-block;
-                  "></span>
-                  ${r.status}
-                </span>
-              </td>
-
-              <td>${r.timeAgo}</td>
-            </tr>`
-            )
-            .join('');
-
-          // 🔹 Reconstruire DataTable
-          if ($.fn.dataTable.isDataTable('#sharedTableType')) {
-            $('#sharedTableType').DataTable().clear().destroy();
-          }
-
-          const table = $('#sharedTableType').DataTable({
-            pageLength: 5,
-            responsive: true,
-            lengthMenu: [5, 10, 25, 50],
-            language: {
-              url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json',
-            },
-            columnDefs: [{ targets: '_all', className: 'text-center' }],
-            dom: 'Bflrtip',
-            buttons: [
-              {
-                extend: 'print',
-                text: '<i class="fa fa-print"></i> Imprimer',
-                className: 'btn btn-secondary btn-sm',
-              },
-            ],
-            pagingType: 'full_numbers',
-          });
-
-          // 🔍 Recherche partielle par vendeur
-          document.querySelector('#searchVendeur').addEventListener('keyup', function () {
-            table.search(this.value).draw();
-          });
-        } catch (error) {
-          console.error('❌ Erreur lors du chargement:', error);
-        }
-      }
-
-      loadPagePasswords();
-    </script>
+    <script src="js/pageUser.js"></script>
   </body>
 </html>
