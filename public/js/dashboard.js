@@ -610,7 +610,7 @@ async function initDashboard() {
     const top10 = Object.entries(vendeursCountMap)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
-    const topLabels = top10.map((v) => v[0].split('@')[0]),
+    topLabels = top10.map((v) => v[0].replace(/@.*/, '').trim());
       topValues = top10.map((v) => v[1]);
 
     destroyChart(window._charts.vendeur);

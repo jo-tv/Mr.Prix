@@ -3,6 +3,7 @@
   bottom: 3em;
   right: 1em;
   z-index: 99999;
+  opacity: 0.8;
 }
 
 .menu-toggle {
@@ -10,7 +11,7 @@
   height: 50px;
   border-radius: 50%;
   background-color: #1ef0a0;
-  box-shadow: 4px 4px 2px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
   position: absolute;
   z-index: 5;
   bottom: 0;
@@ -139,6 +140,7 @@
   transition:
     opacity 0.3s,
     right 0.3s;
+  z-index: 999999999;
 }
 
 /* عند الـ hover */
