@@ -1,9 +1,8 @@
 .containeer {
   position: fixed;
-  bottom: 2em;
+  bottom: 3em;
   right: 1em;
   z-index: 99999;
-  zoom: 1.2;
 }
 
 .menu-toggle {
@@ -18,7 +17,6 @@
   right: 0;
   display: table;
   text-align: center;
-  
 }
 .menu-toggle .fa {
   color: #fff;
@@ -32,8 +30,8 @@
 }
 
 .btn-app {
-  width: 2.5em;
-  height: 2.5em;
+  width: 2.5em !important;
+  height: 2.5em !important;
   border-radius: 50%;
   position: absolute;
   background-color: #4644fd;
@@ -147,6 +145,31 @@
 .btn-app:hover::after {
   opacity: 1;
   right: 130%;
+}
+
+@media (max-width: 576px) {
+  /* كود التابلت */
+  .containeer {
+    zoom: 1;
+  }
+}
+@media (max-width: 768px) {
+  /* كود التابلت */
+  .containeer {
+    zoom: 1.2;
+  }
+}
+@media (max-width: 992px) {
+  /* كود التابلت */
+  .containeer {
+    zoom: 1.3;
+  }
+}
+@media (max-width: 1200px) {
+  /* كود الحواسيب */
+  .containeer {
+    zoom: 1.4 !important;
+  }
 }
 
 /* تصميم نافذة منبثقة */

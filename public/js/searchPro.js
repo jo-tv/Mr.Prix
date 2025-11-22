@@ -13,6 +13,14 @@ const inputCalcul = document.getElementById('calcul');
 // 🔉 صوت المسح
 const beepSound = new Audio('/sounds/beep.mp3'); // ضع الصوت في مجلدك إن أردت
 
+nameInput.addEventListener('focus', () => {
+  nameInput.type = 'text';
+});
+
+nameInput.addEventListener('blur', () => {
+  nameInput.type = 'password';
+});
+
 // ====================
 // عند تحميل الصفحة
 // ====================
@@ -51,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (savedName) {
     document.getElementById('nameVendeur').value = savedName.toLowerCase().trim() || '';
     document.getElementById('nomFichier').value =
-    savedName.toLowerCase().trim().split('@')[0] || '';
+      savedName.toUpperCase().trim().split('@')[0] || '';
   }
   if (savedAdress) {
     document.getElementById('adresse').value = savedAdress.toUpperCase().trim() || '';
@@ -196,6 +204,7 @@ async function searchProduct() {
     document.getElementById('nameVendeur').value = localStorage.nameVendeur || '';
     document.getElementById('productForm').style.display = 'block';
     showToast('✅ Produit trouvé et chargé avec succès. 🛍️', 'success');
+    document.getElementById('qteInven').focus();
   } catch (error) {
     console.error('Erreur lors de la recherche du produit:', error);
     showToast('❌ Une erreur est survenue lors de la recherche. 🛍️', 'warning');
@@ -224,7 +233,6 @@ async function addProduct() {
     adresse: document.getElementById('adresse').value.trim().toUpperCase(), // الحروف الكبيرة
     nameVendeur: document.getElementById('nameVendeur').value.toLowerCase().trim(),
   };
-
   // Regex لاسم المستخدم (غير حساس لحالة الأحرف)
   const usernameRegex = /^[A-Z]\.[a-z]+@[0-9]{4}$/i;
 
@@ -275,6 +283,7 @@ async function addProduct() {
     clearForm();
 
     showToast('✅ Produit 🛍️ ajouté avec succès', 'success');
+    document.getElementById('textSearch').focus();
   } catch (error) {
     console.error('Error adding product:', error);
     showToast("❌ Une erreur est survenue lors de l'ajout du produit", 'error');
@@ -599,7 +608,6 @@ scanBtn.addEventListener('click', async () => {
   try {
     const cameras = await Html5Qrcode.getCameras();
     if (!cameras.length) throw new Error('لا توجد كاميرات متاحة');
-    showToast('⚠️ Aucune caméra disponible', 'warning');
     const camera = cameras.find((cam) => cam.label.toLowerCase().includes('back')) || cameras[0];
     reader.style.display = 'block';
 

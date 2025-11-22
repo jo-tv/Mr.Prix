@@ -149,13 +149,17 @@ async function submitPassword() {
   }
 }
 
-function showCharge() {
-  setTimeout(() => {
-    document.getElementById('topLoad').style.display = 'none';
-  }, 1500);
-}
+let topLoad = document.getElementById('topLoad');
 
-document.addEventListener('DOMContentLoaded', loadPagePasswords, showCharge());
+function showCharge() {
+  if (topLoad) {
+    setTimeout(() => {
+      topLoad.style.display = 'none';
+    }, 1500);
+  }
+}
+showCharge();
+document.addEventListener('DOMContentLoaded', loadPagePasswords);
 
 // 🔹 دالة الرسائل
 function showToast(message, type = 'info', duration = 3000) {

@@ -124,7 +124,6 @@
   }
 }
 
-
 .pagination {
   margin-top: 15px;
   text-align: center;
@@ -177,4 +176,10 @@
 
 #paginationControls span {
   font-weight: bold;
+}
+input {
+  border: solid 2px #1a85b6;
+  border-radius: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }

@@ -4,85 +4,68 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="X-UA-Compatible"
-      content="IE=edge"
-    />
+      content="IE=edge" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1"
-    />
+      content="width=device-width, initial-scale=1" />
     <link
       rel="manifest"
-      href="/manifest.json"
-    />
+      href="/manifest.json" />
     <meta
       name="theme-color"
-      content="#007bff"
-    />
+      content="#007bff" />
     <title>DataTables - Search</title>
     <link
       rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-    />
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
     <link
       rel="stylesheet"
-      href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css"
-    />
+      href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" />
     <link
       rel="stylesheet"
-      href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.bootstrap.min.css"
-    />
+      href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.bootstrap.min.css" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link
       rel="stylesheet"
-      href="https://cdn.datatables.net/select/1.3.1/css/select.bootstrap.min.css"
-    />
+      href="https://cdn.datatables.net/select/1.3.1/css/select.bootstrap.min.css" />
 
     <link
       rel="stylesheet"
-      href="css/chercher.css"
-    />
+      href="css/chercher.css" />
     <link
       rel="stylesheet"
-      href="css/navb.css"
-    />
+      href="css/navb.css" />
     <link
       href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css"
-      rel="stylesheet"
-    />
+      rel="stylesheet" />
     <!-- ===== Boxicons CSS ===== -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script
       src="https://kit.fontawesome.com/fb67a05d46.js"
-      crossorigin="anonymous"
-    ></script>
+      crossorigin="anonymous"></script>
   </head>
   <body>
-        <!-- مكان الرسائل -->
+    <!-- مكان الرسائل -->
     <div
       id="toast"
-      class="toast"
-    ></div>
+      class="toast"></div>
     <!-- partial:index.partial.html -->
     <div class="content">
       <div class="table-responsive-custom">
         <!-- أزرار DataTable في صف علوي -->
         <div
           class="dt-buttons btn-group"
-          style="margin-bottom: 10px"
-        ></div>
+          style="margin-bottom: 10px"></div>
 
         <!-- حقول البحث في صف تحت الأزرار، مع أيقونات داخل الحقول -->
         <div
           class="search-fields"
-          style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px"
-        >
+          style="display: flex; align-items: center; margin-bottom: 20px">
           <div
             class="search-box"
-            style="position: relative; flex: 1; max-width: 300px"
-          >
+            style="position: relative; flex: 1; max-width: 300px">
             <input
               type="text"
               id="globalSearch"
@@ -92,8 +75,7 @@
                 padding: 8px 30px 8px 10px;
                 border-radius: 5px;
                 border: 1px solid #ccc;
-              "
-            />
+              " />
             <i
               class="fa fa-search"
               style="
@@ -103,14 +85,12 @@
                 transform: translateY(-50%);
                 color: #aaa;
                 pointer-events: none;
-              "
-            ></i>
+              "></i>
           </div>
 
           <div
             class="search-box"
-            style="position: relative; flex: 1; max-width: 300px"
-          >
+            style="position: relative; flex: 1; max-width: 300px">
             <input
               type="text"
               id="fournisseurFilter"
@@ -120,8 +100,7 @@
                 padding: 8px 30px 8px 10px;
                 border-radius: 5px;
                 border: 1px solid #ccc;
-              "
-            />
+              " />
             <i
               class="fa fa-search"
               style="
@@ -131,13 +110,11 @@
                 transform: translateY(-50%);
                 color: #aaa;
                 pointer-events: none;
-              "
-            ></i>
+              "></i>
           </div>
           <button
             class="btn btn-success"
-            id="searche"
-          >
+            id="searche">
             Search
           </button>
         </div>
@@ -145,8 +122,7 @@
           id="example"
           class="table table-striped table-bordered"
           cellspacing="0"
-          width="100%"
-        >
+          width="100%">
           <thead>
             <tr>
               <th>LIBELLE</th>
@@ -163,7 +139,9 @@
       </div>
     </div>
     <!--nav FAB Button -->
-    <div class="containeer" style="zoom:1.4">
+    <div
+      class="containeer"
+      >
       <div class="menu-toggle">
         <span class="fa fa-plus"></span>
       </div>
@@ -171,40 +149,34 @@
       <div class="menu-round">
         <div
           class="btn-app"
-          data-label="Devis Gerflex"
-        >
+          data-label="Devis Gerflex">
           <div class="fa">
             <a href="calc"
               ><i
                 class="fas fa-calculator"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
         <div
           class="btn-app"
-          data-label="Album"
-        >
+          data-label="Album">
           <div class="fa">
             <a href="Album"
               ><i
                 class="fas fa-file-image"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
         <div
           class="btn-app"
-          data-label="Déconnexion"
-        >
+          data-label="Déconnexion">
           <div class="fa">
             <a href="logout"
               ><i
                 class="fas fa-sign-out-alt"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
@@ -213,40 +185,34 @@
       <div class="menu-line">
         <div
           class="btn-app"
-          data-label="Devis Parquet"
-        >
+          data-label="Devis Parquet">
           <div class="fa">
             <a href="devis"
               ><i
                 class="fas fa-file-invoice"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
         <div
           class="btn-app"
-          data-label="Recherche Produits"
-        >
+          data-label="Recherche Produits">
           <div class="fa">
             <a href="table"
               ><i
                 class="fas fa-search"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
         <div
           class="btn-app"
-          data-label="InvSmart Manager"
-        >
+          data-label="InvSmart Manager">
           <div class="fa">
             <a href="InvSmartManager"
               ><i
                 class="far fa-file-excel"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
@@ -265,27 +231,23 @@
         </div> -->
         <div
           class="btn-app"
-          data-label="Recherche Code"
-        >
+          data-label="Recherche Code">
           <div class="fa">
             <a href="serchCode"
               ><i
                 class="fas fa-question-circle"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
         <div
           class="btn-app"
-          data-label="Prix Vente"
-        >
+          data-label="Prix Vente">
           <div class="fa">
             <a href="prixVen"
               ><i
                 class="fas fa-cash-register"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
@@ -298,49 +260,41 @@
     <div id="wifi-loader">
       <svg
         viewBox="0 0 86 86"
-        class="circle-outer"
-      >
+        class="circle-outer">
         <circle
           r="40"
           cy="43"
           cx="43"
-          class="back"
-        ></circle>
+          class="back"></circle>
         <circle
           r="40"
           cy="43"
           cx="43"
-          class="front"
-        ></circle>
+          class="front"></circle>
         <circle
           r="40"
           cy="43"
           cx="43"
-          class="new"
-        ></circle>
+          class="new"></circle>
       </svg>
       <svg
         viewBox="0 0 60 60"
-        class="circle-middle"
-      >
+        class="circle-middle">
         <circle
           r="27"
           cy="30"
           cx="30"
-          class="back"
-        ></circle>
+          class="back"></circle>
         <circle
           r="27"
           cy="30"
           cx="30"
-          class="front"
-        ></circle>
+          class="front"></circle>
       </svg>
 
       <div
         data-text="Loading..."
-        class="text"
-      ></div>
+        class="text"></div>
     </div>
 
     <!-- partial -->

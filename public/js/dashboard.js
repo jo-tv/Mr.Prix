@@ -605,12 +605,12 @@ async function initDashboard() {
     const vendeursCountMap = {};
     produits.forEach((p) => {
       if (p.nameVendeur)
-        vendeursCountMap[p.nameVendeur.split('@')[0]] = (vendeursCountMap[p.nameVendeur] || 0) + 1;
+        vendeursCountMap[p.nameVendeur] = (vendeursCountMap[p.nameVendeur] || 0) + 1;
     });
     const top10 = Object.entries(vendeursCountMap)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
-    const topLabels = top10.map((v) => v[0]),
+    const topLabels = top10.map((v) => v[0].split('@')[0]),
       topValues = top10.map((v) => v[1]);
 
     destroyChart(window._charts.vendeur);

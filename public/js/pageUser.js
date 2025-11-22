@@ -89,7 +89,7 @@
               }
             });
           });
-
+          console.log(filtered)
           // 🟦 Remplir le tableau
           const tbody = document.querySelector('#sharedTableType tbody');
           tbody.innerHTML = filtered

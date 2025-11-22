@@ -4,89 +4,77 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+      content="width=device-width, initial-scale=1.0" />
     <link
       rel="manifest"
-      href="/manifest.json"
-    />
+      href="/manifest.json" />
     <meta
       name="theme-color"
-      content="#007bff"
-    />
+      content="#007bff" />
     <title>Gestion des Produits</title>
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <!-- ===== Boxicons CSS ===== -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script
       src="https://kit.fontawesome.com/fb67a05d46.js"
-      crossorigin="anonymous"
-    ></script>
+      crossorigin="anonymous"></script>
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-    />
-
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous" />
     <!-- ===== CSS ===== -->
     <link
       rel="stylesheet"
-      href="/css/search.css"
-    />
+      href="/css/search.css" />
     <link
       rel="stylesheet"
-      href="/css/navb.css"
-    />
+      href="/css/navb.css" />
     <link
       rel="stylesheet"
-      href="/css/searchPro.css"
-    />
+      href="/css/searchPro.css" />
   </head>
   <body>
     <!-- مكان الرسائل -->
     <div
       id="toast"
-      class="toast"
-    ></div>
+      class="toast"></div>
     <h1>Gestion des Produits</h1>
     <div class="search-bar">
       <input
         id="textSearch"
         type="number"
         name="text"
-        placeholder="Rechercher un produit..."
-      />
+        placeholder="Rechercher un produit..." />
       <button
-        class="bb"
-        id="searchBtn"
-      >
+        class="bb btn-danger"
+        id="searchBtn">
         <i class="fa fa-search"></i> Rechercher
       </button>
       <button
-        class="bb"
-        id="scanBtn"
-      >
+        class="bb btn btn-warning"
+        id="scanBtn">
         <i class="fa fa-qrcode"></i> Scanner
       </button>
       <button
-        class="bb"
-        id="plus"
-      >
+        class="bb bg-success"
+        id="plus">
         <i class="fa fa-plus"></i> new produit
       </button>
     </div>
     <div
       id="reader"
-      style="width: 300px; height: 300px; display: none; margin-top: 15px"
-    ></div>
+      style="width: 300px; height: 300px; display: none; margin-top: 15px"></div>
     <div
       class="form-container"
       id="productForm"
-      style="display: none"
-    >
+      style="display: none">
       <div class="form-group">
         <label for="libelle">Libellé</label>
         <input
@@ -94,8 +82,7 @@
           type="text"
           id="libelle"
           placeholder="Libellé"
-          required
-        />
+          required />
       </div>
       <div class="form-group">
         <label for="gencode">GenCode</label>
@@ -104,8 +91,7 @@
           type="number"
           id="gencode"
           placeholder="GenCode"
-          required
-        />
+          required />
       </div>
       <div class="form-group">
         <label for="anpf">ANPF</label>
@@ -114,8 +100,7 @@
           type="number"
           id="anpf"
           placeholder="ANPF"
-          required
-        />
+          required />
       </div>
       <div class="form-group">
         <label for="fournisseur">Fournisseur</label>
@@ -124,21 +109,18 @@
           type="text"
           id="fournisseur"
           placeholder="Fournisseur"
-          required
-        />
+          required />
       </div>
       <div
         class="form-group"
-        style="display: none"
-      >
+        style="display: none">
         <label for="stock">Stock</label>
         <input
           readonly
           type="text"
           id="stock"
           placeholder="Stock"
-          required
-        />
+          required />
       </div>
       <div class="form-group">
         <label for="prix">Prix TTC</label>
@@ -147,16 +129,14 @@
           type="text"
           id="prix"
           placeholder="Prix TTC"
-          required
-        />
+          required />
       </div>
       <div class="form-group">
         <label for="calcul">Sélectionnez ce que vous voulez calculer</label>
         <select
           id="calcul"
           class="form-control"
-          style="background: palegoldenrod; font-weight: 700; text-align: center"
-        >
+          style="background: palegoldenrod; font-weight: 700; text-align: center">
           <option value="">-- Sélectionnez ce que vous voulez calculer --</option>
           <option value="casquette">Casquette</option>
           <option value="fondRayon">Fond Rayon</option>
@@ -170,9 +150,8 @@
           id="qteInven"
           placeholder="Quantité"
           class="infor"
-          style="background: palegoldenrod; font-weight: 700"
-          required
-        />
+          style="background: palegoldenrod"
+          required />
       </div>
       <div class="form-group">
         <label for="adresse">Adresse</label>
@@ -182,18 +161,16 @@
           placeholder="Adresse"
           class="infor"
           style="background: palegoldenrod; font-weight: 700"
-          required
-        />
+          required />
       </div>
-      <div class="form-group">
-        <label for="adresse">Name Du Vendeur</label>
+      <div class="form-group nameVendeur">
+        <label for="nameVendeur">Name Du Vendeur</label>
         <input
-          type="text"
+          type="password"
           id="nameVendeur"
           placeholder="Name Du...."
           class="infor"
-          required
-        />
+          required />
       </div>
       <button id="ajouterBtn"><i class="fa fa-plus"></i> Ajouter au tableau</button>
     </div>
@@ -203,24 +180,15 @@
         type="text"
         id="nomFichier"
         placeholder="Nom du fichier..."
-        readonly
-      />
+        readonly />
       <button
         class="bb"
-        onclick="exportToExcel()"
-      >
+        onclick="exportToExcel()">
         <i class="fa fa-file-excel"></i> Exporter en Excel
       </button>
       <button
-        class="bb"
-        onclick="window.print()"
-      >
-        <i class="fa fa-print"></i> Imprimer
-      </button>
-      <button
         class="btnRed"
-        onclick="clearTableVendeur()"
-      >
+        onclick="clearTableVendeur()">
         <i class="fa fa-trash"></i> Vider
       </button>
     </div>
@@ -229,8 +197,7 @@
         id="searchLocal"
         type="text"
         name="text"
-        placeholder="Rechercher un produit..."
-      />
+        placeholder="Rechercher un produit..." />
     </div>
     <table id="produitTable">
       <thead></thead>
@@ -238,8 +205,7 @@
     </table>
     <div
       id="paginationControls"
-      class="pagination"
-    ></div>
+      class="pagination"></div>
 
     <!--nav FAB Button -->
     <div class="containeer">
@@ -250,40 +216,34 @@
       <div class="menu-round">
         <div
           class="btn-app"
-          data-label="Devis Gerflex"
-        >
+          data-label="Devis Gerflex">
           <div class="fa">
             <a href="calc"
               ><i
                 class="fas fa-calculator"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
         <div
           class="btn-app"
-          data-label="Album"
-        >
+          data-label="Album">
           <div class="fa">
             <a href="Album"
               ><i
                 class="fas fa-file-image"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
         <div
           class="btn-app"
-          data-label="Déconnexion"
-        >
+          data-label="Déconnexion">
           <div class="fa">
             <a href="logout"
               ><i
                 class="fas fa-sign-out-alt"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
@@ -292,40 +252,34 @@
       <div class="menu-line">
         <div
           class="btn-app"
-          data-label="Devis Parquet"
-        >
+          data-label="Devis Parquet">
           <div class="fa">
             <a href="devis"
               ><i
                 class="fas fa-file-invoice"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
         <div
           class="btn-app"
-          data-label="Recherche Produits"
-        >
+          data-label="Recherche Produits">
           <div class="fa">
             <a href="table"
               ><i
                 class="fas fa-search"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
-                <div
+        <div
           class="btn-app"
-          data-label="InvSmart Manager"
-        >
+          data-label="InvSmart Manager">
           <div class="fa">
             <a href="InvSmartManager"
               ><i
                 class="far fa-file-excel"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
@@ -344,27 +298,23 @@
         </div> -->
         <div
           class="btn-app"
-          data-label="Recherche Code"
-        >
+          data-label="Recherche Code">
           <div class="fa">
             <a href="serchCode"
               ><i
                 class="fas fa-question-circle"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
         <div
           class="btn-app"
-          data-label="Prix Vente"
-        >
+          data-label="Prix Vente">
           <div class="fa">
             <a href="prixVen"
               ><i
                 class="fas fa-cash-register"
-                style="color: white"
-              ></i
+                style="color: white"></i
             ></a>
           </div>
         </div>
@@ -373,21 +323,18 @@
     <!--fin FAB Button -->
     <div
       id="confirmModal"
-      class="modal"
-    >
+      class="modal">
       <div class="modal-content">
         <p>هل أنت متأكد أنك تريد حذف هذا المنتج؟</p>
         <div class="modal-actions">
           <button
             id="confirmYes"
-            class="btn btn-danger"
-          >
+            class="btn btn-danger">
             نعم
           </button>
           <button
             id="confirmNo"
-            class="btn btn-secondary"
-          >
+            class="btn btn-secondary">
             إلغاء
           </button>
         </div>
@@ -401,8 +348,7 @@
     <!-- ✅ نافذة تعديل المنتج -->
     <div
       id="editModal"
-      class="modal"
-    >
+      class="modal">
       <div class="modal-content">
         <h3><i class="fas fa-pen-to-square text-primary"></i> تعديل المنتج</h3>
 
@@ -412,8 +358,7 @@
             type="text"
             id="editName"
             class="edit-input"
-            readonly
-          />
+            readonly />
         </div>
 
         <div class="form-group">
@@ -422,8 +367,7 @@
             type="text"
             id="editBarcode"
             class="edit-input"
-            readonly
-          />
+            readonly />
         </div>
 
         <div class="form-group">
@@ -432,8 +376,7 @@
             type="text"
             id="editAnpf"
             class="edit-input"
-            readonly
-          />
+            readonly />
         </div>
 
         <div class="form-group">
@@ -442,8 +385,7 @@
             type="text"
             id="editFour"
             class="edit-input"
-            readonly
-          />
+            readonly />
         </div>
 
         <div class="form-group">
@@ -452,8 +394,7 @@
             type="number"
             id="editPrice"
             class="edit-input"
-            readonly
-          />
+            readonly />
         </div>
 
         <div class="form-group">
@@ -468,8 +409,7 @@
               text-align: center;
               background: palegoldenrod;
               font-weight: 700;
-            "
-          >
+            ">
             <option value="">-- Sélectionnez une option --</option>
             <option value="casquette">🧢 Casquette</option>
             <option value="fondRayon">📦 Fond Rayon</option>
@@ -484,8 +424,7 @@
             id="editQteInven"
             class="edit-input"
             style="background: palegoldenrod; font-weight: 700"
-            required
-          />
+            required />
         </div>
 
         <div class="form-group">
@@ -495,26 +434,22 @@
             id="editAdresse"
             class="edit-input"
             style="background: palegoldenrod; font-weight: 700"
-            required
-          />
+            required />
         </div>
 
         <input
           type="hidden"
-          id="editId"
-        />
+          id="editId" />
 
         <div class="modal-actions">
           <button
             onclick="saveProductChanges()"
-            class="bb"
-          >
+            class="bb">
             <i class="fa fa-save"></i> حفظ التغييرات
           </button>
           <button
             onclick="closeEditModal()"
-            class="btnRed"
-          >
+            class="btnRed">
             <i class="fa fa-times"></i> إلغاء
           </button>
         </div>
@@ -525,28 +460,25 @@
 
     <div
       id="confirmModal"
-      class="modal"
-    >
+      class="modal">
       <div class="modal-content">
         <p>هل أنت متأكد أنك تريد حذف هذا المنتج؟</p>
         <div class="modal-actions">
           <button
             id="confirmYes"
-            class="btn btn-danger"
-          >
+            class="btn btn-danger">
             نعم
           </button>
           <button
             id="confirmNo"
-            class="btn btn-secondary"
-          >
+            class="btn btn-secondary">
             إلغاء
           </button>
         </div>
       </div>
     </div>
     <!--- ______fin code nav bar_________  -->
-        <!-- خلفية تغطي الشاشة -->
+    <!-- خلفية تغطي الشاشة -->
     <div
       id="passwordOverlay"
       style="
@@ -557,8 +489,7 @@
         justify-content: center;
         align-items: center;
         z-index: 9999;
-      "
-    >
+      ">
       <div
         style="
           background: white;
@@ -568,8 +499,7 @@
           margin: 0 auto;
           text-align: center;
           box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        "
-      >
+        ">
         <h3>🔐 Accès protégé</h3>
         <p>Veuillez entrer le mot de passe :</p>
         <input
@@ -581,8 +511,7 @@
             margin: 10px 0;
             border-radius: 8px;
             border: 1px solid #aaa;
-          "
-        />
+          " />
         <button
           onclick="submitPassword()"
           style="
@@ -593,15 +522,13 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-          "
-        >
+          ">
           Entrer
         </button>
 
         <p
           id="errorMsg"
-          style="color: red; margin-top: 10px"
-        ></p>
+          style="color: red; margin-top: 10px"></p>
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>

@@ -11,12 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentPage = 1;
   let totalPages = 1;
-  const ALL_DATA_LIMIT = 999999; // حد كبير لجلب جميع البيانات للتصدير
+  const ALL_DATA_LIMIT = 80000; // حد كبير لجلب جميع البيانات للتصدير
 
   // --- 2. دوال جلب البيانات ومعالجتها (Core Logic) ---
 
   // 2.1. دالة جلب البيانات من الخادم
-  async function fetchProducts(page = 1, limit = 50, search = '') {
+  async function fetchProducts(page = 1, limit = ALL_DATA_LIMIT, search = '') {
     try {
       loadingEl.style.display = 'block';
       const params = new URLSearchParams({ page, limit, search });
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         exportData.push([
           'Libellé',
           'Gencode',
-          'عدد الدمج',
+          'N° Groupe',
           'ANPF',
           'Fournisseur',
           'Stock System',
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             p.ecar || 0,
             p.adresse || '',
             p.nameVendeur || '',
-            '', // L'emplacement
+            p.calcul || '',
             p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : '',
           ]);
         });

@@ -777,7 +777,7 @@ app.get('/api/inventaireProoo', isAuthenticated, async (req, res) => {
 app.get('/api/ProduitsTotal', isAuthenticated, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
+    const limit = parseInt(req.query.limit) || 80000;
     const search = req.query.search?.trim();
 
     let query = {};
@@ -1099,7 +1099,7 @@ app.get('/get-passwords', isAuthenticated, async (req, res) => {
 // --------------------------------------
 //   API لتحديث كلمات السر
 // --------------------------------------
-app.post('/update-passwords', isAuthenticated,isResponsable, async (req, res) => {
+app.post('/update-passwords', isAuthenticated, isResponsable, async (req, res) => {
   const {
     pasPageUploade,
     pasPageInventaire,
