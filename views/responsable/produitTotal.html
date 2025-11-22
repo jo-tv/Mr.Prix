@@ -2,36 +2,35 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-
     <title>Liste des Produits</title>
 
     <!-- ✅ استدعاء مكتبة Bootstrap + FontAwesome + Excel -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+      rel="stylesheet" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-    />
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Option 1: Include in HTML -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-    />
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
 
     <!-- code css nav bar  -->
     <link
       rel="stylesheet"
-      href="/css/navb.css"
-    />
+      href="/css/navb.css" />
 
     <style>
       body {
         background-color: #f8f9fa;
+      }
+      table {
+        font-size: 18px;
+        font-weight: 700;
       }
       #topLoad {
         display: flex;
@@ -76,19 +75,24 @@
         justify-content: space-around;
         align-items: center;
       }
+      .btn {
+        font-weight: 700;
+        zoom: 1.1;
+      }
     </style>
   </head>
   <body>
     <nav class="navbar navbar-dark bg-dark mb-4">
       <div class="container-fluid d-flex justify-content-between align-items-center">
         <span class="navbar-brand mb-0 h1">
-          <i class="fas fa-users"></i> Inventaire Complet des Produits et Vendeurs
-           (<span class="fs-4 text-bg-success">Sans Groupés</span>)
+          <i class="fas fa-users"></i> Inventaire Complet des Produits et Vendeurs (<span
+            class="fs-4 text-bg-success"
+            >Sans Groupés</span
+          >)
         </span>
         <button
           class="btn btn-primary me-2"
-          id="btnRefresh"
-        >
+          id="btnRefresh">
           <i class="fas fa-rotate-right"></i> Rafraîchir
         </button>
       </div>
@@ -105,26 +109,22 @@
             type="text"
             id="searchInput"
             class="form-control"
-            placeholder="🔍 Rechercher un produit par Libellé, ANPF, Gencode ou Adresse..."
-          />
+            placeholder="🔍 Rechercher un produit par Libellé, ANPF, Gencode ou Adresse..." />
         </div>
         <div class="col-md-2 mb-2">
           <button
             class="btn btn-primary w-100"
-            id="btnSearch"
-          >
+            id="btnSearch">
             <i class="fas fa-search"></i> Rechercher
           </button>
         </div>
         <div class="col-md-3 mb-2">
           <select
             id="rowsPerPage"
-            class="form-select"
-          >
+            class="form-select">
             <option
               value="10"
-              selected
-            >
+              selected>
               10 produits / page
             </option>
             <option value="25">25 produits / page</option>
@@ -134,9 +134,13 @@
         </div>
         <div class="col-md-4 text-end mb-2">
           <button
-            class="btn btn-success"
-            id="btnExcel"
-          >
+            class="btn btn-danger"
+            id="btnOpen">
+            <i class="bi bi-google"></i> Open Page
+          </button>
+          <button
+            class="btn btn-success m-5"
+            id="btnExcel">
             <i class="fas fa-file-excel"></i> Excel
           </button>
         </div>
@@ -162,8 +166,7 @@
           </thead>
           <tbody
             id="produitsTableBody"
-            class="text-center"
-          ></tbody>
+            class="text-center"></tbody>
         </table>
       </div>
 
@@ -171,67 +174,74 @@
       <div class="d-flex justify-content-between align-items-center mt-3">
         <span
           id="infoPagination"
-          class="text-muted small"
-        ></span>
+          class="text-muted small"></span>
         <nav>
           <ul
             class="pagination pagination-sm mb-0"
-            id="pagination"
-          ></ul>
+            id="pagination"></ul>
         </nav>
       </div>
     </div>
     <!-- ✅ Toast Bootstrap -->
     <div
       class="position-fixed top-0 end-0 p-3"
-      style="z-index: 9999"
-    >
+      style="z-index: 9999">
       <div
         id="excelToast"
         class="toast align-items-center text-bg-success border-0"
         role="alert"
         aria-live="assertive"
-        aria-atomic="true"
-      >
+        aria-atomic="true">
         <div class="d-flex">
           <div class="toast-body">✅ Fichier Excel téléchargé avec succès !</div>
           <button
             type="button"
             class="btn-close btn-close-white me-2 m-auto"
             data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
+            aria-label="Close"></button>
         </div>
       </div>
     </div>
     <!--nav FAB Button -->
-    <div
-      class="containeer"
-      
-    >
+    <div class="containeer">
       <div class="menu-toggle">
         <span class="fa fa-plus"></span>
       </div>
       <div class="menu-round">
         <div
           class="btn-app"
-          data-label="Dashboard"
-        >
+          data-label="Dashboard">
           <div class="fa">
             <a href="/dashboard"
               ><i
                 class="fa-solid fa-circle-left"
-                style="color: white"
-              ></i>
+                style="color: white"></i>
             </a>
           </div>
         </div>
       </div>
     </div>
     <!--fin FAB Button -->
+    <!-- مودال عرض العناوين -->
+    <div
+      id="adressModal"
+      class="custom-modal"
+      style="display: none">
+      <div class="custom-modal-content">
+        <button
+          id="closeAdressModal"
+          class="btn btn-danger btn-sm"
+          style="float: right">
+          Fermer ×
+        </button>
+        <h4 class="mb-5 text-center">Détails des Adresses</h4>
+        <iframe
+          src="/searchee"
+          ></iframe>
+      </div>
+    </div>
     <!-- JS Libraries (ترتيب التحميل مهم) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 
     <script src="js/produitTotal.js"></script>
   </body>

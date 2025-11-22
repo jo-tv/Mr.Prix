@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tableBody.innerHTML = data.produits
       .map((p) => {
         // منطق التلوين الشرطي لـ ecar
-        const ecarValue =  p.qteInven - p.stock;
+        const ecarValue = p.qteInven - p.stock;
         let cellStyle;
 
         if (ecarValue === 0) {
@@ -157,9 +157,23 @@ document.getElementById('btnRefresh')?.addEventListener('click', () => {
   window.location.href = '/produitTotal'; // أو أي صفحة تريدها
 });
 
-
 $('.menu-toggle').click(function () {
   $('.menu-toggle').toggleClass('open');
   $('.menu-round').toggleClass('open');
   $('.menu-line').toggleClass('open');
 });
+
+const btnClose = document.getElementById('closeAdressModal');
+
+if (btnClose) {
+  btnClose.addEventListener('click', () => {
+    document.getElementById('adressModal').style.display = 'none';
+  });
+}
+const btnOpen = document.getElementById('btnOpen');
+
+if (btnOpen) {
+  btnOpen.addEventListener('click', () => {
+    document.getElementById('adressModal').style.display = 'block';
+  });
+}
