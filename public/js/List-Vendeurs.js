@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let vendeurs = [];
   let filtered = [];
-  
 
   const ITEMS_PER_PAGE = 10;
   let currentPage = 1;
@@ -14,7 +13,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res = await fetch('/api/inventairePro');
     vendeurs = await res.json();
     filtered = [...vendeurs];
-
+    console.log(filtered)
+    showToast(`${filtered.length} vendeurs ont été chargés.`, 'info');
     renderPage();
     renderPagination();
   } catch (err) {
@@ -166,9 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // 🔹 عرض منتجات البائع مع Pagination (50 صف لكل صفحة)
 async function showUserProducts(nameVendeur, page = 1) {
   try {
-    const res = await fetch(
-      `/api/inventairePro/${encodeURIComponent(nameVendeur)}`
-    );
+    const res = await fetch(`/api/inventairePro/${encodeURIComponent(nameVendeur)}`);
 
     const { produits } = await res.json();
 
@@ -206,7 +204,7 @@ async function showUserProducts(nameVendeur, page = 1) {
         return acc;
       }, {})
     );
-    
+
     mergedProduits.forEach((p) => {
       const stock = parseFloat(p.stock) || 0;
       const qteInven = parseFloat(p.qteInven) || 0;
@@ -476,3 +474,13 @@ $('.menu-toggle').click(function () {
   $('.menu-round').toggleClass('open');
   $('.menu-line').toggleClass('open');
 });
+
+// 🔹 دالة الرسائل
+function showToast(message, type = 'info', duration = 3000) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+  setTimeout(() => {
+    toast.className = `toast ${type}`;
+  }, duration);
+}
