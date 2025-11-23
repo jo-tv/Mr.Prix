@@ -1136,13 +1136,12 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 app.use(cors());
 
-app.get('/searchee', (req, res) => {
+app.get('/searchee', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'views/vendeur/searchProducs.html')); // ✅ صفحة فارغة مؤقتاً
 });
 
-
 // ============= Route للبحث =============
-app.get('/api/searchee', async (req, res) => {
+app.get('/api/searchee',isAuthenticated, async (req, res) => {
   try {
     const q = req.query.s || '';
     if (!q) return res.json({ error: 'Missing search query' });

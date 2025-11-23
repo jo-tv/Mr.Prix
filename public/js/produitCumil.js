@@ -249,3 +249,19 @@ $('.menu-toggle').click(function () {
   $('.menu-round').toggleClass('open');
   $('.menu-line').toggleClass('open');
 });
+
+
+const btnClose = document.getElementById('closeAdressModal');
+
+if (btnClose) {
+  btnClose.addEventListener('click', () => {
+    document.getElementById('adressModal').style.display = 'none';
+  });
+}
+const btnOpen = document.getElementById('btnOpen');
+
+if (btnOpen) {
+  btnOpen.addEventListener('click', () => {
+    document.getElementById('adressModal').style.display = 'block';
+  });
+}
