@@ -850,7 +850,7 @@ app.get('/api/ProduitsTotal', isAuthenticated, async (req, res) => {
       total,
       page,
       totalPages,
-      produits: paginated,  // هنا mergeCount موجود بالفعل
+      produits: paginated, // هنا mergeCount موجود بالفعل
     });
   } catch (err) {
     console.error(err);
@@ -1190,33 +1190,67 @@ app.get('/api/searchee', isAuthenticated, async (req, res) => {
     const q = req.query.s || '';
     if (!q) return res.json({ error: 'Missing search query' });
 
-    const url = `https://mrbricolage.ma/wp-content/plugins/ajax-search-for-woocommerce-premium/includes/Engines/TNTSearchMySQL/Endpoints/search.php?s=${encodeURIComponent(
+    const bricoURL = `https://mrbricolage.ma/wp-content/plugins/ajax-search-for-woocommerce-premium/includes/Engines/TNTSearchMySQL/Endpoints/search.php?s=${encodeURIComponent(
       q
     )}`;
 
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0',
-        'Accept': 'application/json, text/plain, */*',
-        'Referer': 'https://mrbricolage.ma/',
-      },
-    });
+    const glovoURL = `https://api.glovoapp.com/v3/stores/453329/addresses/714876/search?query=${encodeURIComponent(
+      q
+    )}&searchId=04a29a7d-418b-4c1a-bd39-fcb5393248e6`;
 
-    const text = await response.text();
-    const data = JSON.parse(text);
+    // جلب البيانات من المصدرين
+    const [bricoRes, glovoRes] = await Promise.all([
+      fetch(bricoURL, { headers: { 'User-Agent': 'Mozilla/5.0' } }),
+      fetch(glovoURL, { headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' } }),
+    ]);
 
-    // إضافة full_image_url لكل عنصر
-    data.suggestions.forEach((item) => {
+    const bricoText = await bricoRes.text();
+    const bricoData = JSON.parse(bricoText);
+
+    const glovoData = await glovoRes.json();
+
+    // 🔧 Mr Bricolage
+    const bricoItems = (bricoData.suggestions || []).map((item) => {
       const match = item.thumb_html.match(/src="([^"]+)"/);
-      if (match) {
-        // استبدال الحجم الصغير في الرابط بالصورة الأصلية
-        item.full_image_url = match[1].replace(/-\d+x\d+/, '');
-      } else {
-        item.full_image_url = '';
-      }
+      const img = match ? match[1] : '';
+
+      return {
+        title: item.value,
+        desc: item.desc || '',
+        price: item.price.replace(/<[^>]*>/g, ''),
+        sku: item.sku || '',
+        thumb: img || 'https://via.placeholder.com/80?text=No+Image',
+        full_image: img.replace(/-\d+x\d+/, '') || 'https://via.placeholder.com/400?text=No+Image',
+        source: 'bricolage',
+      };
     });
 
-    res.json(data);
+    // 🔧 Glovo
+    const glovoProducts = glovoData?.results?.[0]?.products || [];
+    const glovoItems = glovoProducts.map((p) => {
+      let img = '';
+      if (Array.isArray(p.imageUrl) && p.imageUrl.length > 0) {
+        img = p.imageUrl[0];
+      }
+
+      return {
+        title: p.name,
+        desc: p.description || '',
+        price: p.priceInfo?.displayText || `${p.price} MAD`,
+        sku: p.externalId || '',
+        thumb: p.imageUrl || 'https://via.placeholder.com/80?text=No+Image',
+        full_image: p.imageUrl || 'https://via.placeholder.com/400?text=No+Image',
+        source: 'glovo',
+      };
+    });
+
+    // دمج النتائج
+    const finalResults = [...bricoItems, ...glovoItems];
+
+    res.json({
+      count: finalResults.length,
+      results: finalResults,
+    });
   } catch (err) {
     res.json({ error: 'Server error', details: err.message });
   }

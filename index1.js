@@ -773,7 +773,46 @@ app.get('/api/inventaireProoo', isAuthenticated, async (req, res) => {
     res.status(500).json({ error: 'Erreur serveur interne' });
   }
 });
-// ✅ جلب جميع بيانات المنتجات
+// تنظيف النصوص لإنشاء مفتاح موثوق للدمج
+function cleanKey(value) {
+  if (!value) return '';
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+// دمج المنتجات وحساب mergeCount وecar
+function mergeProducts(produits) {
+  const map = {};
+
+  for (const p of produits) {
+    const key = `${cleanKey(p.anpf)}_${cleanKey(p.gencode)}_${cleanKey(p.libelle)}`;
+
+    const qte = Number(p.qteInven) || 0;
+    const stockVal = Number(p.stock) || 0;
+
+    if (!map[key]) {
+      map[key] = {
+        ...p.toObject(), // تحويل Mongoose Document إلى Object
+        qteInven: qte,
+        stock: stockVal,
+        mergeCount: 1,
+        adresseSet: new Set(p.adresse ? [p.adresse] : []),
+      };
+    } else {
+      map[key].qteInven += qte;
+      map[key].mergeCount += 1;
+      if (p.adresse) map[key].adresseSet.add(p.adresse);
+    }
+
+    map[key].adresse = [...map[key].adresseSet].join(' | ');
+    map[key].ecar = map[key].qteInven - map[key].stock;
+  }
+
+  return Object.values(map);
+}
+
 app.get('/api/ProduitsTotal', isAuthenticated, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -781,36 +820,41 @@ app.get('/api/ProduitsTotal', isAuthenticated, async (req, res) => {
     const search = req.query.search?.trim();
 
     let query = {};
-
     if (search) {
-      // البحث case-insensitive و exact match
       query = {
         $or: [
-          { libelle: { $regex: `^${search}$`, $options: 'i' } },
-          { gencode: { $regex: `^${search}$`, $options: 'i' } },
-          { anpf: { $regex: `^${search}$`, $options: 'i' } },
-          { adresse: { $regex: `^${search}$`, $options: 'i' } },
-          { calcul: { $regex: `^${search}$`, $options: 'i' } },
-          { nameVendeur: { $regex: `^${search}$`, $options: 'i' } },
+          { libelle: { $regex: search, $options: 'i' } },
+          { gencode: { $regex: search, $options: 'i' } },
+          { anpf: { $regex: search, $options: 'i' } },
+          { adresse: { $regex: search, $options: 'i' } },
+          { calcul: { $regex: search, $options: 'i' } },
+          { nameVendeur: { $regex: search, $options: 'i' } },
         ],
       };
     }
 
-    const total = await Inventaire.countDocuments(query);
-    const produits = await Inventaire.find(query)
-      .sort({ _id: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+    // 1. جلب كل البيانات من MongoDB
+    const produits = await Inventaire.find(query).sort({ _id: -1 });
 
+    // 2. دمج المنتجات على السيرفر
+    const merged = mergeProducts(produits);
+
+    // 3. تطبيق Pagination بعد الدمج
+    const total = merged.length;
+    const totalPages = Math.ceil(total / limit);
+    const start = (page - 1) * limit;
+    const paginated = merged.slice(start, start + limit);
+
+    // 4. إرسال البيانات للعميل
     res.json({
       total,
       page,
-      totalPages: Math.ceil(total / limit),
-      produits,
+      totalPages,
+      produits: paginated,  // هنا mergeCount موجود بالفعل
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'حدث خطأ في الخادم' });
+    res.status(500).json({ message: 'Erreur serveur' });
   }
 });
 
@@ -1141,7 +1185,7 @@ app.get('/searchee', isAuthenticated, (req, res) => {
 });
 
 // ============= Route للبحث =============
-app.get('/api/searchee',isAuthenticated, async (req, res) => {
+app.get('/api/searchee', isAuthenticated, async (req, res) => {
   try {
     const q = req.query.s || '';
     if (!q) return res.json({ error: 'Missing search query' });
