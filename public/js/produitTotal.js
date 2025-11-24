@@ -11,131 +11,189 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentPage = 1;
   let totalPages = 1;
 
-  async function fetchProducts(page = 1, limit = 50, search = '') {
+  // --------------------------
+  // 1️⃣ جلب البيانات من السيرفر
+  // --------------------------
+  async function fetchInventaireRaw(page = 1, limit = 50, search = '') {
     try {
-      loadingEl.style.display = 'block';
+      loadingEl.style.display = 'flex';
       const params = new URLSearchParams({ page, limit, search });
-      const res = await fetch(`/api/ProduitsTotal?${params.toString()}`);
+      const res = await fetch(`/api/InventaireRaw?${params.toString()}`);
       if (!res.ok) throw new Error('Erreur serveur');
-      const data = await res.json();
-      return data;
+      return await res.json(); // مصفوفة produits + page, totalPages, total
     } finally {
       loadingEl.style.display = 'none';
     }
   }
 
+  // --------------------------
+  // 2️⃣ عرض البيانات في الجدول
+  // --------------------------
   async function renderTable(page = 1) {
-    const limit = parseInt(rowsPerPageEl.value);
+    const limit = parseInt(rowsPerPageEl.value) || 50;
     const search = searchInput.value.trim();
 
-    const data = await fetchProducts(page, limit, search);
-    currentPage = data.page;
-    totalPages = data.totalPages;
+    try {
+      loadingEl.style.display = 'flex';
 
-    tableBody.innerHTML = data.produits
-      .map((p) => {
-        // منطق التلوين الشرطي لـ ecar
-        const ecarValue = p.qteInven - p.stock;
-        let cellStyle;
+      const data = await fetchInventaireRaw(page, limit, search);
+      const produits = data.produits || [];
 
-        if (ecarValue === 0) {
-          cellStyle = 'background-color: #dee2e6; color: #495057;';
-        } else if (ecarValue < 0) {
-          cellStyle = 'background-color: #dc3545; color: white; font-weight: bold;';
-        } else {
-          cellStyle = 'background-color: #198754; color: white; font-weight: bold;';
-        }
+      currentPage = data.page;
+      totalPages = data.totalPages;
 
-        return `
-            <tr>
-                <td>${p.libelle || ''}</td>          
-                <td>${p.gencode || ''}</td>          
-                <td>${p.anpf || ''}</td>             
-                <td>${p.fournisseur || ''}</td>      
-                <td>${p.stock || 0}</td>             
-                <td>${p.qteInven || 0}</td>          
-                <td style="padding: 0;">
-                  <div style="${cellStyle} height: 100%; display: flex; align-items: center; justify-content: center; padding: 0.5rem 0;">
-                    ${ecarValue || 0}
-                  </div>
-                </td>              
-                <td>${p.adresse || ''}</td>          
-                <td>${p.nameVendeur.split('@')[0] || ''}</td>      
-                <td>${p.calcul || ''}</td>      
-                <td>${p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : ''}</td>
-            </tr>`;
-      })
-      .join('');
+      tableBody.innerHTML = produits
+        .map(
+          (p) => `
+          <tr>
+            <td>${p.libelle || ''}</td>
+            <td>${p.gencode || ''}</td>
+            <td>${p.anpf || ''}</td>
+            <td>${p.fournisseur || ''}</td>
+            <td>${p.stock || ''}</td>
+            <td>${p.prix || ''}</td>
+            <td>${p.qteInven || ''}</td>
+            <td>${p.adresse || ''}</td>
+            <td>${(p.nameVendeur || '').split('@')[0]}</td>
+            <td>${p.calcul || ''}</td>
+            <td>${p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : ''}</td>
+          </tr>
+        `
+        )
+        .join('');
 
-    // Pagination
-    const maxButtons = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
-    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
-    if (endPage - startPage + 1 < maxButtons) {
-      startPage = Math.max(1, endPage - maxButtons + 1);
+      renderPagination(currentPage, totalPages, data.total);
+    } catch (err) {
+      console.error(err);
+      alert('❌ Erreur lors du chargement des données');
+    } finally {
+      loadingEl.style.display = 'none';
     }
-
-    paginationEl.innerHTML = '';
-
-    // Prev button
-    const prevLi = document.createElement('li');
-    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-    prevLi.innerHTML = `<a class="page-link" href="#">‹ Précédent</a>`;
-    prevLi.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (currentPage > 1) renderTable(currentPage - 1);
-    });
-    paginationEl.appendChild(prevLi);
-
-    // Page buttons
-    for (let i = startPage; i <= endPage; i++) {
-      const li = document.createElement('li');
-      li.className = `page-item ${i === currentPage ? 'active' : ''}`;
-      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-      li.addEventListener('click', (e) => {
-        e.preventDefault();
-        renderTable(i);
-      });
-      paginationEl.appendChild(li);
-    }
-
-    // Next button
-    const nextLi = document.createElement('li');
-    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-    nextLi.innerHTML = `<a class="page-link" href="#">Suivant ›</a>`;
-    nextLi.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (currentPage < totalPages) renderTable(currentPage + 1);
-    });
-    paginationEl.appendChild(nextLi);
-
-    // Page info
-    infoPagination.textContent = `Page ${currentPage} sur ${totalPages} - Total: ${data.total} produits`;
   }
 
-  // ✅ Event listeners
+  // --------------------------
+  // 3️⃣ الباجيناشن
+  // --------------------------
+  function renderPagination(currentPage, totalPages, totalItems) {
+    paginationEl.innerHTML = '';
+    infoPagination.textContent = `Page ${currentPage} / ${totalPages} — Total: ${totalItems} produits`;
+
+    const createPageItem = (page, label = page, disabled = false, active = false) => {
+      const li = document.createElement('li');
+      li.className = `page-item ${active ? 'active' : ''} ${disabled ? 'disabled' : ''}`;
+      const a = document.createElement('a');
+      a.className = 'page-link';
+      a.href = '#';
+      a.textContent = label;
+      if (!disabled && !active) {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          renderTable(page);
+        });
+      }
+      li.appendChild(a);
+      return li;
+    };
+
+    // زر Prev
+    paginationEl.appendChild(createPageItem(currentPage - 1, '«', currentPage === 1));
+
+    let startPage = Math.max(currentPage - 2, 1);
+    let endPage = Math.min(currentPage + 2, totalPages);
+
+    if (startPage > 1) {
+      paginationEl.appendChild(createPageItem(1));
+      if (startPage > 2) {
+        const li = document.createElement('li');
+        li.className = 'page-item disabled';
+        li.innerHTML = `<span class="page-link">...</span>`;
+        paginationEl.appendChild(li);
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      paginationEl.appendChild(createPageItem(i, i, false, i === currentPage));
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const li = document.createElement('li');
+        li.className = 'page-item disabled';
+        li.innerHTML = `<span class="page-link">...</span>`;
+        paginationEl.appendChild(li);
+      }
+      paginationEl.appendChild(createPageItem(totalPages));
+    }
+
+    // زر Next
+    paginationEl.appendChild(createPageItem(currentPage + 1, '»', currentPage === totalPages));
+  }
+
+  // --------------------------
+  // 4️⃣ البحث وعدد الصفوف
+  // --------------------------
   if (btnSearch) btnSearch.addEventListener('click', () => renderTable(1));
   if (rowsPerPageEl) rowsPerPageEl.addEventListener('change', () => renderTable(1));
 
+  // --------------------------
+  // 5️⃣ تصدير Excel
+  // --------------------------
   if (btnExcel) {
     btnExcel.addEventListener('click', async () => {
       try {
-        loadingEl.textContent = '⏳ Génération du fichier Excel...';
-        loadingEl.style.display = 'block';
+        loadingEl.querySelector('#loading').textContent = '⏳ Génération du fichier Excel...';
+        loadingEl.style.display = 'flex';
 
-        const res = await fetch('/api/exportExcel');
+        const search = searchInput.value.trim();
+        const limit = 1000000; // عدد كبير لجلب كل البيانات
+        const res = await fetch(
+          `/api/InventaireRaw?page=1&limit=${limit}&search=${encodeURIComponent(search)}`
+        );
         if (!res.ok) throw new Error('Erreur serveur');
+        const data = await res.json();
+        const produits = data.produits || [];
 
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
+        if (typeof XLSX === 'undefined') {
+          alert("❌ La bibliothèque XLSX n'est pas chargée.");
+          return;
+        }
 
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Inventaire_Complet.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
+        const exportData = [
+          [
+            'Libellé',
+            'Gencode',
+            'ANPF',
+            'Fournisseur',
+            'Stock System',
+            'Prix',
+            'Quantité Réel',
+            'Adresse',
+            'Vendeur',
+            'Emplacement',
+            'Date Création',
+          ],
+        ];
+
+        produits.forEach((p) => {
+          exportData.push([
+            p.libelle || '',
+            p.gencode || '',
+            p.anpf || '',
+            p.fournisseur || '',
+            p.stock || 0,
+            p.prix || 0,
+            p.qteInven || 0,
+            p.adresse || '',
+            p.nameVendeur || '',
+            p.calcul || '',
+            p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : '',
+          ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Inventaire_Raw');
+        XLSX.writeFile(wb, 'Inventaire_Raw.xlsx');
 
         const toastEl = document.getElementById('excelToast');
         if (toastEl) new bootstrap.Toast(toastEl).show();
@@ -144,36 +202,38 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('❌ Erreur lors de l’export Excel');
       } finally {
         loadingEl.style.display = 'none';
-        loadingEl.textContent = '⏳ Chargement des données...';
+        loadingEl.querySelector('#loading').textContent = 'Chargement des données...';
       }
     });
   }
 
-  // Initial render
+  // --------------------------
+  // 6️⃣ تحميل أولي
+  // --------------------------
   renderTable(1);
-});
 
-document.getElementById('btnRefresh')?.addEventListener('click', () => {
-  window.location.href = '/produitTotal'; // أو أي صفحة تريدها
+  // 🔄 زر Refresh
+  document.getElementById('btnRefresh')?.addEventListener('click', () => {
+    renderTable(1);
+  });
 });
+// Modal
+document
+  .getElementById('btnOpen')
+  ?.addEventListener(
+    'click',
+    () => (document.getElementById('adressModal').style.display = 'block')
+  );
+document
+  .getElementById('closeAdressModal')
+  ?.addEventListener(
+    'click',
+    () => (document.getElementById('adressModal').style.display = 'none')
+  );
+
 
 $('.menu-toggle').click(function () {
   $('.menu-toggle').toggleClass('open');
   $('.menu-round').toggleClass('open');
   $('.menu-line').toggleClass('open');
 });
-
-const btnClose = document.getElementById('closeAdressModal');
-
-if (btnClose) {
-  btnClose.addEventListener('click', () => {
-    document.getElementById('adressModal').style.display = 'none';
-  });
-}
-const btnOpen = document.getElementById('btnOpen');
-
-if (btnOpen) {
-  btnOpen.addEventListener('click', () => {
-    document.getElementById('adressModal').style.display = 'block';
-  });
-}

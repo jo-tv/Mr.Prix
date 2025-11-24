@@ -858,6 +858,41 @@ app.get('/api/ProduitsTotal', isAuthenticated, async (req, res) => {
   }
 });
 
+// GET Raw Inventaire (بدون دمج)
+app.get('/api/InventaireRaw', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const search = req.query.search?.trim() || '';
+
+    const skip = (page - 1) * limit;
+
+    const query = {};
+
+    // البحث فقط في libelle و gencode
+    if (search) {
+      query.$or = [
+        { libelle: { $regex: search, $options: 'i' } },
+        { gencode: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const total = await Inventaire.countDocuments(query);
+    const produits = await Inventaire.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+    res.json({
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      produits,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
 // --------------------------------------
 //   // get data to excel
 // --------------------------------------

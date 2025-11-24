@@ -352,7 +352,10 @@ async function exportExcel() {
 btnSearch?.addEventListener('click', () => renderTable(1));
 rowsPerPageEl?.addEventListener('change', () => renderTable(1));
 btnExcel?.addEventListener('click', exportExcel);
-document.getElementById('btnRefresh')?.addEventListener('click', () => window.location.reload());
+document.getElementById('btnRefresh')?.addEventListener('click', () => {
+    renderTable(1);
+  });
+
 
 // Modal
 document
