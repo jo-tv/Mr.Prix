@@ -50,14 +50,13 @@ table td {
 }
 
 /* Scroll داخل المودال */
-.custom-modal-content {
+.custom-modal-contente {
   max-height: 80vh;
   overflow-y: auto;
   padding: 20px;
 }
-
 /* المودال */
-.custom-modal {
+.custom-modale {
   position: fixed;
   top: 50%;
   left: 50%;

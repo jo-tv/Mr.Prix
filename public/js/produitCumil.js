@@ -372,3 +372,10 @@ document
 // 9. Initial Render
 // ===========================
 renderTable(1);
+
+
+$('.menu-toggle').click(function () {
+  $('.menu-toggle').toggleClass('open');
+  $('.menu-round').toggleClass('open');
+  $('.menu-line').toggleClass('open');
+});
