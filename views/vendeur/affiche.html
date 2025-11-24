@@ -4,16 +4,14 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width,initial-scale=1"
-    />
+      content="width=device-width,initial-scale=1" />
     <title>Price Tag A7</title>
     <!-- html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
     <!-- خط -->
     <link
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&display=swap"
-      rel="stylesheet"
-    />
+      rel="stylesheet" />
     <style>
       @page {
         size: 105mm 148mm; /* عرض 105mm وارتفاع 148mm */
@@ -22,9 +20,10 @@
 
       body {
         display: flex;
-        justify-content: center;
+        flex-direction: column;
         align-items: center;
-        background: #eee;
+        justify-content: space-around;
+        background: #f3f1f1fa;
         padding: 20px;
         font-family: 'Montserrat', sans-serif;
       }
@@ -48,8 +47,9 @@
         font-weight: 800;
         font-size: 15pt;
         line-height: 1.5;
-        letter-spacing: 1, px;
+        letter-spacing: 1px;
         color: #6e5f52;
+        width: 90%;
       }
 
       .arc {
@@ -62,19 +62,33 @@
 
       .price {
         position: absolute;
-        left: 45%;
-        transform: translateX(-50%);
+        /* إلغاء الـ left و الـ transform (اللتان كانتا للتوسيط) */
+        /* left: 45%; */
+        /* transform: translateX(-50%); */
+
+        /* التوسيط الجديد لضمان السعر الكامل: */
+        left: 0; /* يبدأ من اليسار */
+        right: 0; /* ينتهي عند اليمين */
+        width: 100%; /* يمتد على كامل العرض */
+        text-align: center; /* يتوسط النص داخل العرض الكامل */
+
         top: 48mm;
         font-weight: 900;
-        font-size: 96pt;
+        font-size: 84pt; /* تم تقليله قليلاً لضمان عدم القطع */
         color: rgba(138, 76, 72, 0.9);
       }
       .price .unit {
-        position: absolute;
-        left: 100%;
+        /* لضمان موضعها بجوار الرقم مباشرة */
+        position: relative;
+        /* حجم خط أصغر للوحدة (22pt مقارنة بـ 84pt للرقم) */
         font-size: 22pt;
         font-weight: 600;
-        vertical-align: super;
+        /* يرفع الوحدة قليلاً فوق خط الأساس */
+        vertical-align: bottom;
+        /* إضافة مسافة بعد الرقم الرئيسي */
+        margin-left: -20px;
+        /* يمكن تعديل الارتفاع قليلاً إذا لزم الأمر */
+        top: -0.3em;
       }
 
       .small-box {
@@ -127,10 +141,8 @@
 
       /* زر التحميل */
       .actions {
-        margin-top: 20px;
         text-align: center;
-        position: absolute;
-        bottom: 150px;
+        margin-bottom: 100px;
       }
       button {
         padding: 8px 16px;
@@ -140,7 +152,6 @@
         font-weight: bold;
         border-radius: 6px;
         cursor: pointer;
-        zoom: 1.5;
       }
       button:hover {
         background: #a82d29;
@@ -148,38 +159,35 @@
     </style>
   </head>
   <body>
+    <div class="actions">
+      <button onclick="downloadPDF()">📥 Télécharger PDF</button>
+    </div>
     <div
       class="card"
-      id="cardContent"
-    >
+      id="cardContent">
       <div
         class="title"
-        contenteditable="false"
-      ></div>
+        contenteditable="false"></div>
 
       <!-- قوس -->
       <div
         class="arc"
-        aria-hidden="true"
-      >
+        aria-hidden="true">
         <svg
           viewBox="0 0 1000 300"
           preserveAspectRatio="none"
           width="100%"
-          height="100%"
-        >
+          height="100%">
           <path
             d="M0,200 C200,60 800,60 1000,200 L1000,300 L0,300 Z"
-            fill="#f5efe9"
-          />
+            fill="#f5efe9" />
           <path
             d="M0,210 C200,80 800,80 1000,210"
             stroke="#c73f3a"
             stroke-width="40"
             fill="none"
             stroke-linecap="round"
-            stroke-linejoin="round"
-          />
+            stroke-linejoin="round" />
         </svg>
       </div>
 
@@ -189,7 +197,11 @@
           contenteditable="true"
           >1290</span
         >
-        <span class="unit">Dh</span>
+        <span
+          class="unit"
+          contenteditable="true"
+          >Dh</span
+        >
       </div>
 
       <div class="small-box"></div>
@@ -200,22 +212,17 @@
           <input
             type="number"
             class="Ref"
-            placeholder="2000002244479"
-          />
+            placeholder="2000002244479" />
         </div>
         <div style="margin-top: 7px">
           SKU :
           <span
             contenteditable="false"
-            class="sku"
-          >
+            class="sku">
           </span>
         </div>
       </div>
       <div class="date"></div>
-    </div>
-    <div class="actions">
-      <button onclick="downloadPDF()">📥 Télécharger PDF</button>
     </div>
     <script>
       function svgToImg(selector) {
@@ -247,10 +254,15 @@
           margin: 0,
           filename: 'affi_a7|' + getFormattedDate() + '.pdf',
           image: { type: 'jpeg', quality: 1 },
-          html2canvas: { scale: 3, useCORS: true },
+          html2canvas: {
+            // يفضل الإبقاء على معامل القياس 4 للحصول على جودة طباعة عالية
+            scale: 4,
+            useCORS: true,
+          },
           jsPDF: {
             unit: 'mm',
-            format: [74, 105],
+            // الأبعاد الدقيقة لورقة A6: 105 ملم عرض، 148 ملم ارتفاع
+            format: [105, 148],
             orientation: 'portrait',
           },
         };

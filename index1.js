@@ -1128,6 +1128,58 @@ app.post('/update-passwords', isAuthenticated, isResponsable, async (req, res) =
 // ========================================
 //  fin function manager password
 // ========================================
+// ========================================
+//  code shearch product to site web MR
+// ========================================
+const cors = require('cors');
+// حل fetch لجميع إصدارات Node
+const fetch = require('node-fetch');
+app.use(cors());
+
+app.get('/searchee', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/vendeur/searchProducs.html')); // ✅ صفحة فارغة مؤقتاً
+});
+
+// ============= Route للبحث =============
+app.get('/api/searchee',isAuthenticated, async (req, res) => {
+  try {
+    const q = req.query.s || '';
+    if (!q) return res.json({ error: 'Missing search query' });
+
+    const url = `https://mrbricolage.ma/wp-content/plugins/ajax-search-for-woocommerce-premium/includes/Engines/TNTSearchMySQL/Endpoints/search.php?s=${encodeURIComponent(
+      q
+    )}`;
+
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0',
+        'Accept': 'application/json, text/plain, */*',
+        'Referer': 'https://mrbricolage.ma/',
+      },
+    });
+
+    const text = await response.text();
+    const data = JSON.parse(text);
+
+    // إضافة full_image_url لكل عنصر
+    data.suggestions.forEach((item) => {
+      const match = item.thumb_html.match(/src="([^"]+)"/);
+      if (match) {
+        // استبدال الحجم الصغير في الرابط بالصورة الأصلية
+        item.full_image_url = match[1].replace(/-\d+x\d+/, '');
+      } else {
+        item.full_image_url = '';
+      }
+    });
+
+    res.json(data);
+  } catch (err) {
+    res.json({ error: 'Server error', details: err.message });
+  }
+});
+// ========================================
+//  code shearch product to site web MR
+// ========================================
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);

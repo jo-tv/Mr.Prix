@@ -20,6 +20,7 @@
   right: 0;
   display: table;
   text-align: center;
+  
 }
 .menu-toggle .fa {
   color: #fff;
@@ -242,7 +243,6 @@
   height: 80%;
   overflow-y: auto;
   padding: 20px;
-  
 }
 .custom-modal-content iframe {
   width: 100%;

@@ -83,58 +83,43 @@ function mergeAndCalculateProducts(produits) {
 // ===========================
 // 4. عرض الجدول (RenderTable)
 // ===========================
-// حالة التخزين للترتيب
-let sortColumn = null; // اسم العمود
-let sortDirection = 'asc'; // asc أو desc
-
 async function renderTable(page = 1) {
-  const limit = parseInt(rowsPerPageEl?.value) || 10;
-  const search = searchInput?.value.trim() || '';
+  const limit = parseInt(rowsPerPageEl.value) || 10;
+  const search = searchInput.value.trim();
 
   try {
     loadingEl.style.display = 'flex';
-    loadingEl.querySelector('#loading').textContent = '⏳ Chargement des produits...';
 
+    // جلب البيانات من السيرفر
     const data = await fetchProducts(page, limit, search);
 
-    currentPage = data.page || 1;
-    totalPages = data.totalPages || 1;
+    currentPage = data.page;
+    totalPages = data.totalPages;
 
-    const produits = Array.isArray(data.produits) ? data.produits : [];
+    // البيانات المدمجة تأتي جاهزة من السيرفر (mergeCount موجود)
+    const produits = data.produits;
 
-    // --- ترتيب المنتجات إذا تم الضغط على رأس العمود ---
-    let sortedProduits = [...produits];
-    if (sortColumn) {
-      sortedProduits.sort((a, b) => {
-        const valA = a[sortColumn] ?? 0;
-        const valB = b[sortColumn] ?? 0;
-        if (typeof valA === 'string')
-          return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-        return sortDirection === 'asc' ? valA - valB : valB - valA;
-      });
-    }
-
-    // --- بناء صفوف الجدول ---
-    tableBody.innerHTML = sortedProduits
+    // بناء صفوف الجدول
+    tableBody.innerHTML = produits
       .map((p) => {
         const ecar = Number(p.ecar) || 0;
-        const cellStyle =
-          ecar === 0
-            ? 'background-color: #dee2e6; color: #495057;'
-            : ecar < 0
-            ? 'background-color: #dc3545; color: white; font-weight: bold;'
-            : 'background-color: #198754; color: white; font-weight: bold;';
+        let cellStyle = '';
+        if (ecar === 0) cellStyle = 'background-color: #dee2e6; color: #495057;';
+        else if (ecar < 0)
+          cellStyle = 'background-color: #dc3545; color: white; font-weight: bold;';
+        else cellStyle = 'background-color: #198754; color: white; font-weight: bold;';
 
         return `
           <tr>
             <td>${p.libelle || ''}</td>
-            <td>${p.gencode || ''} <span class="badge bg-secondary ms-1">(${
-              p.mergeCount || 1
-            })</span></td>
+            <td>
+              ${p.gencode || ''}
+              <span class="badge bg-secondary ms-1">(${p.mergeCount || 1})</span>
+            </td>
             <td>${p.anpf || ''}</td>
             <td>${p.fournisseur || ''}</td>
-            <td>${p.stock ?? 0}</td>
-            <td>${p.qteInven ?? 0}</td>
+            <td>${p.stock || 0}</td>
+            <td>${p.qteInven || 0}</td>
             <td style="padding:0;">
               <div style="${cellStyle} height:100%; display:flex; align-items:center; justify-content:center; padding:0.5rem 0;">
                 ${ecar}
@@ -149,40 +134,10 @@ async function renderTable(page = 1) {
       .join('');
 
     // --- Pagination ---
-    renderPagination(currentPage, totalPages, data.total ?? produits.length);
-
-    // --- إضافة أحداث على رؤوس الأعمدة للفلترة ---
-    document.querySelectorAll('thead th').forEach((th, index) => {
-      th.style.cursor = 'pointer';
-      th.onclick = () => {
-        const columnMap = {
-          0: 'libelle',
-          1: 'gencode',
-          2: 'anpf',
-          3: 'fournisseur',
-          4: 'stock',
-          5: 'qteInven',
-          6: 'ecar',
-          7: 'adresse',
-          8: 'nameVendeur',
-          9: 'calcul',
-          10: 'createdAt',
-        };
-        const col = columnMap[index];
-        if (col) {
-          if (sortColumn === col) {
-            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-          } else {
-            sortColumn = col;
-            sortDirection = 'asc';
-          }
-          renderTable(currentPage);
-        }
-      };
-    });
+    renderPagination(currentPage, totalPages, data.total);
   } catch (err) {
     console.error(err);
-    alert('❌ Erreur lors du chargement des produits');
+    alert('Erreur lors du chargement des produits');
   } finally {
     loadingEl.style.display = 'none';
   }
@@ -270,7 +225,7 @@ function renderPagination() {
 async function fetchAllProductsForExcel(search = '') {
   loadingEl.style.display = 'flex';
   loadingEl.querySelector('#loading').textContent = "⏳ J'extrait toutes les données...";
-
+  
   try {
     const params = new URLSearchParams({ page: 1, limit: ALL_DATA_LIMIT, search });
     const res = await fetch(`/api/ProduitsTotal?${params.toString()}`);
@@ -279,7 +234,7 @@ async function fetchAllProductsForExcel(search = '') {
     return data.produits; // البيانات جاهزة مع mergeCount وecar
   } finally {
     loadingEl.style.display = 'none';
-    loadingEl.querySelector('#loading').textContent = 'Chargement des données...';
+    loadingEl.querySelector('#loading').textContent = "Chargement des données...";
   }
 }
 
@@ -318,7 +273,7 @@ async function exportExcel() {
       exportData.push([
         p.libelle || '',
         p.gencode || '',
-        p.mergeCount || 1, // mergeCount من السيرفر
+        p.mergeCount || 1,        // mergeCount من السيرفر
         p.anpf || '',
         p.fournisseur || '',
         p.stock || 0,
@@ -340,6 +295,7 @@ async function exportExcel() {
     // عرض Toast نجاح
     const toastEl = document.getElementById('excelToast');
     if (toastEl) new bootstrap.Toast(toastEl).show();
+
   } catch (err) {
     console.error(err);
     alert("❌ Erreur lors de l'export Excel");
