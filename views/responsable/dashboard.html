@@ -119,15 +119,9 @@
             <h3 id="sharedAddresses">0</h3>
           </div>
         </div>
-        <div class="col-md-3 col-6 mb-3 totalPro">
-          <div class="card text-bg-info p-3">
-            <i class="fas fa-database mb-2"></i>
-            <h5>N° des Adresse Magasin</h5>
-            <h3 id="jsonAdressesCount">0</h3>
-          </div>
-        </div>
 
-        <div class="col-md-3 col-6 mb-3">
+
+        <div class="col-md-3 col-6 mb-3 TotalPro">
           <div class="card text-bg-success p-3">
             <i class="fas fa-map-marker-alt mb-2"></i>
             <h5>N° des Adresse comptée</h5>
@@ -143,6 +137,13 @@
           </div>
         </div>
 
+        <div class="col-md-3 col-6 mb-3 totalPro">
+          <div class="card text-bg-info p-3">
+            <i class="fa-solid fa-circle-exclamation text-warning"></i>
+            <h5>Produits à Adresse Inexistante</h5>
+            <h3 id="jsonAdressesCount">0</h3>
+          </div>
+        </div>
         <div class="col-md-3 col-6 mb-3 refe">
           <div class="card text-bg-danger p-3">
             <i class="fas fa-exclamation-triangle mb-2"></i>
@@ -270,6 +271,26 @@
                   <th>Statut</th>
                   <th>Date d’enregistrement</th>
                   <th>Total Adresse</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card cart-table p-3">
+          <h5 class="mb-3">
+            <i class="fa-solid fa-map-pin text-danger"></i> Table des Produits Non Référencées
+          </h5>
+          <div class="table-responsive">
+            <table
+              class="table table-bordered"
+              id="produitInexistant">
+              <thead class="table-dark">
+                <tr>
+                  <th>Adresse</th>
+                  <th>Vendeur</th>
+                  <th>GenCode</th>
+                  <th>Libelle</th>
                 </tr>
               </thead>
               <tbody></tbody>

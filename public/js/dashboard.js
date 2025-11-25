@@ -123,7 +123,7 @@ async function initDashboard() {
 
       // تحديث الكروت
       document.getElementById('dbAdressesCount').innerText = computedAdresses.length;
-      document.getElementById('jsonAdressesCount').innerText = jsonAdresses.length;
+
       document.getElementById('missingCount').innerText = missingInDB.length;
 
       // فتح المودال عند الضغط
@@ -269,6 +269,70 @@ async function initDashboard() {
    🔵 بدء العملية
 -------------------------------------------------- */
     showAdressesStats(produits);
+    function chargerProduitsInexistants(produits) {
+      // استخراج المنتجات التي تحتوي libelle على: "Produit Inexistant"
+      const produitsInexistants = produits.filter(
+        (p) => typeof p.libelle === 'string' && p.libelle.includes('Produit Inexistant')
+      );
+      document.getElementById('jsonAdressesCount').innerText = produitsInexistants.length;
+      if (produitsInexistants.length > 0) {
+        document.querySelector('.totalPro').classList.add('jello-vertical');
+      }
+
+      // تعبئة الجدول
+      const tbody = document.querySelector('#produitInexistant tbody');
+      tbody.innerHTML = ''; // تفريغ الجدول
+
+      produitsInexistants.forEach((produit) => {
+        const tr = document.createElement('tr');
+        tr.style.padding = '8px'; // ⬅️ إضافة padding للصف
+
+        tr.innerHTML = `
+      <td style="padding: 8px;">${produit.adresse ?? '-'}</td>
+      <td style="padding: 8px;">${produit.nameVendeur.split('@')[0] ?? '-'}</td>
+      <td style="padding: 8px;">${produit.gencode}</td>
+      <td style="padding: 8px;">${produit.libelle}</td>
+    `;
+
+        tbody.appendChild(tr);
+      });
+
+      // Datatable
+      let extraDT = null;
+
+      function initExtraAdressTable() {
+        if ($.fn.DataTable.isDataTable('#produitInexistant')) {
+          extraDT.destroy();
+        }
+
+        extraDT = $('#produitInexistant').DataTable({
+          dom: 'Bflrtip',
+          buttons: [
+            {
+              extend: 'excelHtml5',
+              text: '📥 Télécharger Excel',
+              title: 'Adresses_Inconnues',
+            },
+            {
+              extend: 'print',
+              text: '🖨️ Imprimer',
+            },
+          ],
+          pageLength: 10,
+          lengthMenu: [
+            [5, 10, 20, 50, -1],
+            [5, 10, 20, 50, 'Tout'],
+          ],
+          language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json',
+          },
+          pagingType: 'full_numbers',
+        });
+      }
+
+      initExtraAdressTable();
+    }
+    chargerProduitsInexistants(produits);
 
     function getExtraAdresses(dbProducts, jsonAddresses) {
       const map = {};
@@ -611,7 +675,7 @@ async function initDashboard() {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
     topLabels = top10.map((v) => v[0].replace(/@.*/, '').trim());
-      topValues = top10.map((v) => v[1]);
+    topValues = top10.map((v) => v[1]);
 
     destroyChart(window._charts.vendeur);
     const ctxV = document.getElementById('vendeurChart')?.getContext('2d');
@@ -756,7 +820,7 @@ document
   .querySelector('.usersPro')
   ?.addEventListener('click', () => (window.location.href = '/produitTotal'));
 document
-  .querySelector('.totalPro')
+  .querySelector('.TotalPro')
   ?.addEventListener('click', () => (window.location.href = '/totalProduit'));
 document
   .querySelector('.Adresses')
@@ -764,6 +828,9 @@ document
 document
   .querySelector('.refe')
   ?.addEventListener('click', () => (window.location.href = '#extraAdressTable'));
+document
+  .querySelector('.totalPro')
+  ?.addEventListener('click', () => (window.location.href = '#produitInexistant'));
 
 $('.menu-toggle').click(function () {
   $('.menu-toggle').toggleClass('open');
@@ -771,9 +838,9 @@ $('.menu-toggle').click(function () {
   $('.menu-line').toggleClass('open');
 });
 
-
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
+  navigator.serviceWorker
+    .register('/service-worker.js')
     .then(() => console.log('Service Worker registered'))
-    .catch(err => console.error('SW registration failed:', err));
+    .catch((err) => console.error('SW registration failed:', err));
 }
