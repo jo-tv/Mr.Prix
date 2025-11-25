@@ -190,6 +190,14 @@ async function searchProduct() {
     // إذا لم يُعثر على منتج
     if (!products.length) {
       showToast('⁉️ Produit non trouvé. 🛍️', 'error');
+      document.getElementById('productForm').style.display = 'block';
+      document.getElementById('libelle').value = 'Produit Inexistant ';
+      document.getElementById('gencode').value = query;
+      document.getElementById('anpf').value = query;
+      document.getElementById('fournisseur').value = 'Inexistant';
+      document.getElementById('stock').value = 'Inexistant';
+      document.getElementById('prix').value = 'Inexistant';
+      document.getElementById('nameVendeur').value = localStorage.nameVendeur || '';
       return;
     }
 
@@ -707,7 +715,6 @@ showToast('🗑️ تم حذف المنتج بنجاح', 'success');
 showToast('❌ حدث خطأ أثناء حذف المنتج', 'error');
 showToast('⚠️ المرجو إدخال اسم البائع أولاً', 'warning');
 showToast('ℹ️ جارٍ تحميل المنتجات...', 'info');
-
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
