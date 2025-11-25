@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res = await fetch('/api/inventairePro');
     vendeurs = await res.json();
     filtered = [...vendeurs];
-    console.log(filtered)
+
     showToast(`${filtered.length} vendeurs ont été chargés.`, 'info');
     renderPage();
     renderPagination();
@@ -483,4 +483,10 @@ function showToast(message, type = 'info', duration = 3000) {
   setTimeout(() => {
     toast.className = `toast ${type}`;
   }, duration);
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(() => console.log('Service Worker registered'))
+    .catch(err => console.error('SW registration failed:', err));
 }
