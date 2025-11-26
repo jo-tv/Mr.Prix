@@ -6,11 +6,22 @@ const CACHE_NAME = `my-site-cache-${CACHE_VERSION}`;
 
 // الملفات الثابتة التي سيتم تخزينها عند التثبيت
 const urlsToCache = [
+  //file style css
   '/css/style.css',
   '/css/dashboard.css',
   '/css/navb.css',
   '/css/searchPro.css',
   '/css/List-Vendeurs.css',
+  '/css/calc.css',
+  '/css/chercher.css',
+  '/css/Devis.css',
+  '/css/galerie.css',
+  '/css/login.css',
+  '/css/search.css',
+  '/css/searchCode.css',
+  '/css/searchProducs.css',
+  '/css/upload.css',
+  //file java script
   '/js/dashboard.js',
   '/js/List-Vendeurs.js',
   '/js/main.js',
@@ -18,6 +29,14 @@ const urlsToCache = [
   '/js/produitCumil.js',
   '/js/produitTotal.js',
   '/js/searchPro.js',
+  '/js/calc.js',
+  '/js/chercher.js',
+  '/js/Devis.js',
+  '/js/login.js',
+  '/js/pageUser.js',
+  '/js/search.js',
+  '/js/search2.js',
+  '/js/searchProducs.js',
   // أضف ملفات أخرى حسب مشروعك
 ];
 

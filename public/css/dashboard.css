@@ -12,9 +12,38 @@ body {
 .card {
   border: none;
   border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    rgba(0, 0, 0, 0.25) 0px 54px 55px,
+    rgba(0, 0, 0, 0.12) 0px -12px 30px,
+    rgba(0, 0, 0, 0.12) 0px 4px 6px,
+    rgba(0, 0, 0, 0.17) 0px 12px 13px,
+    rgba(0, 0, 0, 0.09) 0px -3px 5px;
   text-align: center;
   padding: 1rem;
+}
+.carde {
+  font-family: sans-serif !important;
+  color: white !important;
+}
+.carde h5,
+.carde h3 {
+  text-align: center;
+  font-weight: 900 !important;
+  font-size: 25px !important;
+  letter-spacing: 0.5px !important;
+  text-shadow: 4px 4px 6px rgba(66, 68, 90, 1);
+}
+ h5 {
+  font-weight: 700 !important;
+  font-size: 25px !important;
+  letter-spacing: 0.5px !important;
+  text-shadow: 0px 0px 4px rgba(90, 163, 68, 1);
+}
+.carde h3,
+.carde i {
+  color: #f7f7f8;
+  font-size: 37px !important;
+  margin: 5px 0;
 }
 .cart-table {
   margin: 50px auto;

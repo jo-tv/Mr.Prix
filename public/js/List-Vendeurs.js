@@ -409,7 +409,7 @@ async function confirmDeleteUser() {
 
     if (result.success) {
       showToast(
-        `✅ Tous les produits de ${currentVendeur} ont été supprimés (${result.deletedCount})`,
+        `✅ Tous les produits de ${currentVendeur.split('@')[0]} ont été supprimés (${result.deletedCount})`,
         'success',
         4000
       );
@@ -486,7 +486,8 @@ function showToast(message, type = 'info', duration = 3000) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
+  navigator.serviceWorker
+    .register('/service-worker.js')
     .then(() => console.log('Service Worker registered'))
-    .catch(err => console.error('SW registration failed:', err));
+    .catch((err) => console.error('SW registration failed:', err));
 }

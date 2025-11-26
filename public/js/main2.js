@@ -170,3 +170,9 @@ function showToast(message, type = 'info', duration = 3000) {
     toast.className = `toast ${type}`;
   }, duration);
 }
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('/service-worker.js')
+    .then(() => console.log('Service Worker registered'))
+    .catch((err) => console.error('SW registration failed:', err));
+}
