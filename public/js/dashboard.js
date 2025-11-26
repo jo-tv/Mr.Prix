@@ -288,12 +288,15 @@ async function initDashboard() {
         tr.style.padding = '8px'; // ⬅️ إضافة padding للصف
 
         tr.innerHTML = `
-      <td style="padding: 8px;">${produit.adresse ?? '-'}</td>
-      <td style="padding: 8px;">${produit.nameVendeur.split('@')[0] ?? '-'}</td>
-      <td style="padding: 8px;">${produit.gencode}</td>
-      <td style="padding: 8px;">${produit.libelle}</td>
+      <td style="padding: 8px;background:#dd9261b6 ;">${
+        produit.nameVendeur.split('@')[0] ?? '-'
+      }</td>
+      <td style="padding: 8px;background:#dd9261b6 ;">${produit.libelle}</td>
+      <td style="padding: 8px;background:#dd9261b6 ;">${produit.gencode}</td>
+      <td style="padding: 8px;background:#dd9261b6 ;">${produit.adresse ?? '-'}</td>
+      <td style="padding: 8px;background:#dd9261b6 ;">${produit.qteInven}</td>
+      <td style="padding: 8px;background:#dd9261b6 ;">${produit.calcul}</td>
     `;
-
         tbody.appendChild(tr);
       });
 
