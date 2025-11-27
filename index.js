@@ -380,7 +380,7 @@ app.get('/search', isAuthenticated, async (req, res) => {
 });
 
 // نقطة تسجيل مستخدم جديد
-app.post('/register', isAuthenticated, async (req, res) => {
+app.post('/register', async (req, res) => {
   const { username, password, role } = req.body;
 
   if (!username || !password || !role) {
