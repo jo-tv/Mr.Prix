@@ -284,7 +284,7 @@ async function initDashboard() {
     applyDomQueue();
 
     // fill produits inexistants (batched)
-    (function fillInexistants() {
+    (async function fillInexistants() {
       const arr = agg.produitsInexistants || [];
       setText('jsonAdressesCount', arr.length);
       applyDomQueue();
@@ -451,7 +451,7 @@ async function initDashboard() {
       requestAnimationFrame(step);
     }
 
-    function initExtraAdressTable() {
+    async function initExtraAdressTable() {
       if (!q('#extraAdressTable')) return;
       if ($.fn.DataTable.isDataTable('#extraAdressTable'))
         $('#extraAdressTable').DataTable().clear().destroy();
@@ -882,7 +882,7 @@ async function initDashboard() {
 
       const extra = getExtraAdresses(produits, jsonAdrs);
       fillExtraAdressTable(extra);
-      initExtraAdressTable();
+      
     })();
 
     function getExtraAdresses(dbProducts, jsonAddresses) {
