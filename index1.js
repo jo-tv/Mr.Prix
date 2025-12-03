@@ -380,7 +380,7 @@ app.get('/search', isAuthenticated, async (req, res) => {
 });
 
 // نقطة تسجيل مستخدم جديد
-app.post('/register', isAuthenticated, async (req, res) => {
+app.post('/register', isAuthenticated, isResponsable, async (req, res) => {
   const { username, password, role } = req.body;
 
   if (!username || !password || !role) {
@@ -509,7 +509,7 @@ app.get('/login', (req, res) => {
 });
 
 // صفحة التسجيل (نفس منطق صفحة تسجيل الدخول)
-app.get('/tassgile', (req, res) => {
+app.get('/tassgile',isAuthenticated,isResponsable, (req, res) => {
   if (req.session && req.session.user) {
     return res.redirect(req.session.user.role === 'vendeur' ? '/prixVen' : '/');
   }

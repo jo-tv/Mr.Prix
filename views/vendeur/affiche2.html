@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1" />
+    <title>Price Tag A7</title>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <!-- خط -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&display=swap"
+      rel="stylesheet" />
+    <style>
+      @page {
+        size: 105mm 148mm; /* عرض 105mm وارتفاع 148mm */
+        margin: 0; /* بدون هوامش */
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        background: #f3f1f1fa;
+        padding: 20px;
+        font-family: 'Montserrat', sans-serif;
+      }
+
+      .card {
+        width: 105mm;
+        height: 148mm;
+        box-sizing: border-box;
+        position: relative;
+        background: #f5efe9;
+        overflow: hidden;
+        padding: 6mm;
+        border: 1px solid #ccc;
+      }
+
+      .title {
+        position: absolute;
+        top: 6mm;
+        left: 6mm;
+        right: 6mm;
+        font-weight: 800;
+        font-size: 15pt;
+        line-height: 1.5;
+        letter-spacing: 1px;
+        color: #6e5f52;
+        width: 90%;
+      }
+
+      .arc {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 22mm;
+        height: 26mm;
+      }
+
+      .price {
+        position: absolute;
+        /* إلغاء الـ left و الـ transform (اللتان كانتا للتوسيط) */
+        /* left: 45%; */
+        /* transform: translateX(-50%); */
+
+        /* التوسيط الجديد لضمان السعر الكامل: */
+        left: 0; /* يبدأ من اليسار */
+        right: 0; /* ينتهي عند اليمين */
+        width: 100%; /* يمتد على كامل العرض */
+        text-align: center; /* يتوسط النص داخل العرض الكامل */
+
+        top: 48mm;
+        font-weight: 900;
+        font-size: 84pt; /* تم تقليله قليلاً لضمان عدم القطع */
+        color: rgba(138, 76, 72, 0.9);
+      }
+      .price .unit {
+        /* لضمان موضعها بجوار الرقم مباشرة */
+        position: absolute;
+        /* حجم خط أصغر للوحدة (22pt مقارنة بـ 84pt للرقم) */
+        font-size: 25pt;
+        font-weight: 600;
+        /* يرفع الوحدة قليلاً فوق خط الأساس */
+        vertical-align: bottom;
+        /* إضافة مسافة بعد الرقم الرئيسي */
+        margin-left: -50px !important;
+        /* يمكن تعديل الارتفاع قليلاً إذا لزم الأمر */
+        top: 0 !important;
+      }
+      .price #cente {
+        /* لضمان موضعها بجوار الرقم مباشرة */
+        position: relative;
+        /* حجم خط أصغر للوحدة (22pt مقارنة بـ 84pt للرقم) */
+        font-size: 32pt;
+        font-weight: 600;
+        /* يرفع الوحدة قليلاً فوق خط الأساس */
+        vertical-align: bottom;
+        /* إضافة مسافة بعد الرقم الرئيسي */
+        margin-rigth: -20px !important;
+        /* يمكن تعديل الارتفاع قليلاً إذا لزم الأمر */
+        top: 0 !important;
+      }
+
+      .small-box {
+        position: absolute;
+        left: 6mm;
+        bottom: 12mm;
+        width: 45mm;
+        height: 42mm;
+        border: 0.6pt solid rgba(110, 95, 82, 0.6);
+      }
+
+      .meta {
+        position: absolute;
+        right: 5mm;
+        bottom: 12mm;
+        text-align: left;
+        font-size: 9pt;
+        color: #000;
+        line-height: 2;
+        font-weight: 900;
+        letter-spacing: 1px;
+      }
+
+      .meta span {
+        border: none;
+        background: transparent;
+        width: 15mm;
+        font-size: 9pt;
+        text-align: right;
+        outline: none;
+      }
+      .meta input {
+        border: none;
+        background: transparent;
+        width: 33mm;
+        outline: none;
+        letter-spacing: 1px;
+        font-weight: 900;
+        color: #000;
+      }
+      .date {
+        font-size: 10px;
+        opacity: 0.4;
+        letter-spacing: 1px;
+        font-weight: 700;
+        position: absolute;
+        bottom: 10px;
+        left: 20px;
+      }
+
+      /* زر التحميل */
+      .actions {
+        text-align: center;
+        margin-bottom: 100px;
+      }
+      button {
+        padding: 8px 16px;
+        border: none;
+        background: #c73f3a;
+        color: #fff;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #a82d29;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="actions">
+      <button onclick="downloadPDF()">📥 Télécharger PDF</button>
+    </div>
+    <div
+      class="card"
+      id="cardContent">
+      <div
+        class="title"
+        contenteditable="false"></div>
+
+      <!-- قوس -->
+      <div
+        class="arc"
+        aria-hidden="true">
+        <svg
+          viewBox="0 0 1000 300"
+          preserveAspectRatio="none"
+          width="100%"
+          height="100%">
+          <path
+            d="M0,200 C200,60 800,60 1000,200 L1000,300 L0,300 Z"
+            fill="#f5efe9" />
+          <path
+            d="M0,210 C200,80 800,80 1000,210"
+            stroke="#c73f3a"
+            stroke-width="40"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+
+      <div class="price">
+        <span
+          class="amount"
+          contenteditable="true"
+          >1290<span id="cente">,00</span></span
+        >
+        <span class="unit">Dh</span>
+      </div>
+
+      <div class="small-box"></div>
+
+      <div class="meta">
+        <div>
+          Réf :
+          <input
+            type="number"
+            class="Ref"
+            placeholder="2000002244479" />
+        </div>
+        <div style="margin-top: 7px">
+          SKU :
+          <span
+            contenteditable="false"
+            class="sku">
+          </span>
+        </div>
+      </div>
+      <div class="date"></div>
+    </div>
+    <script>
+      function svgToImg(selector) {
+        const svg = document.querySelector(selector); // ✅ استخدم المتغير
+        if (!svg) return;
+
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const svgBlob = new Blob([svgData], {
+          type: 'image/svg+xml;charset=utf-8',
+        });
+        const url = URL.createObjectURL(svgBlob);
+
+        // ننشئ صورة مكان الـ svg
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.width = svg.getAttribute('width') || '100%';
+        img.style.height = svg.getAttribute('height') || '100%';
+
+        svg.parentNode.replaceChild(img, svg);
+      }
+
+      function downloadPDF() {
+        // نحول الـ SVG داخل .arc إلى صورة
+        svgToImg('.arc svg');
+
+        const element = document.getElementById('cardContent');
+
+        const opt = {
+          margin: 0,
+          filename: 'affi_a7|' + getFormattedDate() + '.pdf',
+          image: { type: 'jpeg', quality: 1 },
+          html2canvas: {
+            // يفضل الإبقاء على معامل القياس 4 للحصول على جودة طباعة عالية
+            scale: 4,
+            useCORS: true,
+          },
+          jsPDF: {
+            unit: 'mm',
+            // الأبعاد الدقيقة لورقة A6: 105 ملم عرض، 148 ملم ارتفاع
+            format: [105, 148],
+            orientation: 'portrait',
+          },
+        };
+
+        // نستخدم delay بسيط حتى تحمل الصورة قبل التصوير
+        setTimeout(() => {
+          html2pdf().set(opt).from(element).save();
+        }, 500);
+      }
+      // عند إدخال الكود → جلب السعر تلقائياً
+      const input = document.querySelector('.Ref');
+      const title = document.querySelector('.title');
+      const anpf = document.querySelector('.sku');
+      const price = document.querySelector('.amount');
+      async function fetchPrice(input) {
+        const code = input.value.trim();
+        if (!code) {
+          anpf.value = '';
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/produit/${code}`);
+          if (!response.ok) {
+            title.textContent = '';
+            anpf.textContent = '';
+            price.textContent = '';
+            return;
+          }
+
+          const data = await response.json();
+          console.log(data);
+
+          title.textContent = data.libelle.replace(/\[.*?\]/g, '').trim();
+          anpf.textContent = data.anpf;
+          price.innerHTML = `<span>${data.prix}<span id="cente">,00</span></span
+        >`;
+        } catch (err) {
+          console.error(err);
+          anpf.value = '';
+        }
+      }
+      input.addEventListener('input', function () {
+        fetchPrice(input);
+      });
+      // دالة استخراج تاريخ اليوم
+      function getFormattedDate() {
+        const today = new Date();
+
+        const day = String(today.getDate()).padStart(2, '0'); // 25
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // 08 (الأشهر تبدأ من 0)
+        const year = today.getFullYear(); // 2025
+
+        return `${day}/${month}/${year}`;
+      }
+      document.querySelector('.date').textContent = getFormattedDate();
+    </script>
+  </body>
+</html>
