@@ -4,28 +4,28 @@ const ip = require("ip");
 // قائمة العناوين المسموح بها (يمكنك وضع IP مفرد أو CIDR)
 const allowedIPs = [
     "127.0.0.1", // IP مفرد
-    "10.50.223.0", // كل العناوين من 192.168.1.0 إلى 192.168.1.255
-//     "10.0.0.0/16" // شبكة كبيرة
+    "10.50.223.0" // كل العناوين من 192.168.1.0 إلى 192.168.1.255
+    //     "10.0.0.0/16" // شبكة كبيرة
 ];
 
 function ipCheck(req, res, next) {
-    // الحصول على IP الحقيقي حتى لو خلف Proxy
-    let userIP =
-        req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-        req.socket.remoteAddress;
-
-    if (userIP === "::1") userIP = "127.0.0.1"; // تحويل localhost
-
-    // تحقق مما إذا كان IP ضمن القائمة
-    const isAllowed = allowedIPs.some(allowed => {
-        if (allowed.includes("/")) {
-            // CIDR
-            return ip.cidrSubnet(allowed).contains(userIP);
-        } else {
-            // IP مفرد أو مقارنة البادئة
-            return userIP.startsWith(allowed);
-        }
-    });
+ let userIP =
+  req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
+  req.socket.remoteAddress;
+ 
+ // تحويل IPv6 Localhost
+ if (userIP === "::1") userIP = "127.0.0.1";
+ 
+ // ✅ قائمة البادئات المسموح بها
+ const allowedIPPrefixes = [
+  "127.0.0.1",
+  "10.50.223." // ✅ أي IP يبدأ بهذا الجزء مسموح
+ ];
+ 
+ // ✅ تحقق جزئي بالبادئة
+ const isAllowed = allowedIPPrefixes.some(prefix =>
+  userIP.startsWith(prefix)
+ );
 
     if (!isAllowed) {
         // IP غير مسموح → عرض صفحة HTML مودرن
