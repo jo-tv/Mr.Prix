@@ -1,34 +1,34 @@
-// npm install ip
-const ip = require("ip");
-
-// قائمة العناوين المسموح بها (يمكنك وضع IP مفرد أو CIDR)
-const allowedIPs = [
-    "127.0.0.1", // IP مفرد
-    "10.50.223.0" // كل العناوين من 192.168.1.0 إلى 192.168.1.255
-    //     "10.0.0.0/16" // شبكة كبيرة
-];
-
 function ipCheck(req, res, next) {
- let userIP =
-  req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-  req.socket.remoteAddress;
- 
- // تحويل IPv6 Localhost
- if (userIP === "::1") userIP = "127.0.0.1";
- 
- // ✅ قائمة البادئات المسموح بها
- const allowedIPPrefixes = [
-  "127.0.0.1",
-  "10.50.223." // ✅ أي IP يبدأ بهذا الجزء مسموح
- ];
- 
- // ✅ تحقق جزئي بالبادئة
- const isAllowed = allowedIPPrefixes.some(prefix =>
-  userIP.startsWith(prefix)
- );
+    let userIP =
+        req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
+        req.socket.remoteAddress;
 
-    if (!isAllowed) {
-        // IP غير مسموح → عرض صفحة HTML مودرن
+    // ✅ تحويل localhost
+    if (userIP === "::1") userIP = "127.0.0.1";
+
+    // ✅ إزالة ::ffff: في حال وجودها (مهم جدًا في الاستضافات)
+    userIP = userIP.replace("::ffff:", "");
+
+    
+
+    // ✅ البادئات المسموح بها
+    const allowedIPs = ["127.0.0.1", "127.0.0.", "10.50.223.", "154.144.255."];
+
+    function isIPAllowed(userIP) {
+        if (userIP === "::1") userIP = "127.0.0.1";
+        userIP = userIP.replace("::ffff:", "");
+
+        return allowedIPs.some(item => {
+            // ✅ IP دقيق
+            if (!item.endsWith(".")) {
+                return userIP === item;
+            }
+            // ✅ شبكة (prefix)
+            return userIP.startsWith(item);
+        });
+    }
+
+    if (!isIPAllowed(userIP)) {
         return res.status(403).send(`
 <!DOCTYPE html>
 <html lang="fr">
@@ -41,40 +41,45 @@ function ipCheck(req, res, next) {
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg,#ff4e50,#f9d423);
-    height:100vh; display:flex; justify-content:center; align-items:center; color:#333;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
   }
   .container {
-    background: rgba(255,255,255,0.95); padding:40px 30px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2);
-    max-width:500px; text-align:center;
+    background: rgba(255,255,255,0.95);
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    max-width: 500px;
+    text-align: center;
   }
-  .container img { max-width:150px; margin-bottom:20px; }
-  h1 { font-size:2rem; color:#e63946; margin-bottom:20px; }
-  p { font-size:1rem; margin-bottom:25px; color:#333; }
-  .btn {
-    display:inline-block; padding:12px 25px; border:none; border-radius:8px; background:#457b9d; color:#fff; font-size:1rem; text-decoration:none; transition:all 0.3s ease;
-  }
-  .btn:hover { background:#1d3557; transform:translateY(-2px); }
-  @media (max-width:600px){
-    .container { padding:30px 20px; }
-    h1 { font-size:1.5rem; }
-    p { font-size:0.9rem; }
-    .btn { padding:10px 20px; }
+  img { max-width:120px; margin-bottom:20px; }
+  h1 { color:#e63946; margin-bottom:15px; }
+  p { margin-bottom:20px; }
+  a {
+    display:inline-block;
+    padding:12px 25px;
+    border-radius:8px;
+    background:#457b9d;
+    color:white;
+    text-decoration:none;
   }
 </style>
 </head>
 <body>
   <div class="container">
-    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Access Denied">
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
     <h1>Accès refusé</h1>
-    <p>🚫 L'accès à cette application est restreint. Veuillez contacter l'administrateur si nécessaire.</p>
-    <a href="/" class="btn">Retour à l'accueil</a>
+    <p>🚫 L'accès à cette application est restreint.</p>
+    <a href="/">Retour</a>
   </div>
 </body>
 </html>
-        `);
+    `);
     }
 
-    next(); // IP مسموح → تابع
+    next();
 }
 
 module.exports = ipCheck;
