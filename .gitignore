@@ -1,6 +1,7 @@
 node_modules/
 .env
-index1.js
-affiche2.html
-upload.html 1
-dashboard1.js
+/index1.js
+/views/vendeur/affiche2.html
+/views/responsable/upload.html 1
+/public/js/dashboard1.js
+/public/js/searchPro222.js
