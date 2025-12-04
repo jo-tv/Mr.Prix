@@ -24,7 +24,7 @@ const ipCheck = require("./models/ipCheck.js");
 const app = express();
 const PORT = process.env.PORT || 5000;
 // وضع الـ Middleware قبل أي Route تريد حمايته
- app.use(ipCheck);
+ // app.use(ipCheck);
 
 // إعداد EJS كـ view engine
 app.set("view engine", "ejs");
