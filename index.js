@@ -19,9 +19,12 @@ const { v2: cloudinary } = require("cloudinary");
 const User = require("./models/user.js");
 const Inventaire = require("./models/Inventaire.js");
 const PagePasswords = require("./models/PagePasswords.js");
+const ipCheck = require("./models/ipCheck.js");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+// وضع الـ Middleware قبل أي Route تريد حمايته
+ app.use(ipCheck);
 
 // إعداد EJS كـ view engine
 app.set("view engine", "ejs");
@@ -60,8 +63,6 @@ app.use(
     })
 );
 app.use(express.static("public"));
-
-
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
