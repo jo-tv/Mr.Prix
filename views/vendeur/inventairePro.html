@@ -1,306 +1,306 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="manifest"
-      href="/manifest.json" />
-    <meta
-      name="theme-color"
-      content="#007bff" />
-    <title>Gestion des Produits</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <!-- ===== Boxicons CSS ===== -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script
-      src="https://kit.fontawesome.com/fb67a05d46.js"
-      crossorigin="anonymous"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous" />
-    <!-- ===== CSS ===== -->
-    <link
-      rel="stylesheet"
-      href="/css/search.css" />
-    <link
-      rel="stylesheet"
-      href="/css/navb.css" />
-    <link
-      rel="stylesheet"
-      href="/css/searchPro.css" />
-  </head>
-  <body>
-    <!-- مكان الرسائل -->
-    <div
-      id="toast"
-      class="toast"></div>
-    <h1>Gestion des Produits</h1>
-    <div class="search-bar">
-      <input
-        id="textSearch"
-        type="number"
-        name="text"
-        placeholder="Rechercher un produit..." />
-      <button
-        class="bb btn-danger"
-        id="searchBtn">
-        <i class="fa fa-search"></i> Rechercher
-      </button>
-      <button
-        class="bb btn btn-warning"
-        id="scanBtn">
-        <i class="fa fa-qrcode"></i> Scanner
-      </button>
-      <button
-        class="bb bg-success"
-        id="plus">
-        <i class="fa fa-plus"></i> new produit
-      </button>
-    </div>
-    <div
-      id="reader"
-      style="width: 300px; height: 300px; display: none; margin-top: 15px"></div>
-    <div
-      class="form-container"
-      id="productForm"
-      style="display: none">
-      <div class="form-group">
-        <label for="libelle">Libellé</label>
-        <input
-          readonly
-          type="text"
-          id="libelle"
-          placeholder="Libellé"
-          required />
-      </div>
-      <div class="form-group">
-        <label for="gencode">GenCode</label>
-        <input
-          readonly
-          type="number"
-          id="gencode"
-          placeholder="GenCode"
-          required />
-      </div>
-      <div class="form-group">
-        <label for="anpf">ANPF</label>
-        <input
-          readonly
-          type="number"
-          id="anpf"
-          placeholder="ANPF"
-          required />
-      </div>
-      <div class="form-group">
-        <label for="fournisseur">Fournisseur</label>
-        <input
-          readonly
-          type="text"
-          id="fournisseur"
-          placeholder="Fournisseur"
-          required />
-      </div>
-      <div
-        class="form-group"
-        style="display: none">
-        <label for="stock">Stock</label>
-        <input
-          readonly
-          type="text"
-          id="stock"
-          placeholder="Stock"
-          required />
-      </div>
-      <div class="form-group">
-        <label for="prix">Prix TTC</label>
-        <input
-          readonly
-          type="text"
-          id="prix"
-          placeholder="Prix TTC"
-          required />
-      </div>
-      <div class="form-group">
-        <label for="calcul">Sélectionnez ce que vous voulez calculer</label>
-        <select
-          id="calcul"
-          class="form-control"
-          style="background: palegoldenrod; font-weight: 700; text-align: center">
-          <option value="">-- Sélectionnez ce que vous voulez calculer --</option>
-          <option value="casquette">Casquette</option>
-          <option value="fondRayon">Fond Rayon</option>
-          <option value="reserve">Réserve</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="qteInven">Quantité</label>
-        <input
-          type="number"
-          id="qteInven"
-          placeholder="Quantité"
-          class="infor"
-          style="background: palegoldenrod"
-          required />
-      </div>
-      <div class="form-group">
-        <label for="adresse">Adresse</label>
-        <input
-          type="text"
-          id="adresse"
-          placeholder="Adresse"
-          class="infor"
-          style="background: palegoldenrod; font-weight: 700"
-          required />
-      </div>
-      <div class="form-group nameVendeur">
-        <label for="nameVendeur">Name Du Vendeur</label>
-        <input
-          type="password"
-          id="nameVendeur"
-          placeholder="Name Du...."
-          class="infor"
-          required />
-      </div>
-      <button id="ajouterBtn"><i class="fa fa-plus"></i> Ajouter au tableau</button>
-    </div>
-    <div class="form-container">
-      <label for="nomFichier">Name Du Vendeur</label>
-      <input
-        type="text"
-        id="nomFichier"
-        placeholder="Nom du fichier..."
-        readonly />
-      <button
-        class="bb"
-        onclick="exportToExcel()">
-        <i class="fa fa-file-excel"></i> Exporter en Excel
-      </button>
-      <button
-        class="btnRed"
-        onclick="clearTableVendeur()">
-        <i class="fa fa-trash"></i> Vider
-      </button>
-    </div>
-    <div class="search-bar">
-      <input
-        id="searchLocal"
-        type="text"
-        name="text"
-        placeholder="Rechercher un produit..." />
-    </div>
-    <table id="produitTable">
-      <thead></thead>
-      <tbody></tbody>
-    </table>
-    <div
-      id="paginationControls"
-      class="pagination"></div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#007bff" />
+        <title>Gestion des Produits</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+        <!-- ===== Boxicons CSS ===== -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script
+            src="https://kit.fontawesome.com/fb67a05d46.js"
+            crossorigin="anonymous"
+        ></script>
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+            crossorigin="anonymous"
+        />
+        <!-- ===== CSS ===== -->
+        <link rel="stylesheet" href="/css/search.css" />
+        <link rel="stylesheet" href="/css/navb.css" />
+        <link rel="stylesheet" href="/css/searchPro.css" />
+    </head>
+    <body>
+        <!-- From Uiverse.io by alexmaracinaru -->
+        <div class="card">
+            <div class="card-border-top"></div>
+            <div class="img">
+                <img src="https://i.postimg.cc/pyb8Mwf7/6419952.png" />
+            </div>
+            <span> Attention Produit Inexistant !!</span>
+            <p class="job">Produit non trouvé. 🛍</p>
+            <button onclick="fermerAffiche()">Fermer</button>
+        </div>
+        <!-- مكان الرسائل -->
+        <div id="toast" class="toast"></div>
+        <h1>Gestion des Produits</h1>
+        <div class="search-bar">
+            <input
+                id="textSearch"
+                type="number"
+                name="text"
+                placeholder="Rechercher un produit..."
+            />
+            <button class="bb btn-danger" id="searchBtn">
+                <i class="fa fa-search"></i> Rechercher
+            </button>
+            <button class="bb btn btn-warning" id="scanBtn">
+                <i class="fa fa-qrcode"></i> Scanner
+            </button>
+            <button class="bb bg-success" id="plus">
+                <i class="fa fa-plus"></i> new produit
+            </button>
+        </div>
+        <div
+            id="reader"
+            style="width: 300px; height: 300px; display: none; margin-top: 15px"
+        ></div>
+        <div class="form-container" id="productForm" style="display: none">
+            <div class="form-group">
+                <label for="libelle">Libellé</label>
+                <input
+                    readonly
+                    type="text"
+                    id="libelle"
+                    placeholder="Libellé"
+                    required
+                />
+            </div>
+            <div class="form-group">
+                <label for="gencode">GenCode</label>
+                <input
+                    readonly
+                    type="number"
+                    id="gencode"
+                    placeholder="GenCode"
+                    required
+                />
+            </div>
+            <div class="form-group">
+                <label for="anpf">ANPF</label>
+                <input
+                    readonly
+                    type="number"
+                    id="anpf"
+                    placeholder="ANPF"
+                    required
+                />
+            </div>
+            <div class="form-group">
+                <label for="fournisseur">Fournisseur</label>
+                <input
+                    readonly
+                    type="text"
+                    id="fournisseur"
+                    placeholder="Fournisseur"
+                    required
+                />
+            </div>
+            <div class="form-group" style="display: none">
+                <label for="stock">Stock</label>
+                <input
+                    readonly
+                    type="text"
+                    id="stock"
+                    placeholder="Stock"
+                    required
+                />
+            </div>
+            <div class="form-group">
+                <label for="prix">Prix TTC</label>
+                <input
+                    readonly
+                    type="text"
+                    id="prix"
+                    placeholder="Prix TTC"
+                    required
+                />
+            </div>
+            <div class="form-group">
+                <label for="calcul"
+                    >Sélectionnez ce que vous voulez calculer</label
+                >
+                <select
+                    id="calcul"
+                    class="form-control"
+                    style="
+                        background: palegoldenrod;
+                        font-weight: 700;
+                        text-align: center;
+                    "
+                >
+                    <option value="">
+                        -- Sélectionnez ce que vous voulez calculer --
+                    </option>
+                    <option value="casquette">Casquette</option>
+                    <option value="fondRayon">Fond Rayon</option>
+                    <option value="reserve">Réserve</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="qteInven">Quantité</label>
+                <input
+                    type="number"
+                    id="qteInven"
+                    placeholder="Quantité"
+                    class="infor"
+                    style="background: palegoldenrod"
+                    required
+                />
+            </div>
+            <div class="form-group">
+                <label for="adresse">Adresse</label>
+                <input
+                    type="text"
+                    id="adresse"
+                    placeholder="Adresse"
+                    class="infor"
+                    style="background: palegoldenrod; font-weight: 700"
+                    required
+                />
+            </div>
+            <div class="form-group nameVendeur">
+                <label for="nameVendeur">Name Du Vendeur</label>
+                <input
+                    type="password"
+                    id="nameVendeur"
+                    placeholder="Name Du...."
+                    class="infor"
+                    required
+                />
+            </div>
+            <button id="ajouterBtn">
+                <i class="fa fa-plus"></i> Ajouter au tableau
+            </button>
+        </div>
+        <div class="form-container">
+            <label for="nomFichier">Name Du Vendeur</label>
+            <input
+                type="text"
+                id="nomFichier"
+                placeholder="Nom du fichier..."
+                readonly
+            />
+            <button class="bb" onclick="exportToExcel()">
+                <i class="fa fa-file-excel"></i> Exporter en Excel
+            </button>
+            <button class="btnRed" onclick="clearTableVendeur()">
+                <i class="fa fa-trash"></i> Vider
+            </button>
+        </div>
+        <div class="search-bar">
+            <input
+                id="searchLocal"
+                type="text"
+                name="text"
+                placeholder="Rechercher un produit..."
+            />
+        </div>
+        <table id="produitTable">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+        <div id="paginationControls" class="pagination"></div>
 
-    <!--nav FAB Button -->
-    <div class="containeer">
-      <div class="menu-toggle">
-        <span class="fa fa-plus"></span>
-      </div>
-      <div class="menu-round">
-        <div
-          class="btn-app"
-          data-label="Devis Gerflex">
-          <a href="calc"></a>
-          <div class="fa">
-            <a href="calc"
-              ><i
-                class="fas fa-calculator"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="Album">
-          <a href="Album"></a>
-          <div class="fa">
-            <a href="Album"
-              ><i
-                class="fas fa-file-image"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="Déconnexion">
-          <a href="logout"></a>
-          <div class="fa">
-            <a href="logout"
-              ><i
-                class="fas fa-sign-out-alt"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-      </div>
+        <!--nav FAB Button -->
+        <div class="containeer">
+            <div class="menu-toggle">
+                <span class="fa fa-plus"></span>
+            </div>
+            <div class="menu-round">
+                <div class="btn-app" data-label="Devis Gerflex">
+                    <a href="calc"></a>
+                    <div class="fa">
+                        <a href="calc"
+                            ><i
+                                class="fas fa-calculator"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Album">
+                    <a href="Album"></a>
+                    <div class="fa">
+                        <a href="Album"
+                            ><i
+                                class="fas fa-file-image"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Déconnexion">
+                    <a href="logout"></a>
+                    <div class="fa">
+                        <a href="logout"
+                            ><i
+                                class="fas fa-sign-out-alt"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+            </div>
 
-      <div class="menu-line">
-        <div
-          class="btn-app"
-          data-label="Devis Parquet">
-          <a href="devis"></a>
-          <div class="fa">
-            <a href="devis"
-              ><i
-                class="fas fa-file-invoice"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label=" Trouver un produit avec photo">
-          <a href="searchee"></a>
-          <div class="fa">
-            <a href="searchee"
-              ><i
-                class="fa-brands fa-google"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="Recherche Produits">
-          <a href="table"></a>
-          <div class="fa">
-            <a href="table"
-              ><i
-                class="fas fa-search"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="InvSmart Manager">
-          <a href="InvSmartManager"></a>
-          <div class="fa">
-            <a href="InvSmartManager"
-              ><i
-                class="far fa-file-excel"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <!--         <div
+            <div class="menu-line">
+                <div class="btn-app" data-label="Devis Parquet">
+                    <a href="devis"></a>
+                    <div class="fa">
+                        <a href="devis"
+                            ><i
+                                class="fas fa-file-invoice"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div
+                    class="btn-app"
+                    data-label=" Trouver un produit avec photo"
+                >
+                    <a href="searchee"></a>
+                    <div class="fa">
+                        <a href="searchee"
+                            ><i
+                                class="fa-brands fa-google"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Recherche Produits">
+                    <a href="table"></a>
+                    <div class="fa">
+                        <a href="table"
+                            ><i class="fas fa-search" style="color: white"></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="InvSmart Manager">
+                    <a href="InvSmartManager"></a>
+                    <div class="fa">
+                        <a href="InvSmartManager"
+                            ><i
+                                class="far fa-file-excel"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <!--         <div
           class="btn-app"
           data-label="Inventaire Fournisseurs"
         > <a href="inventaire"></a>
@@ -313,247 +313,251 @@
             ></a>
           </div>
         </div> -->
+                <div class="btn-app" data-label="Recherche Code">
+                    <a href="serchCode"></a>
+                    <div class="fa">
+                        <a href="serchCode"
+                            ><i
+                                class="fas fa-question-circle"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Prix Vente">
+                    <a href="prixVen"></a>
+                    <div class="fa">
+                        <a href="prixVen"
+                            ><i
+                                class="fas fa-cash-register"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--fin FAB Button -->
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <p>هل أنت متأكد أنك تريد حذف هذا المنتج؟</p>
+                <div class="modal-actions">
+                    <button id="confirmYes" class="btn btn-danger">نعم</button>
+                    <button id="confirmNo" class="btn btn-secondary">
+                        إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loader -->
+        <!-- From Uiverse.io by paesjr -->
+
+        <!-- 🧾 نافذة تعديل المنتج -->
+        <!-- ✅ نافذة تعديل المنتج -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <h3>
+                    <i class="fas fa-pen-to-square text-primary"></i> تعديل
+                    المنتج
+                </h3>
+
+                <div class="form-group">
+                    <label><i class="fas fa-box text-info"></i> Libellé</label>
+                    <input
+                        type="text"
+                        id="editName"
+                        class="edit-input"
+                        readonly
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label
+                        ><i class="fas fa-barcode text-secondary"></i>
+                        GenCode</label
+                    >
+                    <input
+                        type="text"
+                        id="editBarcode"
+                        class="edit-input"
+                        readonly
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label
+                        ><i class="fas fa-hashtag text-warning"></i> Anpf</label
+                    >
+                    <input
+                        type="text"
+                        id="editAnpf"
+                        class="edit-input"
+                        readonly
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label
+                        ><i class="fas fa-truck text-success"></i>
+                        Fournisseur</label
+                    >
+                    <input
+                        type="text"
+                        id="editFour"
+                        class="edit-input"
+                        readonly
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label
+                        ><i class="fas fa-tag text-danger"></i> Prix TTC</label
+                    >
+                    <input
+                        type="number"
+                        id="editPrice"
+                        class="edit-input"
+                        readonly
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label
+                        ><i class="fas fa-calculator text-primary"></i>
+                        Sélectionnez le type de calcul</label
+                    >
+                    <select
+                        id="editCalcul"
+                        class="form-control"
+                        style="
+                            border: solid 1px #000;
+                            text-align: center;
+                            background: palegoldenrod;
+                            font-weight: 700;
+                        "
+                    >
+                        <option value="">-- Sélectionnez une option --</option>
+                        <option value="casquette">🧢 Casquette</option>
+                        <option value="fondRayon">📦 Fond Rayon</option>
+                        <option value="reserve">🏣 Réserver</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label
+                        ><i class="fas fa-boxes-stacked text-warning"></i>
+                        Quantité Inventaire</label
+                    >
+                    <input
+                        type="number"
+                        id="editQteInven"
+                        class="edit-input"
+                        style="background: palegoldenrod; font-weight: 700"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label
+                        ><i class="fas fa-location-dot text-danger"></i>
+                        Adresse</label
+                    >
+                    <input
+                        type="text"
+                        id="editAdresse"
+                        class="edit-input"
+                        style="background: palegoldenrod; font-weight: 700"
+                        required
+                    />
+                </div>
+
+                <input type="hidden" id="editId" />
+
+                <div class="modal-actions">
+                    <button onclick="saveProductChanges()" class="bb">
+                        <i class="fa fa-save"></i> حفظ التغييرات
+                    </button>
+                    <button onclick="closeEditModal()" class="btnRed">
+                        <i class="fa fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ تنسيق المودال -->
+
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <p>هل أنت متأكد أنك تريد حذف هذا المنتج؟</p>
+                <div class="modal-actions">
+                    <button id="confirmYes" class="btn btn-danger">نعم</button>
+                    <button id="confirmNo" class="btn btn-secondary">
+                        إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!--- ______fin code nav bar_________  -->
+        <!-- خلفية تغطي الشاشة -->
         <div
-          class="btn-app"
-          data-label="Recherche Code">
-          <a href="serchCode"></a>
-          <div class="fa">
-            <a href="serchCode"
-              ><i
-                class="fas fa-question-circle"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="Prix Vente">
-          <a href="prixVen"></a>
-          <div class="fa">
-            <a href="prixVen"
-              ><i
-                class="fas fa-cash-register"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--fin FAB Button -->
-    <div
-      id="confirmModal"
-      class="modal">
-      <div class="modal-content">
-        <p>هل أنت متأكد أنك تريد حذف هذا المنتج؟</p>
-        <div class="modal-actions">
-          <button
-            id="confirmYes"
-            class="btn btn-danger">
-            نعم
-          </button>
-          <button
-            id="confirmNo"
-            class="btn btn-secondary">
-            إلغاء
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Loader -->
-    <!-- From Uiverse.io by paesjr -->
-
-    <!-- 🧾 نافذة تعديل المنتج -->
-    <!-- ✅ نافذة تعديل المنتج -->
-    <div
-      id="editModal"
-      class="modal">
-      <div class="modal-content">
-        <h3><i class="fas fa-pen-to-square text-primary"></i> تعديل المنتج</h3>
-
-        <div class="form-group">
-          <label><i class="fas fa-box text-info"></i> Libellé</label>
-          <input
-            type="text"
-            id="editName"
-            class="edit-input"
-            readonly />
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-barcode text-secondary"></i> GenCode</label>
-          <input
-            type="text"
-            id="editBarcode"
-            class="edit-input"
-            readonly />
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-hashtag text-warning"></i> Anpf</label>
-          <input
-            type="text"
-            id="editAnpf"
-            class="edit-input"
-            readonly />
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-truck text-success"></i> Fournisseur</label>
-          <input
-            type="text"
-            id="editFour"
-            class="edit-input"
-            readonly />
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-tag text-danger"></i> Prix TTC</label>
-          <input
-            type="number"
-            id="editPrice"
-            class="edit-input"
-            readonly />
-        </div>
-
-        <div class="form-group">
-          <label
-            ><i class="fas fa-calculator text-primary"></i> Sélectionnez le type de calcul</label
-          >
-          <select
-            id="editCalcul"
-            class="form-control"
+            id="passwordOverlay"
             style="
-              border: solid 1px #000;
-              text-align: center;
-              background: palegoldenrod;
-              font-weight: 700;
-            ">
-            <option value="">-- Sélectionnez une option --</option>
-            <option value="casquette">🧢 Casquette</option>
-            <option value="fondRayon">📦 Fond Rayon</option>
-            <option value="reserve">🏣 Réserver</option>
-          </select>
+                position: fixed;
+                inset: 0;
+                background: rgb(128, 120, 120);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            "
+        >
+            <div
+                style="
+                    background: white;
+                    padding: 25px;
+                    border-radius: 10px;
+                    width: 80%;
+                    margin: 0 auto;
+                    text-align: center;
+                    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+                "
+            >
+                <h3>🔐 Accès protégé</h3>
+                <p>Veuillez entrer le mot de passe :</p>
+                <input
+                    id="passwordInput"
+                    type="password"
+                    style="
+                        width: 100%;
+                        padding: 10px;
+                        margin: 10px 0;
+                        border-radius: 8px;
+                        border: 1px solid #aaa;
+                    "
+                />
+                <button
+                    onclick="submitPassword()"
+                    style="
+                        padding: 10px;
+                        width: 100%;
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                    "
+                >
+                    Entrer
+                </button>
+
+                <p id="errorMsg" style="color: red; margin-top: 10px"></p>
+            </div>
         </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-boxes-stacked text-warning"></i> Quantité Inventaire</label>
-          <input
-            type="number"
-            id="editQteInven"
-            class="edit-input"
-            style="background: palegoldenrod; font-weight: 700"
-            required />
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-location-dot text-danger"></i> Adresse</label>
-          <input
-            type="text"
-            id="editAdresse"
-            class="edit-input"
-            style="background: palegoldenrod; font-weight: 700"
-            required />
-        </div>
-
-        <input
-          type="hidden"
-          id="editId" />
-
-        <div class="modal-actions">
-          <button
-            onclick="saveProductChanges()"
-            class="bb">
-            <i class="fa fa-save"></i> حفظ التغييرات
-          </button>
-          <button
-            onclick="closeEditModal()"
-            class="btnRed">
-            <i class="fa fa-times"></i> إلغاء
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ✅ تنسيق المودال -->
-
-    <div
-      id="confirmModal"
-      class="modal">
-      <div class="modal-content">
-        <p>هل أنت متأكد أنك تريد حذف هذا المنتج؟</p>
-        <div class="modal-actions">
-          <button
-            id="confirmYes"
-            class="btn btn-danger">
-            نعم
-          </button>
-          <button
-            id="confirmNo"
-            class="btn btn-secondary">
-            إلغاء
-          </button>
-        </div>
-      </div>
-    </div>
-    <!--- ______fin code nav bar_________  -->
-    <!-- خلفية تغطي الشاشة -->
-    <div
-      id="passwordOverlay"
-      style="
-        position: fixed;
-        inset: 0;
-        background: rgb(128, 120, 120);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-      ">
-      <div
-        style="
-          background: white;
-          padding: 25px;
-          border-radius: 10px;
-          width: 80%;
-          margin: 0 auto;
-          text-align: center;
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        ">
-        <h3>🔐 Accès protégé</h3>
-        <p>Veuillez entrer le mot de passe :</p>
-        <input
-          id="passwordInput"
-          type="password"
-          style="
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #aaa;
-          " />
-        <button
-          onclick="submitPassword()"
-          style="
-            padding: 10px;
-            width: 100%;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-          ">
-          Entrer
-        </button>
-
-        <p
-          id="errorMsg"
-          style="color: red; margin-top: 10px"></p>
-      </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="js/codebar.min.js"></script>
-    <script src="js/searchPro.js"></script>
-    <script src="js/main2.js"></script>
-  </body>
+        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="js/codebar.min.js"></script>
+        <script src="js/searchPro.js"></script>
+        <script src="js/main2.js"></script>
+    </body>
 </html>

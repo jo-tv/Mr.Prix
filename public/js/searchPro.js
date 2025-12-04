@@ -99,7 +99,7 @@ async function loadProductsFromDatabase() {
         Date.now() - Number(cacheTime) < 30 * 60 * 1000
     ) {
         const products = JSON.parse(cached);
-products.reverse().forEach(addProductToTable); // ✅ بدون تخريب الكاش
+        products.reverse().forEach(addProductToTable); // ✅ بدون تخريب الكاش
         showToast("✅ Produits chargés depuis le cache", "success");
         return;
     }
@@ -196,6 +196,7 @@ async function searchProduct() {
             document.getElementById("prix").value = "Inexistant";
             document.getElementById("nameVendeur").value =
                 localStorage.nameVendeur || "";
+            document.querySelector(".card").style.display = "block";
             return;
         }
 
@@ -219,6 +220,10 @@ async function searchProduct() {
             "warning"
         );
     }
+}
+
+function fermerAffiche(){
+  document.querySelector(".card").style.display = "none"
 }
 
 // ====================
@@ -279,42 +284,41 @@ async function addProduct() {
     // إذا كل شيء صحيح، يمكن إرسال البيانات
 
     try {
-    const response = await fetch("/api/inventairePro", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product)
-    });
+        const response = await fetch("/api/inventairePro", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(product)
+        });
 
-    if (!response.ok) throw new Error("Échec de l'ajout du produit");
+        if (!response.ok) throw new Error("Échec de l'ajout du produit");
 
-    const addedProduct = await response.json();
+        const addedProduct = await response.json();
 
-    document.getElementById("productForm").style.display = "none";
+        document.getElementById("productForm").style.display = "none";
 
-    // 🔹 إضافة المنتج مباشرة إلى الجدول
-    addProductToTable(addedProduct);
+        // 🔹 إضافة المنتج مباشرة إلى الجدول
+        addProductToTable(addedProduct);
 
-    // 🔹 تحديث الكاش محليًا
-    const nameVendeur = localStorage.getItem("nameVendeur");
-    const cacheKey = `products_${nameVendeur}`;
-    const cached = localStorage.getItem(cacheKey);
-    let products = cached ? JSON.parse(cached) : [];
+        // 🔹 تحديث الكاش محليًا
+        const nameVendeur = localStorage.getItem("nameVendeur");
+        const cacheKey = `products_${nameVendeur}`;
+        const cached = localStorage.getItem(cacheKey);
+        let products = cached ? JSON.parse(cached) : [];
 
-    products.push(addedProduct); // إضافة المنتج الجديد
-    localStorage.setItem(cacheKey, JSON.stringify(products));
-    localStorage.setItem(cacheKey + "_time", Date.now());
+        products.push(addedProduct); // إضافة المنتج الجديد
+        localStorage.setItem(cacheKey, JSON.stringify(products));
+        localStorage.setItem(cacheKey + "_time", Date.now());
 
-    clearForm();
+        clearForm();
 
-    showToast("✅ Produit 🛍️ ajouté et cache mis à jour", "success");
-    document.getElementById("textSearch").focus();
-} catch (error) {
-    console.error("Error adding product:", error);
-    showToast(
-        "❌ Une erreur est survenue lors de l'ajout du produit",
-        "error"
-    );
-
+        showToast("✅ Produit 🛍️ ajouté et cache mis à jour", "success");
+        document.getElementById("textSearch").focus();
+    } catch (error) {
+        console.error("Error adding product:", error);
+        showToast(
+            "❌ Une erreur est survenue lors de l'ajout du produit",
+            "error"
+        );
     } finally {
         // 🔹 إعادة تفعيل الزر بعد انتهاء العملية
         ajouterBtn.disabled = false;

@@ -1,62 +1,62 @@
 #editModal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: rgba(0, 0, 0, 0.8);
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
 }
 
 #editModal .modal-content {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
-  width: 100%;
-  max-width: 450px;
-  padding: 20px;
-  text-align: center;
-  animation: fadeIn 0.3s ease-in-out;
-  max-height: 90vh;
-  overflow-y: auto;
-  margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 0 auto;
 }
 
 #editModal h3 {
-  text-align: center;
-  color: #007bff;
-  margin-bottom: 15px;
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 15px;
 }
 
 #editModal .form-group {
-  margin-bottom: 12px;
+    margin-bottom: 12px;
 }
 
 #editModal label {
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 5px;
-  color: #333;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+    color: #333;
 }
 
 #editModal .edit-input,
 #editModal select {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
 }
 
 #editModal .modal-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 #editModal .bb,
@@ -64,122 +64,194 @@
 #btnRed,
 #editModal .btnBlue,
 #btnBlue {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-  transition: all 0.2s ease;
-  margin: 10px auto !important;
-  color: gold !important;
-  box-shadow:
-    rgba(0, 0, 0, 0.25) 0px 54px 55px,
-    rgba(0, 0, 0, 0.12) 0px -12px 30px,
-    rgba(0, 0, 0, 0.12) 0px 4px 6px,
-    rgba(0, 0, 0, 0.17) 0px 12px 13px,
-    rgba(0, 0, 0, 0.09) 0px -3px 5px !important;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    margin: 10px auto !important;
+    color: gold !important;
+    box-shadow:
+        rgba(0, 0, 0, 0.25) 0px 54px 55px,
+        rgba(0, 0, 0, 0.12) 0px -12px 30px,
+        rgba(0, 0, 0, 0.12) 0px 4px 6px,
+        rgba(0, 0, 0, 0.17) 0px 12px 13px,
+        rgba(0, 0, 0, 0.09) 0px -3px 5px !important;
 }
 
 #editModal .bb {
-  background: #007bff;
-  color: #fff;
-  margin: 10px 0;
+    background: #007bff;
+    color: #fff;
+    margin: 10px 0;
 }
 
 #editModal .bb:hover {
-  background: #0056b3;
+    background: #0056b3;
 }
 
 #editModal .btnRed {
-  background: #dc3545;
-  color: #fff;
+    background: #dc3545;
+    color: #fff;
 }
 
 #editModal .btnRed:hover {
-  background: #b52a36;
+    background: #b52a36;
 }
 
 @media (max-width: 600px) {
-  #editModal .modal-content {
-    max-width: 90%;
-    padding: 15px;
-    font-size: 14px;
-  }
+    #editModal .modal-content {
+        max-width: 90%;
+        padding: 15px;
+        font-size: 14px;
+    }
 
-  #editModal .bb,
-  #editModal .btnRed {
-    width: 90%;
-  }
+    #editModal .bb,
+    #editModal .btnRed {
+        width: 90%;
+    }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .pagination {
-  margin-top: 15px;
-  text-align: center;
-  display: flex !important;
-  flex-direction: row-reverse !important;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+    margin-top: 15px;
+    text-align: center;
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .pagination button {
-  padding: 6px 12px;
-  margin: 3px;
-  border: 1px solid #ddd;
-  color: #000;
-  background: #f4f4f4;
-  cursor: pointer;
-  border-radius: 5px;
-  width: 50px;
+    padding: 6px 12px;
+    margin: 3px;
+    border: 1px solid #ddd;
+    color: #000;
+    background: #f4f4f4;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 50px;
 }
 
 .pagination button:hover {
-  background: #ddd;
+    background: #ddd;
 }
 
 .pagination .active-page {
-  background: #007bff;
-  color: #fff;
-  font-weight: bold;
+    background: #007bff;
+    color: #fff;
+    font-weight: bold;
 }
 #paginationControls {
-  text-align: center;
-  margin-top: 10px;
-  font-size: 16px;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 16px;
 }
 
 #paginationControls button {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  margin: 0 5px;
-  cursor: pointer;
-  border-radius: 6px;
-  background: #f5f5f5;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 6px;
+    background: #f5f5f5;
 }
 
 #paginationControls button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 #paginationControls span {
-  font-weight: bold;
+    font-weight: bold;
 }
 input {
-  border: solid 2px #1a85b6;
-  border-radius: 10px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
+    border: solid 2px #1a85b6;
+    border-radius: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+/* From Uiverse.io by alexmaracinaru */
+.card {
+  display: none;
+    width: 250px;
+    height: 324px;
+    background: #3405a3;
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99999;
+}
+
+.card .card-border-top {
+    width: 60%;
+    height: 3%;
+    background: #6b64f3;
+    margin: auto;
+    border-radius: 0px 0px 15px 15px;
+}
+
+.card span {
+    font-weight: 900;
+    color: #deb7b7;
+    text-align: center;
+    display: block;
+    padding-top: 10px;
+    margin-bottom: 10px;
+    font-size: 22px;
+}
+
+.card .job {
+    font-weight: 600;
+    color: white;
+    display: block;
+    text-align: center;
+    padding-top: 3px;
+    font-size: 17px;
+}
+
+.card .img {
+    width: 70px;
+    height: 80px;
+    background: #6b64f3;
+    border-radius: 15px;
+    margin: auto;
+    margin-top: 25px;
+}
+
+.card .img img {
+    width: 100%;
+    height: 100%;
+}
+
+.card button {
+    padding: 8px 25px;
+    display: block;
+    margin: auto;
+    border-radius: 8px;
+    border: none;
+    margin-top: 30px;
+    background: #6b64f3;
+    color: white;
+    font-weight: 600;
+}
+
+.card button:hover {
+    background: #534bf3;
 }
