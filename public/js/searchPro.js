@@ -99,7 +99,7 @@ async function loadProductsFromDatabase() {
         Date.now() - Number(cacheTime) < 30 * 60 * 1000
     ) {
         const products = JSON.parse(cached);
-        [...products].reverse().forEach(addProductToTable); // ✅ بدون تخريب الكاش
+products.reverse().forEach(addProductToTable); // ✅ بدون تخريب الكاش
         showToast("✅ Produits chargés depuis le cache", "success");
         return;
     }
