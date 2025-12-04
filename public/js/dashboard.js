@@ -1076,12 +1076,16 @@ document
         "click",
         () => (window.location.href = "#produitInexistant")
     );
+const menuToggle = document.querySelector('.menu-toggle');
+const menuRound = document.querySelector('.menu-round');
+const menuLines = document.querySelectorAll('.menu-line');
 
-$(".menu-toggle").click(function () {
-    $(".menu-toggle").toggleClass("open");
-    $(".menu-round").toggleClass("open");
-    $(".menu-line").toggleClass("open");
+menuToggle.addEventListener('click', () => {
+  menuToggle.classList.toggle('open');
+  menuRound.classList.toggle('open');
+  menuLines.forEach(line => line.classList.toggle('open'));
 });
+
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker

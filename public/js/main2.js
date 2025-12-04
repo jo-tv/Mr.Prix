@@ -1,9 +1,14 @@
 // ==================== MENU ====================
-$('.menu-toggle').click(function () {
-  $('.menu-toggle').toggleClass('open');
-  $('.menu-round').toggleClass('open');
-  $('.menu-line').toggleClass('open');
+const menuToggle = document.querySelector('.menu-toggle');
+const menuRound = document.querySelector('.menu-round');
+const menuLines = document.querySelectorAll('.menu-line');
+
+menuToggle.addEventListener('click', () => {
+  menuToggle.classList.toggle('open');
+  menuRound.classList.toggle('open');
+  menuLines.forEach(line => line.classList.toggle('open'));
 });
+
 
 // ==================== GLOBALS ====================
 let PASSWORDS = {};

@@ -276,11 +276,16 @@ window.addEventListener('load', function () {
   loader.style.display = 'none';
 });
 
-$('.menu-toggle').click(function () {
-  $('.menu-toggle').toggleClass('open');
-  $('.menu-round').toggleClass('open');
-  $('.menu-line').toggleClass('open');
+const menuToggle = document.querySelector('.menu-toggle');
+const menuRound = document.querySelector('.menu-round');
+const menuLines = document.querySelectorAll('.menu-line');
+
+menuToggle.addEventListener('click', () => {
+  menuToggle.classList.toggle('open');
+  menuRound.classList.toggle('open');
+  menuLines.forEach(line => line.classList.toggle('open'));
 });
+
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js')

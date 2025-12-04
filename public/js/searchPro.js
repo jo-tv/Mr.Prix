@@ -716,4 +716,9 @@ showToast('❌ حدث خطأ أثناء حذف المنتج', 'error');
 showToast('⚠️ المرجو إدخال اسم البائع أولاً', 'warning');
 showToast('ℹ️ جارٍ تحميل المنتجات...', 'info');
 
-
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+        .register("/service-worker.js")
+        .then(() => console.log("Service Worker registered"))
+        .catch(err => console.error("SW registration failed:", err));
+}

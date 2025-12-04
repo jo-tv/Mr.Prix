@@ -473,7 +473,7 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
     }
 
-    const passwordMatch = bcrypt.compareSync(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       return res.status(401).json({ message: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
     }
