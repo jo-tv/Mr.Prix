@@ -39,17 +39,30 @@ app.set("views", path.join(__dirname, "views"));
 app.use(compression());
 
 // الاتصال بقاعدة البيانات MongoDB مع تفعيل ضغط zlib
+
+let isConnected = false;
+
 async function connectDB() {
+    if (isConnected) {
+        return;
+    }
+
     try {
         await mongoose.connect(process.env.MONGO_URI, {
-            compressors: "zlib", // تفعيل ضغط البيانات
-            socketTimeoutMS: 30000, // زيادة مهلة الاتصال
-            connectTimeoutMS: 30000
+            maxPoolSize: 25, // عدد الاتصالات المتزامنة
+            minPoolSize: 5, // أقل عدد اتصالات دائمًا مفتوح
+            socketTimeoutMS: 30000,
+            connectTimeoutMS: 30000,
+            serverSelectionTimeoutMS: 30000,
+            compressors: "zlib",
+            bufferCommands: false // يمنع تراكم الطلبات أثناء انقطاع الاتصال
         });
-        console.log("✅ تم الاتصال بقاعدة البيانات MongoDB");
+
+        isConnected = true;
+        console.log("✅ MongoDB Connected Successfully");
     } catch (err) {
-        console.error("❌ فشل الاتصال بـ MongoDB:", err);
-        process.exit(1); // إيقاف السيرفر إذا فشل الاتصال
+        console.error("❌ MongoDB Connection Failed:", err);
+        process.exit(1);
     }
 }
 
