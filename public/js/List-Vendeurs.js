@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderPagination();
   } catch (err) {
     console.error(err);
-    container.innerHTML = `<div class="alert alert-danger text-center">Erreur lors du chargement</div>`;
+    container.innerHTML = `<div class="alert alert-danger text-center">Erreur lors du chargement${err}</div>`;
   }
 
   // ===================== 🔍 البحث =====================
@@ -116,51 +116,85 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ===================== 🔢 Pagination =====================
   function renderPagination() {
-    paginationContainer.innerHTML = '';
+  paginationContainer.innerHTML = '';
 
-    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-    if (totalPages <= 1) return;
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  if (totalPages <= 1) return;
 
-    let html = `
-      <nav>
-        <ul class="pagination justify-content-center">
+  const maxVisible = 5; // عدد الأرقام الظاهرة فقط
+  let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+  let end = start + maxVisible - 1;
 
-          <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <button class="page-link" data-page="${currentPage - 1}">Précédent</button>
-          </li>
-    `;
-
-    for (let i = 1; i <= totalPages; i++) {
-      html += `
-        <li class="page-item ${i === currentPage ? 'active' : ''}">
-          <button class="page-link" data-page="${i}">${i}</button>
-        </li>
-      `;
-    }
-
-    html += `
-          <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <button class="page-link" data-page="${currentPage + 1}">Suivant</button>
-          </li>
-
-        </ul>
-      </nav>
-    `;
-
-    paginationContainer.innerHTML = html;
-
-    // click events
-    paginationContainer.querySelectorAll('[data-page]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const page = Number(btn.getAttribute('data-page'));
-        if (!isNaN(page)) {
-          currentPage = page;
-          renderPage();
-          renderPagination();
-        }
-      });
-    });
+  if (end > totalPages) {
+    end = totalPages;
+    start = Math.max(1, end - maxVisible + 1);
   }
+
+  let html = `
+    <nav>
+      <ul class="pagination justify-content-center">
+
+        <!-- زر الرجوع صفحة -->
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <button class="page-link" data-page="${currentPage - 1}">◀</button>
+        </li>
+
+        <!-- زر الرجوع السريع -->
+        ${start > 1 ? `
+          <li class="page-item">
+            <button class="page-link" data-page="1">1</button>
+          </li>
+          <li class="page-item disabled">
+            <span class="page-link">...</span>
+          </li>
+        ` : ''}
+  `;
+
+  // الأرقام المحدودة
+  for (let i = start; i <= end; i++) {
+    html += `
+      <li class="page-item ${i === currentPage ? 'active' : ''}">
+        <button class="page-link" data-page="${i}">${i}</button>
+      </li>
+    `;
+  }
+
+  // زر التقدم السريع
+  if (end < totalPages) {
+    html += `
+      <li class="page-item disabled">
+        <span class="page-link">...</span>
+      </li>
+      <li class="page-item">
+        <button class="page-link" data-page="${totalPages}">${totalPages}</button>
+      </li>
+    `;
+  }
+
+  html += `
+        <!-- زر التقدم صفحة -->
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <button class="page-link" data-page="${currentPage + 1}">▶</button>
+        </li>
+
+      </ul>
+    </nav>
+  `;
+
+  paginationContainer.innerHTML = html;
+
+  // الأحداث
+  paginationContainer.querySelectorAll('[data-page]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const page = Number(btn.getAttribute('data-page'));
+      if (!isNaN(page) && page >= 1 && page <= totalPages) {
+        currentPage = page;
+        renderPage();
+        renderPagination();
+      }
+    });
+  });
+}
 });
 
 // 🔹 عرض منتجات البائع مع Pagination (50 صف لكل صفحة)

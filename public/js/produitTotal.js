@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             p.prix || 0,
             p.qteInven || 0,
             p.adresse || '',
-            p.nameVendeur || '',
+            p.nameVendeur.split('@')[0] || '',
             p.calcul || '',
             p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : '',
           ]);

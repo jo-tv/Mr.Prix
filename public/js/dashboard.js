@@ -497,11 +497,16 @@ async function initDashboard() {
             requestAnimationFrame(step);
         }
 
-        async function initExtraAdressTable() {
+        async function initExtraAdressTable(extraList) {
             if (!q("#extraAdressTable")) return;
-            if ($.fn.DataTable.isDataTable("#extraAdressTable"))
+
+            // إذا الجدول موجود مسبقًا، احذفه أولًا
+            if ($.fn.DataTable.isDataTable("#extraAdressTable")) {
                 $("#extraAdressTable").DataTable().clear().destroy();
-            $("#extraAdressTable").DataTable({
+            }
+
+            // تهيئة DataTable فارغ
+            const table = $("#extraAdressTable").DataTable({
                 dom: "Bflrtip",
                 buttons: [
                     {
@@ -511,16 +516,58 @@ async function initDashboard() {
                     },
                     { extend: "print", text: "🖨️ Imprimer" }
                 ],
+                paging: true,
                 pageLength: 10,
+                lengthChange: true,
                 lengthMenu: [
                     [5, 10, 20, 50, -1],
                     [5, 10, 20, 50, "Tout"]
                 ],
+                pagingType: "full_numbers",
                 language: {
                     url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
-                },
-                pagingType: "full_numbers"
+                }
             });
+
+            // إضافة الصفوف مباشرة للـ DataTable
+            extraList.forEach(item => {
+                const d = new Date(item.lastDate);
+                const formatted =
+                    d.getFullYear() +
+                    "-" +
+                    String(d.getMonth() + 1).padStart(2, "0") +
+                    "-" +
+                    String(d.getDate()).padStart(2, "0") +
+                    " " +
+                    String(d.getHours()).padStart(2, "0") +
+                    ":" +
+                    String(d.getMinutes()).padStart(2, "0") +
+                    ":" +
+                    String(d.getSeconds()).padStart(2, "0");
+
+                table.row.add([
+                    `<span class="badge bg-primary p-2 w-100">${esc(
+                        item.adresse
+                    )}</span>`,
+                    `<span class="badge bg-success p-2 w-100">${esc(
+                        (item.vendeur || "").toUpperCase().split("@")[0]
+                    )}</span>`,
+                    `<span class="badge bg-danger p-2 w-100">Adresse inconnue</span>`,
+                    `<span class="badge bg-primary p-2 w-100">${formatted}</span>`,
+                    `<span class="badge bg-primary p-2 w-100">${item.count}</span>`
+                ]);
+            });
+
+            // رسم الصفوف بعد الإضافة
+            table.draw();
+
+            // تحديث عدد العناصر في الواجهة
+            qId("extraCount") &&
+                (qId("extraCount").innerText = extraList.length);
+
+            // إضافة تأثير إذا هناك بيانات
+            if (extraList.length > 0)
+                q(".refe")?.classList.add("jello-vertical");
         }
 
         // openAdressModal + fillAdressTableAsync
@@ -650,15 +697,37 @@ async function initDashboard() {
                 .join("");
             if ($.fn.dataTable && $.fn.dataTable.isDataTable("#sharedTable"))
                 $("#sharedTable").DataTable().clear().destroy();
-            $("#sharedTable").DataTable({
-                pageLength: 5,
-                responsive: true,
-                lengthMenu: [5, 10, 25],
-                language: {
-                    url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
-                },
-                pagingType: "full_numbers"
-            });
+            $(document).ready(function () {
+    const table = $("#sharedTable").DataTable({
+        dom: "Bflrtip", // ✅ هذا ضروري لعرض الأزرار
+
+        buttons: [
+            {
+                extend: "excelHtml5",
+                text: "📥 Télécharger Excel",
+                title: "Shared_Table"
+            },
+            {
+                extend: "print",
+                text: "🖨️ Imprimer"
+            }
+        ],
+
+        pageLength: 5,
+        responsive: true,
+
+        lengthMenu: [5, 10, 25],
+
+        pagingType: "full_numbers",
+
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
+        }
+    });
+
+    // ✅ أحيانًا ضروري لإظهار الأزرار في المكان الصحيح
+    table.buttons().container().appendTo('#sharedTable_wrapper .col-md-6:eq(0)');
+});
         })();
 
         // fill shared type table
@@ -1002,7 +1071,7 @@ async function initDashboard() {
             );
 
             const extra = getExtraAdresses(produits, jsonAdrs);
-            fillExtraAdressTable(extra);
+            initExtraAdressTable(extra); // كل شيء يعمل مباشرة
         })();
 
         function getExtraAdresses(dbProducts, jsonAddresses) {
@@ -1076,16 +1145,15 @@ document
         "click",
         () => (window.location.href = "#produitInexistant")
     );
-const menuToggle = document.querySelector('.menu-toggle');
-const menuRound = document.querySelector('.menu-round');
-const menuLines = document.querySelectorAll('.menu-line');
+const menuToggle = document.querySelector(".menu-toggle");
+const menuRound = document.querySelector(".menu-round");
+const menuLines = document.querySelectorAll(".menu-line");
 
-menuToggle.addEventListener('click', () => {
-  menuToggle.classList.toggle('open');
-  menuRound.classList.toggle('open');
-  menuLines.forEach(line => line.classList.toggle('open'));
+menuToggle.addEventListener("click", () => {
+    menuToggle.classList.toggle("open");
+    menuRound.classList.toggle("open");
+    menuLines.forEach(line => line.classList.toggle("open"));
 });
-
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker
