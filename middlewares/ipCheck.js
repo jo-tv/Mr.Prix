@@ -9,10 +9,13 @@ function ipCheck(req, res, next) {
     // ✅ إزالة ::ffff: في حال وجودها (مهم جدًا في الاستضافات)
     userIP = userIP.replace("::ffff:", "");
 
-    
-
     // ✅ البادئات المسموح بها
-    const allowedIPs = ["127.0.0.1", "127.0.0.", "10.50.223.", "154.144.255.","192.168.98."];
+    const allowedIPs = [
+        "127.0.0.1",
+        "127.0.0.",
+        "10.50.223.",
+        "154.144.255."
+    ];
 
     function isIPAllowed(userIP) {
         if (userIP === "::1") userIP = "127.0.0.1";
