@@ -1,6 +1,5 @@
 node_modules/
 .env
-.env2
 /index1.js
 /views/vendeur/affiche2.html
 /views/responsable/upload.html 1
