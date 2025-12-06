@@ -207,21 +207,41 @@ async function insertInBatches(data, batchSize = 20000) {
 app.post("/process-cloudinary-file", isAuthenticated, async (req, res) => {
     try {
         const { url } = req.body;
+
         if (!url) {
             console.warn("⚠️ لم يتم إرسال رابط الملف");
-            return res
-                .status(400)
-                .json({ error: "❌ لم يتم إرسال رابط الملف" });
+            return res.status(400).json({ error: "❌ لم يتم إرسال رابط الملف" });
         }
 
         console.log("🌐 تحميل الملف من Cloudinary:", url);
 
-        // 🔹 تنزيل الملف من Cloudinary مباشرة
+        /* ------------------------------------------------------------------ */
+        /* ✅ 1️⃣ حذف جميع ملفات Excel القديمة قبل المعالجة */
+        /* ------------------------------------------------------------------ */
+        const resources = await cloudinary.api.resources({
+            type: "upload",
+            prefix: "excel_files/"
+        });
+
+        const publicIds = resources.resources.map(r => r.public_id);
+
+        if (publicIds.length > 0) {
+            await cloudinary.api.delete_resources(publicIds);
+            console.log(`🧹 تم حذف ${publicIds.length} ملف Excel قديم`);
+        } else {
+            console.log("✅ لا توجد ملفات قديمة للحذف");
+        }
+
+        /* ------------------------------------------------------------------ */
+        /* ✅ 2️⃣ تحميل الملف الجديد من Cloudinary */
+        /* ------------------------------------------------------------------ */
         const response = await axios.get(url, { responseType: "arraybuffer" });
         const buffer = Buffer.from(response.data);
         console.log("✅ تم تحميل الملف من Cloudinary");
 
-        // 🔹 قراءة بيانات Excel
+        /* ------------------------------------------------------------------ */
+        /* ✅ 3️⃣ قراءة ملف Excel */
+        /* ------------------------------------------------------------------ */
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.load(buffer);
         console.log("📖 تم فتح ملف Excel بنجاح");
@@ -232,70 +252,53 @@ app.post("/process-cloudinary-file", isAuthenticated, async (req, res) => {
         const jsonData = [];
         const columns = [];
 
-        // قراءة رؤوس الأعمدة
         worksheet.getRow(1).eachCell((cell, colNumber) => {
             columns[colNumber] = cell.value;
         });
 
-        // قراءة البيانات من الصفوف التالية
         worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
             if (rowNumber === 1) return;
             const rowData = {};
+
             row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
                 const key = columns[colNumber];
                 if (key) rowData[key] = cell.value?.toString() || "";
             });
+
             jsonData.push(rowData);
         });
 
         if (jsonData.length === 0) {
             console.warn("⚠️ الملف لا يحتوي على بيانات!");
-            return res
-                .status(400)
-                .json({ error: "❌ لا توجد بيانات داخل الملف" });
+            return res.status(400).json({ error: "❌ لا توجد بيانات داخل الملف" });
         }
 
         console.log(`📦 تم استخراج ${jsonData.length} صف من ملف Excel`);
 
-        // 🔹 حذف البيانات القديمة
+        /* ------------------------------------------------------------------ */
+        /* ✅ 4️⃣ تفريغ قاعدة البيانات القديمة */
+        /* ------------------------------------------------------------------ */
         await Product.deleteMany({});
         console.log("🧹 تم حذف البيانات القديمة من MongoDB");
 
-        // 🔹 إدخال البيانات الجديدة
+        /* ------------------------------------------------------------------ */
+        /* ✅ 5️⃣ إدخال البيانات الجديدة */
+        /* ------------------------------------------------------------------ */
         await insertInBatches(jsonData);
 
         console.log(`✅ تم حفظ ${jsonData.length} منتج في MongoDB بنجاح`);
 
         res.json({
-            message: `✅ تم معالجة الملف وحفظ ${jsonData.length} منتج في MongoDB`
+            message: `✅ تم معالجة الملف وحفظ ${jsonData.length} منتج في MongoDB`,
+            deletedFiles: publicIds.length
         });
+
     } catch (err) {
         console.error("❌ خطأ أثناء معالجة الملف:", err.message);
         res.status(500).json({
             error: "❌ حدث خطأ أثناء المعالجة",
             details: err.message
         });
-    }
-});
-
-app.post("/clear-old-files", isAuthenticated, async (req, res) => {
-    try {
-        // استدعاء Cloudinary API لحذف الملفات القديمة
-        const resources = await cloudinary.api.resources({
-            type: "upload",
-            prefix: "excel_files/"
-        });
-        const publicIds = resources.resources.map(r => r.public_id);
-
-        if (publicIds.length > 0) {
-            await cloudinary.api.delete_resources(publicIds);
-            console.log(`🧹 تم حذف ${publicIds.length} ملف قديم`);
-        }
-
-        res.json({ message: "✅ تم حذف الملفات القديمة" });
-    } catch (err) {
-        console.error("❌ خطأ في حذف الملفات القديمة:", err.message);
-        res.status(500).json({ error: err.message });
     }
 });
 
@@ -936,7 +939,8 @@ app.get("/api/InventaireRaw", async (req, res) => {
         if (search) {
             query.$or = [
                 { libelle: { $regex: search, $options: "i" } },
-                { gencode: { $regex: search, $options: "i" } }
+                { gencode: { $regex: search, $options: "i" } },
+                { anpf: { $regex: search, $options: "i" } }
             ];
         }
 
