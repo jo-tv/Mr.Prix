@@ -828,16 +828,14 @@ app.get("/api/InventaireRaw", async (req, res) => {
 
         // البحث فقط في libelle و gencode
         if (search) {
-            query = {
-                $or: [
-                    { libelle: { $regex: search, $options: "i" } },
-                    { gencode: { $regex: search, $options: "i" } },
-                    { anpf: { $regex: search, $options: "i" } },
-                    { adresse: { $regex: search, $options: "i" } },
-                    { calcul: { $regex: search, $options: "i" } },
-                    { nameVendeur: { $regex: search, $options: "i" } }
-                ]
-            };
+            query.$or = [
+                { libelle: { $regex: search, $options: "i" } },
+                { gencode: { $regex: search, $options: "i" } },
+                { anpf: { $regex: search, $options: "i" } },
+                { adresse: { $regex: search, $options: "i" } },
+                { nameVendeur: { $regex: search, $options: "i" } },
+                { calcul: { $regex: search, $options: "i" } }
+            ];
         }
 
         const total = await Inventaire.countDocuments(query);
