@@ -12,34 +12,53 @@ const http = require("http");
 const axios = require("axios");
 const rateLimit = require("express-rate-limit");
 const agent = new http.Agent({ keepAlive: true });
-
 const { v2: cloudinary } = require("cloudinary");
-
+// ===============================================
 // استدعاء نموذج المستخدم - تأكد من المسار الصحيح
+// ===============================================
 const User = require("./models/user.js");
 const Inventaire = require("./models/Inventaire.js");
 const PagePasswords = require("./models/PagePasswords.js");
-const ipCheck = require("./models/ipCheck.js");
-
+const ipCheck = require("./middlewares/ipCheck.js");
+const {
+    isAuthenticated,
+    isResponsable,
+    isVendeur
+} = require("./middlewares/auth");
+// ===============================================
 const app = express();
 const PORT = process.env.PORT || 5000;
+// ===============================================
 // وضع الـ Middleware قبل أي Route تريد حمايته
-
-app.set("trust proxy", true); // ✅ ضروري جدًا للاستضافة
-
+// ===============================================
 app.use(ipCheck); // قبل الراوتات
-
+// ===============================================
 // إعداد EJS كـ view engine
 app.set("view engine", "ejs");
-
+// ===============================================
 // إعداد مسار الـ views
+// ===============================================
 app.set("views", path.join(__dirname, "views"));
-
+// ===============================================
 // تفعيل ضغط GZIP لتحسين الأداء
+// ===============================================
 app.use(compression());
+// ===============================================
+// إعدادات استضافة الملفات الثابتة
+// ===============================================
+app.use(express.static(path.join(__dirname, "public")));
 
+app.use(
+    express.static("public", {
+        extensions: ["html"],
+        index: false // يمنع التحميل التلقائي للـ index.html
+    })
+);
+
+app.use(express.static("public"));
+// ===============================================
 // الاتصال بقاعدة البيانات MongoDB مع تفعيل ضغط zlib
-
+// ===============================================
 let isConnected = false;
 
 async function connectDB() {
@@ -65,29 +84,33 @@ async function connectDB() {
         process.exit(1);
     }
 }
-
+// ===============================================
 // استدعاء الاتصال عند بدء السيرفر
+// ===============================================
 connectDB();
+// ===============================================
+// ✅ إعداد آمن مع البروكسي
+// ===============================================
 
-// إعدادات استضافة الملفات الثابتة
-app.use(express.static(path.join(__dirname, "public")));
-
-app.use(
-    express.static("public", {
-        extensions: ["html"],
-        index: false // يمنع التحميل التلقائي للـ index.html
-    })
-);
-app.use(express.static("public"));
+app.set("trust proxy", 1);
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false
 });
 
-app.use("/api", limiter);
+app.use(limiter);
 
+app.use("/api", limiter);
+// ===============================================
+// صفحة رفع الملفات للمسؤول
+// ===============================================
+const indexRoutes = require("./routes/index.routes");
+// ===============================================
 // تمكين استقبال بيانات POST (form data و json) مع تحديد حدود الحجم
+// ===============================================
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.json({ limit: "10mb" }));
 
@@ -109,78 +132,19 @@ app.use(
         }
     })
 );
-// ====================================
-// التحقق من أن المستخدم مسجل الدخول
-// ====================================
-function isAuthenticated(req, res, next) {
-    // هل توجد جلسة وفيها بيانات المستخدم؟
-    if (req.session && req.session.user) {
-        return next();
-    }
 
-    // إذا لم يكن مسجلاً الدخول:
-    // إذا كان الطلب من المتصفح مباشرة (مثل كتابة الرابط في العنوان)
-    if (req.headers.accept && req.headers.accept.includes("text/html")) {
-        return res.redirect("/login"); // تحويل إلى صفحة تسجيل الدخول
-    }
-
-    // إذا كان الطلب من JavaScript (fetch أو AJAX)
-    return res.status(401).json({ error: "يجب تسجيل الدخول" });
-}
-// ====================================
-// التحقق من أن المستخدم مسؤول (responsable)
-// ====================================
-function isResponsable(req, res, next) {
-    // التأكد أن المستخدم موجود وأنه من نوع "responsable"
-    if (req.session.user && req.session.user.role === "responsable") {
-        return next();
-    }
-
-    // غير مسموح: إما ليس مسجلاً أو ليس مسؤولاً
-    if (req.headers.accept && req.headers.accept.includes("text/html")) {
-        return res.redirect("/login");
-    }
-
-    return res.status(403).json({ error: "هذه الصفحة مخصصة للمسؤول فقط" });
-}
-// ====================================
-// التحقق من أن المستخدم بائع (vendeur)
-// ====================================
-function isVendeur(req, res, next) {
-    // التأكد أن المستخدم موجود وأنه من نوع "vendeur"
-    if (req.session.user && req.session.user.role === "vendeur") {
-        return next();
-    }
-
-    // غير مسموح: إما ليس مسجلاً أو ليس بائعاً
-    if (req.headers.accept && req.headers.accept.includes("text/html")) {
-        return res.redirect("/login");
-    }
-
-    return res.status(403).json({ error: "هذه الصفحة مخصصة للبائع فقط" });
-}
-// ====================================
-// ميدلوير نهائي للتعامل مع حالات الرفض (إن وُجد)
-// ====================================
-app.use((req, res, next) => {
-    if (req.rejectedAccess) {
-        return res.status(403).json({ error: "هذه الصفحة مخصصة للمسؤول فقط" });
-    }
-    next();
-});
-
-// ===================
+// ===============================================
 // إعداد Cloudinary
-// ===================
+// ===============================================
 cloudinary.config({
     cloud_name: "dvvknaxx6",
     api_key: "955798727236253",
     api_secret: "Art43qa10C8-3pOliHqiV92JbHw"
 });
 
-// ===================
+// ===============================================
 // نموذج ديناميكي
-// ===================
+// ===============================================
 const productSchema = new mongoose.Schema(
     {},
     {
@@ -190,9 +154,9 @@ const productSchema = new mongoose.Schema(
 );
 const Product = mongoose.model("Product", productSchema);
 
-// ===================
+// ===============================================
 // دالة إدخال دفعات
-// ===================
+// ===============================================
 async function insertInBatches(data, batchSize = 20000) {
     for (let i = 0; i < data.length; i += batchSize) {
         const batch = data.slice(i, i + batchSize);
@@ -201,16 +165,18 @@ async function insertInBatches(data, batchSize = 20000) {
     }
 }
 
-// ===================
+// ===============================================
 // مسار معالجة ملف Cloudinary
-// ===================
+// ===============================================
 app.post("/process-cloudinary-file", isAuthenticated, async (req, res) => {
     try {
         const { url } = req.body;
 
         if (!url) {
             console.warn("⚠️ لم يتم إرسال رابط الملف");
-            return res.status(400).json({ error: "❌ لم يتم إرسال رابط الملف" });
+            return res
+                .status(400)
+                .json({ error: "❌ لم يتم إرسال رابط الملف" });
         }
 
         console.log("🌐 تحميل الملف من Cloudinary:", url);
@@ -270,7 +236,9 @@ app.post("/process-cloudinary-file", isAuthenticated, async (req, res) => {
 
         if (jsonData.length === 0) {
             console.warn("⚠️ الملف لا يحتوي على بيانات!");
-            return res.status(400).json({ error: "❌ لا توجد بيانات داخل الملف" });
+            return res
+                .status(400)
+                .json({ error: "❌ لا توجد بيانات داخل الملف" });
         }
 
         console.log(`📦 تم استخراج ${jsonData.length} صف من ملف Excel`);
@@ -292,7 +260,6 @@ app.post("/process-cloudinary-file", isAuthenticated, async (req, res) => {
             message: `✅ تم معالجة الملف وحفظ ${jsonData.length} منتج في MongoDB`,
             deletedFiles: publicIds.length
         });
-
     } catch (err) {
         console.error("❌ خطأ أثناء معالجة الملف:", err.message);
         res.status(500).json({
@@ -302,15 +269,18 @@ app.post("/process-cloudinary-file", isAuthenticated, async (req, res) => {
     }
 });
 
+// ===============================================
 // API لخدمة DataTables server-side
+// ===============================================
 app.post("/api/products", isAuthenticated, async (req, res) => {
     const draw = Number(req.body.draw);
     const start = Number(req.body.start);
     const length = Number(req.body.length);
     const searchValue = req.body.search?.value || "";
     const fournisseurFilter = req.body.fournisseur || "";
-
+    // ===============================================
     // بناء شرط البحث العام (searchValue) على عدة حقول
+    // ===============================================
     const searchQuery = searchValue
         ? {
               $or: [
@@ -324,8 +294,9 @@ app.post("/api/products", isAuthenticated, async (req, res) => {
               ]
           }
         : {};
-
+    // ===============================================
     // بناء شرط فلترة المورد (fournisseurFilter) — نبحث عنه في حقل المورد فقط
+    // ===============================================
     const fournisseurQuery = fournisseurFilter
         ? { FOURNISSEUR_P: { $regex: fournisseurFilter, $options: "i" } }
         : {};
@@ -335,10 +306,10 @@ app.post("/api/products", isAuthenticated, async (req, res) => {
         ...searchQuery,
         ...fournisseurQuery
     };
-
+    // ===============================================
     // ملاحظة: دمج الشرطين بهذه الطريقة يعني أن جميع الشروط يجب أن تتحقق (AND)
     // إذا أردت أن يكون المنطق OR بين الشرطين، يلزم تعديل الكود.
-
+    // ===============================================
     try {
         const recordsTotal = await Product.countDocuments({});
         const recordsFiltered = await Product.countDocuments(query);
@@ -356,8 +327,9 @@ app.post("/api/products", isAuthenticated, async (req, res) => {
         res.status(500).json({ error: "حدث خطأ في الخادم" });
     }
 });
-
+// ===============================================
 // نقطة البحث في قاعدة بيانات المنتجات (API)
+// ===============================================
 app.get("/api/search", isAuthenticated, async (req, res) => {
     const { q } = req.query;
     if (!q) return res.status(400).send("يرجى إرسال كلمة للبحث");
@@ -379,8 +351,9 @@ app.get("/api/search", isAuthenticated, async (req, res) => {
         res.status(500).send("حدث خطأ أثناء البحث");
     }
 });
-
+// ===============================================
 // GET /api/produit/:code → جلب السعر حسب GENCOD_P
+// ===============================================
 app.get("/api/Produit/:code", isAuthenticated, async (req, res) => {
     try {
         const code = req.params.code;
@@ -401,8 +374,9 @@ app.get("/api/Produit/:code", isAuthenticated, async (req, res) => {
         res.status(500).json({ message: "Erreur serveur" });
     }
 });
-
+// ======================================
 // نقطة بحث أخرى (معادلة لنقطة /api/search) إن أردت
+// ======================================
 app.get("/search", isAuthenticated, async (req, res) => {
     const { q } = req.query;
     if (!q) return res.status(400).send("يرجى إرسال كلمة للبحث");
@@ -423,8 +397,9 @@ app.get("/search", isAuthenticated, async (req, res) => {
         res.status(500).send("حدث خطأ أثناء البحث");
     }
 });
-
+// ======================================
 // نقطة تسجيل مستخدم جديد
+// ======================================
 app.post("/register", async (req, res) => {
     const { username, password, role } = req.body;
 
@@ -454,14 +429,16 @@ app.post("/register", async (req, res) => {
         res.status(500).send("فشل في التسجيل");
     }
 });
-
+// ======================================
 // معالجة بيانات تسجيل الدخول
+// ======================================
 const loginAttempts = {}; // تخزين مؤقت للمحاولات
 
 const MAX_ATTEMPTS = 4;
 const BLOCK_DURATION = 15 * 60 * 1000; // 15 دقيقة
-
+// ======================================
 // Middleware: الحد من المحاولات
+// ======================================
 const loginRateLimiter = (req, res, next) => {
     const { username } = req.body;
     if (!username) {
@@ -492,8 +469,9 @@ const loginRateLimiter = (req, res, next) => {
 
     next();
 };
-
+// ======================================
 // زيادة المحاولات عند الفشل
+// ======================================
 const registerFailedAttempt = username => {
     const now = Date.now();
     if (!loginAttempts[username]) {
@@ -503,13 +481,15 @@ const registerFailedAttempt = username => {
         loginAttempts[username].lastAttempt = now;
     }
 };
-
+// ======================================
 // إعادة تعيين المحاولات عند النجاح
+// ======================================
 const resetAttempts = username => {
     delete loginAttempts[username];
 };
-
+// ======================================
 // مسار تسجيل الدخول
+// ======================================
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -545,16 +525,18 @@ app.post("/login", async (req, res) => {
         return res.status(500).json({ message: "حدث خطأ أثناء تسجيل الدخول" });
     }
 });
-
+// ======================================
 // جلب بيانات الدور الحالي للمستخدم
+// ======================================
 app.get("/get-role", isAuthenticated, (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: "غير مصرح" });
     }
     res.json({ role: req.session.user.role });
 });
-
+// ======================================
 // صفحة تسجيل الدخول (إذا كان مسجلاً يتم منعه من الدخول إليها)
+// =====================================
 app.get("/login", (req, res) => {
     // إذا كان مسجلاً بالفعل، أعد توجيهه حسب دوره
     if (req.session && req.session.user) {
@@ -564,8 +546,9 @@ app.get("/login", (req, res) => {
     }
     res.sendFile(path.join(__dirname, "views/login-register/login.html"));
 });
-
+// ======================================
 // صفحة التسجيل (نفس منطق صفحة تسجيل الدخول)
+// ======================================
 app.get("/tassgile", (req, res) => {
     if (req.session && req.session.user) {
         return res.redirect(
@@ -575,118 +558,14 @@ app.get("/tassgile", (req, res) => {
     res.sendFile(path.join(__dirname, "views/login-register/register.html"));
 });
 
-// ===================
-// الصفحة الرئيسية الخاصة بالمسؤول
-// ===================
-
-app.get("/", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/index.html"));
-});
-
-// صفحة الأسعار الخاصة بالمسؤول
-app.get("/prix", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/index.html"));
-});
-
-// صفحة رفع الملفات للمسؤول
-app.get("/upload", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/upload.html"));
-});
-
-app.get("/cmd", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/search.html"));
-});
-
-app.get("/CHERCHER", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/CHERCHER.html"));
-});
-
-app.get("/galerie", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/galerie.html"));
-});
-
-app.get("/totalProduit", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/produitCumil.html")); // ✅ صفحة فارغة مؤقتاً
-});
-
-app.get("/infoPassPage", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/info.html")); // ✅ صفحة فارغة مؤقتاً
-});
-
-app.get("/pageUser", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/pageUser.html")); // ✅ صفحة فارغة مؤقتاً
-});
-
-app.get("/dashboard", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/dashboard.html")); // ✅ صفحة فارغة مؤقتاً
-});
-
-app.get("/listVendeurs", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/List-Vendeurs.html")); // ✅ صفحة فارغة مؤقتاً
-});
-
-app.get("/produitTotal", isAuthenticated, isResponsable, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/responsable/produitTotal.html")); // ✅ صفحة فارغة مؤقتاً
-});
-// ===================
+// ===============================================
 //fin الصفحة الرئيسية الخاصة بالمسؤول
-// ===================
+// ===============================================
+app.use("/", indexRoutes);
 
-// ===================
-// صفحة الأسعار الخاصة بالبائع
-// ===================
-
-app.get("/prixVen", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/prixVen.html"));
-});
-
-app.get("/serchCode", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/searchCode.html"));
-});
-
-app.get("/inventaire", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/inventaire.html"));
-});
-
-app.get("/inventaire2", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/inventaire2.html"));
-});
-
-app.get("/Album", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/Album.html"));
-});
-
-app.get("/table", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/chercher.html"));
-});
-
-app.get("/chart", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/chercher.html"));
-});
-
-app.get("/calc", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/calc.html"));
-});
-
-app.get("/devis", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/Devis.html"));
-});
-
-app.get("/affiche", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/affiche.html"));
-});
-
-// إضافة نقطة GET لعرض البيانات في صفحة HTML
-app.get("/InvSmartManager", isAuthenticated, isVendeur, (req, res) => {
-    res.sendFile(path.join(__dirname, "views/vendeur/inventairePro.html")); // ✅ صفحة فارغة مؤقتاً
-});
-// ================================
-//fin صفحة الأسعار الخاصة بالبائع
-// =================================
-
-// ===================
+// ===============================================
 // تسجيل الخروج وتدمير الجلسة
-// ===================
+// ===============================================
 
 app.get("/logout", (req, res) => {
     req.session.destroy(() => {
@@ -694,10 +573,12 @@ app.get("/logout", (req, res) => {
     });
 });
 
-// ===================
+// ===============================================
 // API لاستقبال المنتجات وحفظها في قاعدة البيانات
-// ===================
+// ===============================================
+// ===============================================
 // 🔹 ملخص البائعين
+// ===============================================
 app.get("/api/inventairePro", isAuthenticated, async (req, res) => {
     try {
         const result = await Inventaire.aggregate([
@@ -727,7 +608,7 @@ app.get("/api/inventairePro", isAuthenticated, async (req, res) => {
         });
     }
 });
-
+// ===============================================
 app.post("/api/inventairePro", isAuthenticated, async (req, res) => {
     try {
         const productData = req.body;
@@ -738,8 +619,9 @@ app.post("/api/inventairePro", isAuthenticated, async (req, res) => {
         res.status(500).send({ message: "Error saving product", error });
     }
 });
-
+// ===============================================
 // 🔹 جلب منتجات بائع مع Pagination
+// ===============================================
 app.get("/api/inventairePro/:vendeur", isAuthenticated, async (req, res) => {
     try {
         const { page, limit } = req.query;
@@ -788,8 +670,9 @@ app.get("/api/inventairePro/:vendeur", isAuthenticated, async (req, res) => {
         });
     }
 });
-
+// ===============================================
 // GET /api/dashboard
+// ===============================================
 app.get("/api/inventaireProo", isAuthenticated, async (req, res) => {
     try {
         const { nameVendeur } = req.query;
@@ -809,7 +692,9 @@ app.get("/api/inventaireProo", isAuthenticated, async (req, res) => {
         res.status(500).send({ message: "Error loading products", error });
     }
 });
+// ===============================================
 // GET /api/inventairePro?nameVendeur=xxx
+// ===============================================
 app.get("/api/inventaireProoo", isAuthenticated, async (req, res) => {
     const { nameVendeur } = req.query;
 
@@ -837,7 +722,9 @@ app.get("/api/inventaireProoo", isAuthenticated, async (req, res) => {
         res.status(500).json({ error: "Erreur serveur interne" });
     }
 });
+// ===============================================
 // تنظيف النصوص لإنشاء مفتاح موثوق للدمج
+// ===============================================
 function cleanKey(value) {
     if (!value) return "";
     return String(value)
@@ -845,8 +732,9 @@ function cleanKey(value) {
         .toLowerCase()
         .replace(/[^a-z0-9]/g, "");
 }
-
+// ===============================================
 // دمج المنتجات وحساب mergeCount وecar
+// ===============================================
 function mergeProducts(produits) {
     const map = {};
 
@@ -878,7 +766,9 @@ function mergeProducts(produits) {
 
     return Object.values(map);
 }
-
+// ===============================================
+// GET Raw Inventaire (مع دمج)
+// ===============================================
 app.get("/api/ProduitsTotal", isAuthenticated, async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -923,8 +813,9 @@ app.get("/api/ProduitsTotal", isAuthenticated, async (req, res) => {
         res.status(500).json({ message: "Erreur serveur" });
     }
 });
-
+// ===============================================
 // GET Raw Inventaire (بدون دمج)
+// ===============================================
 app.get("/api/InventaireRaw", async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -971,8 +862,9 @@ app.get("/api/InventaireRaw", async (req, res) => {
 // --------------------------------------
 //   // get data to excel
 // --------------------------------------
-
+// ===============================================
 // ✅ دالة عامة لتوليد ملف Excel لأي بائع
+// ===============================================
 async function exportExcelByVendeur(nameVendeur, res) {
     try {
         const produits = await Inventaire.find({ nameVendeur }).sort({
@@ -1061,13 +953,15 @@ async function exportExcelByVendeur(nameVendeur, res) {
         res.status(500).send({ message: "Erreur lors de l'export Excel", err });
     }
 }
-
+// ===============================================
 // ✅ المسار العام لتصدير ملف Excel لأي بائع
+// ===============================================
 app.get("/api/exportExcel/:vendeur", isResponsable, async (req, res) => {
     await exportExcelByVendeur(req.params.vendeur, res);
 });
-
+// ===============================================
 // 🔹 دالة عامة لتصدير جميع البيانات
+// ===============================================
 async function exportAllProducts(res) {
     try {
         // ⚙️ إنشاء مصنف جديد
@@ -1138,8 +1032,9 @@ async function exportAllProducts(res) {
         });
     }
 }
-
+// ===============================================
 // 🔹 المسار العام لتصدير كل البيانات
+// ===============================================
 app.get("/api/exportExcel", isAuthenticated, async (req, res) => {
     await exportAllProducts(res);
 });
@@ -1147,8 +1042,9 @@ app.get("/api/exportExcel", isAuthenticated, async (req, res) => {
 // --------------------------------------
 // fin  // get data to excel
 // --------------------------------------
-
+// ===============================================
 //جلب جميع بيانات products
+// ===============================================
 app.get("/api/Produits", isAuthenticated, async (req, res) => {
     try {
         // جلب عدد المنتجات فقط
@@ -1165,8 +1061,9 @@ app.get("/api/Produits", isAuthenticated, async (req, res) => {
 // ========================================
 //   function delete/put/deleteAll  products
 // ========================================
-
+// ===============================================
 // API لتحديث منتج
+// ===============================================
 app.put("/api/inventairePro/:id", isAuthenticated, async (req, res) => {
     const { id } = req.params;
     try {
@@ -1182,8 +1079,9 @@ app.put("/api/inventairePro/:id", isAuthenticated, async (req, res) => {
         res.status(500).json({ message: "Error updating product", error });
     }
 });
-
+// ===============================================
 // حذف منتج
+// ===============================================
 app.delete("/api/inventairePro/:vendeur", isAuthenticated, async (req, res) => {
     try {
         const nameVendeur = req.params.vendeur;
@@ -1194,8 +1092,9 @@ app.delete("/api/inventairePro/:vendeur", isAuthenticated, async (req, res) => {
         res.status(500).send({ message: "Erreur lors de la suppression", err });
     }
 });
-
+// ===============================================
 // DELETE /api/inventairePro/:id
+// ===============================================
 const { ObjectId } = require("mongoose").Types;
 app.delete("/api/InvSmartManager/:id", isAuthenticated, async (req, res) => {
     try {
@@ -1234,8 +1133,9 @@ app.delete("/api/InvSmartManager/:id", isAuthenticated, async (req, res) => {
         });
     }
 });
-
+// ===============================================
 // ✅ مسح كل المنتجات من جميع المستخدمين
+// ===============================================
 app.delete("/api/inventairePro", isAuthenticated, async (req, res) => {
     try {
         const result = await Inventaire.deleteMany({});
@@ -1265,8 +1165,9 @@ app.delete("/api/inventairePro", isAuthenticated, async (req, res) => {
 // --------------------------------------
 app.get("/get-passwords", isAuthenticated, async (req, res) => {
     let data = await PagePasswords.findOne();
-
+    // ===============================================
     // لو لم توجد بيانات يتم إنشاء واحدة تلقائياً
+    // ===============================================
     if (!data) {
         data = new PagePasswords({
             pasPageUploade: "",
@@ -1322,7 +1223,9 @@ app.post(
 //  code shearch product to site web MR
 // ========================================
 const cors = require("cors");
+// ===============================================
 // حل fetch لجميع إصدارات Node
+// ===============================================
 const fetch = require("node-fetch");
 app.use(cors());
 
@@ -1419,3 +1322,4 @@ app.get("/api/searchee", isAuthenticated, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
+// ===============================================
