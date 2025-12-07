@@ -89,20 +89,6 @@ async function connectDB() {
 // استدعاء الاتصال عند بدء السيرفر
 // ===============================================
 connectDB();
-// ===============================================
-// ✅ إعداد آمن مع البروكسي
-// ===============================================
-
-app.set("trust proxy", 1);
-
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false
-});
-
-app.use(limiter);
 
 // ===============================================
 // صفحة رفع الملفات للمسؤول
@@ -121,7 +107,7 @@ app.use(
     session({
         secret: "secret-key",
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
         store: MongoStore.create({
             mongoUrl: process.env.MONGO_URI, // أو ضع الرابط مباشرة للتجربة
             collectionName: "sessions"
@@ -132,6 +118,41 @@ app.use(
         }
     })
 );
+
+// ===============================================
+// ✅ إعداد آمن مع البروكسي
+// ===============================================
+// Middleware لتشخيص IP والمستخدم
+app.use((req, res, next) => {
+    const ip =
+        req.headers["x-forwarded-for"]?.split(",")[0] ||
+        req.socket.remoteAddress;
+
+    // بيانات الجلسة
+    const sessionData = req.session || null;
+
+    // معلومات المستخدم من الجلسة إذا موجودة
+    const username = req.session?.user?.username || null;
+    const role = req.session?.user?.role || null;
+
+    next();
+});
+
+// Rate limiter مع fallback بين User ID و IP
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 دقائق
+  max: 300,
+  keyGenerator: (req) => req.session?.user?.sessionId || req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress || "local",
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    status: 429,
+    error: "لقد تجاوزت الحد الأقصى للطلبات.",
+    message: "لقد أرسلت الكثير من الطلبات في فترة قصيرة. يرجى الانتظار قليلاً قبل المحاولة مرة أخرى."
+  }
+});
+
+app.use(limiter);
 
 // ===============================================
 // إعداد Cloudinary
@@ -485,6 +506,8 @@ const resetAttempts = username => {
 // ======================================
 // مسار تسجيل الدخول
 // ======================================
+const { v4: uuidv4 } = require("uuid");
+
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -508,10 +531,14 @@ app.post("/login", async (req, res) => {
                 .json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
         }
 
-        // حفظ بيانات المستخدم في الجلسة
+        // إنشاء معرف فريد للجلسة لكل تسجيل دخول
+        const sessionId = uuidv4();
+
+        // حفظ بيانات المستخدم في الجلسة مع معرف فريد
         req.session.user = {
             username: user.username,
-            role: user.role
+            role: user.role,
+            sessionId // معرف فريد لكل جهاز/جلسة
         };
 
         return res.status(200).json({ message: "success" });
