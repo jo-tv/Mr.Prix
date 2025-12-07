@@ -1,237 +1,233 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      http-equiv="X-UA-Compatible"
-      content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=.7" />
-    <link
-      rel="manifest"
-      href="/manifest.json" />
-    <meta
-      name="theme-color"
-      content="#007bff" />
-    <title>DataTables - Search</title>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.bootstrap.min.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/select/1.3.1/css/select.bootstrap.min.css" />
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=.7" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#007bff" />
+        <title>DataTables - Search</title>
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.datatables.net/select/1.3.1/css/select.bootstrap.min.css"
+        />
 
-    <link
-      rel="stylesheet"
-      href="css/chercher.css" />
-    <link
-      rel="stylesheet"
-      href="css/navb.css" />
-    <link
-      href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css"
-      rel="stylesheet" />
-    <!-- ===== Boxicons CSS ===== -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script
-      src="https://kit.fontawesome.com/fb67a05d46.js"
-      crossorigin="anonymous"></script>
-  </head>
-  <body>
-    <!-- مكان الرسائل -->
-    <div
-      id="toast"
-      class="toast"></div>
-    <!-- partial:index.partial.html -->
-    <div class="content">
-      <div class="table-responsive-custom">
-        <!-- أزرار DataTable في صف علوي -->
-        <div
-          class="dt-buttons btn-group"
-          style="margin-bottom: 10px"></div>
+        <link rel="stylesheet" href="css/chercher.css" />
+        <link rel="stylesheet" href="css/navb.css" />
+        <link
+            href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css"
+            rel="stylesheet"
+        />
+        <!-- ===== Boxicons CSS ===== -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script
+            src="https://kit.fontawesome.com/fb67a05d46.js"
+            crossorigin="anonymous"
+        ></script>
+    </head>
+    <body>
+        <!-- مكان الرسائل -->
+        <div id="toast" class="toast"></div>
+        <!-- partial:index.partial.html -->
+        <div class="content">
+            <div class="table-responsive-custom">
+                <!-- أزرار DataTable في صف علوي -->
+                <div
+                    class="dt-buttons btn-group"
+                    style="margin-bottom: 10px"
+                ></div>
 
-        <!-- حقول البحث في صف تحت الأزرار، مع أيقونات داخل الحقول -->
-        <div
-          class="search-fields"
-          style="display: flex; align-items: center; margin-bottom: 20px; gap: 10px">
-          <div
-            class="search-box"
-            style="position: relative; flex: 1; max-width: 300px">
-            <input
-              type="text"
-              id="globalSearch"
-              placeholder="search...."
-              style="
-                width: 100%;
-                padding: 8px 30px 8px 10px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
-              " />
-            <i
-              class="fa fa-search"
-              style="
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: #aaa;
-                pointer-events: none;
-              "></i>
-          </div>
+                <!-- حقول البحث في صف تحت الأزرار، مع أيقونات داخل الحقول -->
+                <div
+                    class="search-fields"
+                    style="
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 20px;
+                        gap: 10px;
+                    "
+                >
+                    <div
+                        class="search-box"
+                        style="position: relative; flex: 1; max-width: 300px"
+                    >
+                        <input
+                            type="text"
+                            id="globalSearch"
+                            placeholder="search...."
+                            style="
+                                width: 100%;
+                                padding: 8px 30px 8px 10px;
+                                border-radius: 5px;
+                                border: 1px solid #ccc;
+                            "
+                        />
+                        <i
+                            class="fa fa-search"
+                            style="
+                                position: absolute;
+                                right: 10px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                color: #aaa;
+                                pointer-events: none;
+                            "
+                        ></i>
+                    </div>
 
-          <div
-            class="search-box"
-            style="position: relative; flex: 1; max-width: 300px">
-            <input
-              type="text"
-              id="fournisseurFilter"
-              placeholder="fournisseur...."
-              style="
-                width: 100%;
-                padding: 8px 30px 8px 10px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
-              " />
-            <i
-              class="fa fa-search"
-              style="
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: #aaa;
-                pointer-events: none;
-              "></i>
-          </div>
-          <button
-            class="btn btn-success"
-            id="searche">
-            Search
-          </button>
+                    <div
+                        class="search-box"
+                        style="position: relative; flex: 1; max-width: 300px"
+                    >
+                        <input
+                            type="text"
+                            id="fournisseurFilter"
+                            placeholder="fournisseur...."
+                            style="
+                                width: 100%;
+                                padding: 8px 30px 8px 10px;
+                                border-radius: 5px;
+                                border: 1px solid #ccc;
+                            "
+                        />
+                        <i
+                            class="fa fa-search"
+                            style="
+                                position: absolute;
+                                right: 10px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                color: #aaa;
+                                pointer-events: none;
+                            "
+                        ></i>
+                    </div>
+                    <button class="btn btn-success" id="searche">Search</button>
+                </div>
+                <table
+                    id="example"
+                    class="table table-striped table-bordered"
+                    cellspacing="0"
+                    width="100%"
+                >
+                    <thead>
+                        <tr>
+                            <th>LIBELLE</th>
+                            <th>GENCODE</th>
+                            <th>ANPF</th>
+                            <th>FOURNI</th>
+                            <th>REF-FOUR</th>
+                            <th>STOCK</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot></tfoot>
+                </table>
+            </div>
         </div>
-        <table
-          id="example"
-          class="table table-striped table-bordered"
-          cellspacing="0"
-          width="100%">
-          <thead>
-            <tr>
-              <th>LIBELLE</th>
-              <th>GENCODE</th>
-              <th>ANPF</th>
-              <th>FOURNI</th>
-              <th>REF-FOUR</th>
-              <th>STOCK</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-          <tfoot></tfoot>
-        </table>
-      </div>
-    </div>
-    <!--nav FAB Button -->
-    <div class="containeer">
-      <div class="menu-toggle">
-        <span class="fa fa-plus"></span>
-      </div>
-      <div class="menu-round">
-        <div
-          class="btn-app"
-          data-label="Devis Gerflex">
-          <a href="calc"></a>
-          <div class="fa">
-            <a href="calc"
-              ><i
-                class="fas fa-calculator"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="Album">
-          <a href="Album"></a>
-          <div class="fa">
-            <a href="Album"
-              ><i
-                class="fas fa-file-image"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="Déconnexion">
-          <a href="logout"></a>
-          <div class="fa">
-            <a href="logout"
-              ><i
-                class="fas fa-sign-out-alt"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-      </div>
+        <!--nav FAB Button -->
+        <div class="containeer">
+            <div class="menu-toggle">
+                <span class="fa fa-plus"></span>
+            </div>
+            <div class="menu-round">
+                <div class="btn-app" data-label="Devis Gerflex">
+                    <a href="calc"></a>
+                    <div class="fa">
+                        <a href="calc"
+                            ><i
+                                class="fas fa-calculator"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Album">
+                    <a href="Album"></a>
+                    <div class="fa">
+                        <a href="Album"
+                            ><i
+                                class="fas fa-file-image"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Déconnexion">
+                    <a href="logout"></a>
+                    <div class="fa">
+                        <a href="logout"
+                            ><i
+                                class="fas fa-sign-out-alt"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+            </div>
 
-      <div class="menu-line">
-        <div
-          class="btn-app"
-          data-label="Devis Parquet">
-          <a href="devis"></a>
-          <div class="fa">
-            <a href="devis"
-              ><i
-                class="fas fa-file-invoice"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label=" Trouver un produit avec photo">
-          <a href="searchee"></a>
-          <div class="fa">
-            <a href="searchee"
-              ><i
-                class="fa-brands fa-google"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="Recherche Produits">
-          <a href="table"></a>
-          <div class="fa">
-            <a href="table"
-              ><i
-                class="fas fa-search"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="InvSmart Manager">
-          <a href="InvSmartManager"></a>
-          <div class="fa">
-            <a href="InvSmartManager"
-              ><i
-                class="far fa-file-excel"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <!--         <div
+            <div class="menu-line">
+                <div class="btn-app" data-label="Devis Parquet">
+                    <a href="devis"></a>
+                    <div class="fa">
+                        <a href="devis"
+                            ><i
+                                class="fas fa-file-invoice"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div
+                    class="btn-app"
+                    data-label=" Trouver un produit avec photo"
+                >
+                    <a href="searchee"></a>
+                    <div class="fa">
+                        <a href="searchee"
+                            ><i
+                                class="fa-brands fa-google"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Recherche Produits">
+                    <a href="table"></a>
+                    <div class="fa">
+                        <a href="table"
+                            ><i class="fas fa-search" style="color: white"></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="InvSmart Manager">
+                    <a href="InvSmartManager"></a>
+                    <div class="fa">
+                        <a href="InvSmartManager"
+                            ><i
+                                class="far fa-file-excel"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <!--         <div
           class="btn-app"
           data-label="Inventaire Fournisseurs"
         > <a href="inventaire"></a>
@@ -244,89 +240,61 @@
             ></a>
           </div>
         </div> -->
-        <div
-          class="btn-app"
-          data-label="Recherche Code">
-          <a href="serchCode"></a>
-          <div class="fa">
-            <a href="serchCode"
-              ><i
-                class="fas fa-question-circle"
-                style="color: white"></i
-            ></a>
-          </div>
+                <div class="btn-app" data-label="Recherche Code">
+                    <a href="serchCode"></a>
+                    <div class="fa">
+                        <a href="serchCode"
+                            ><i
+                                class="fas fa-question-circle"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Prix Vente">
+                    <a href="prixVen"></a>
+                    <div class="fa">
+                        <a href="prixVen"
+                            ><i
+                                class="fas fa-cash-register"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div
-          class="btn-app"
-          data-label="Prix Vente">
-          <a href="prixVen"></a>
-          <div class="fa">
-            <a href="prixVen"
-              ><i
-                class="fas fa-cash-register"
-                style="color: white"></i
-            ></a>
-          </div>
+        <!--fin FAB Button -->
+
+        <!-- Loader -->
+        <!-- From Uiverse.io by paesjr -->
+        <div id="wifi-loader">
+            <svg viewBox="0 0 86 86" class="circle-outer">
+                <circle r="40" cy="43" cx="43" class="back"></circle>
+                <circle r="40" cy="43" cx="43" class="front"></circle>
+                <circle r="40" cy="43" cx="43" class="new"></circle>
+            </svg>
+            <svg viewBox="0 0 60 60" class="circle-middle">
+                <circle r="27" cy="30" cx="30" class="back"></circle>
+                <circle r="27" cy="30" cx="30" class="front"></circle>
+            </svg>
+
+            <div data-text="Loading..." class="text"></div>
         </div>
-      </div>
-    </div>
-    <!--fin FAB Button -->
 
-    <!-- Loader -->
-    <!-- From Uiverse.io by paesjr -->
-    <div id="wifi-loader">
-      <svg
-        viewBox="0 0 86 86"
-        class="circle-outer">
-        <circle
-          r="40"
-          cy="43"
-          cx="43"
-          class="back"></circle>
-        <circle
-          r="40"
-          cy="43"
-          cx="43"
-          class="front"></circle>
-        <circle
-          r="40"
-          cy="43"
-          cx="43"
-          class="new"></circle>
-      </svg>
-      <svg
-        viewBox="0 0 60 60"
-        class="circle-middle">
-        <circle
-          r="27"
-          cy="30"
-          cx="30"
-          class="back"></circle>
-        <circle
-          r="27"
-          cy="30"
-          cx="30"
-          class="front"></circle>
-      </svg>
-
-      <div
-        data-text="Loading..."
-        class="text"></div>
-    </div>
-
-    <!-- partial -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.colVis.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
-    <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
-    <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
-    <script src="js/chercher.js"></script>
-    <script src="js/table.js"></script>
-  </body>
+        <!-- partial -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.colVis.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.print.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+        <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
+        <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
+        <script src="js/chercher.js"></script>
+        <script src="js/table.js"></script>
+    </body>
 </html>
