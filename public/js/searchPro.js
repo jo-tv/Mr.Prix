@@ -222,8 +222,8 @@ async function searchProduct() {
     }
 }
 
-function fermerAffiche(){
-  document.querySelector(".card").style.display = "none"
+function fermerAffiche() {
+    document.querySelector(".card").style.display = "none";
 }
 
 // ====================
@@ -454,6 +454,7 @@ async function removeProduct(button) {
         localStorage.removeItem(
             `products_${localStorage.getItem("nameVendeur")}`
         );
+        window.location.reload();
     } catch (error) {
         console.error("Error deleting product:", error);
         showToast(
@@ -581,6 +582,7 @@ async function saveProductChanges() {
         localStorage.removeItem(
             `products_${localStorage.getItem("nameVendeur")}`
         );
+        window.location.reload();
     } catch (error) {
         console.error("Error updating product:", error);
         showToast("❌ error updating product", "error");

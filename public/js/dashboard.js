@@ -368,7 +368,7 @@ async function initDashboard() {
                             },
                             { extend: "print", text: "🖨️ Imprimer" }
                         ],
-                        pageLength: 10,
+                        pageLength: 5,
                         lengthMenu: [
                             [5, 10, 20, 50, -1],
                             [5, 10, 20, 50, "Tout"]
@@ -517,7 +517,7 @@ async function initDashboard() {
                     { extend: "print", text: "🖨️ Imprimer" }
                 ],
                 paging: true,
-                pageLength: 10,
+                pageLength: 5,
                 lengthChange: true,
                 lengthMenu: [
                     [5, 10, 20, 50, -1],
@@ -592,7 +592,7 @@ async function initDashboard() {
                     AdressDT = $("#adressTable").DataTable({
                         dom: "Blfrtip",
                         buttons: ["excelHtml5"],
-                        pageLength: 10,
+                        pageLength: 5,
                         lengthMenu: [5, 10, 20, 50, 100],
                         language: {
                             url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
@@ -752,14 +752,17 @@ async function initDashboard() {
             if ($.fn.dataTable.isDataTable("#sharedTableType"))
                 $("#sharedTableType").DataTable().clear().destroy();
             $("#sharedTableType").DataTable({
+                dom: "Bflrtip",
                 pageLength: 5,
                 responsive: true,
-                lengthMenu: [5, 10, 25, 100],
+                lengthMenu: [
+                 [5, 10, 20, 50, -1],
+                 [5, 10, 20, 50, "Tout"]
+                        ],
                 language: {
                     url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
                 },
                 columnDefs: [{ targets: "_all", className: "text-center" }],
-                dom: "Bflrtip",
                 buttons: [
                     {
                         extend: "excelHtml5",

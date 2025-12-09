@@ -18,6 +18,7 @@ const { v2: cloudinary } = require("cloudinary");
 // ===============================================
 const User = require("./models/user.js");
 const Inventaire = require("./models/Inventaire.js");
+const Product = require("./models/Product.js");
 const PagePasswords = require("./models/PagePasswords.js");
 const ipCheck = require("./middlewares/ipCheck.js");
 const {
@@ -88,20 +89,6 @@ async function connectDB() {
 // استدعاء الاتصال عند بدء السيرفر
 // ===============================================
 connectDB();
-// ===============================================
-// ✅ إعداد آمن مع البروكسي
-// ===============================================
-
-app.set("trust proxy", 1);
-
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false
-});
-
-app.use(limiter);
 
 // ===============================================
 // صفحة رفع الملفات للمسؤول
@@ -120,7 +107,7 @@ app.use(
     session({
         secret: "secret-key",
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
         store: MongoStore.create({
             mongoUrl: process.env.MONGO_URI, // أو ضع الرابط مباشرة للتجربة
             collectionName: "sessions"
@@ -133,6 +120,41 @@ app.use(
 );
 
 // ===============================================
+// ✅ إعداد آمن مع البروكسي
+// ===============================================
+// Middleware لتشخيص IP والمستخدم
+app.use((req, res, next) => {
+    const ip =
+        req.headers["x-forwarded-for"]?.split(",")[0] ||
+        req.socket.remoteAddress;
+
+    // بيانات الجلسة
+    const sessionData = req.session || null;
+
+    // معلومات المستخدم من الجلسة إذا موجودة
+    const username = req.session?.user?.username || null;
+    const role = req.session?.user?.role || null;
+
+    next();
+});
+
+// Rate limiter مع fallback بين User ID و IP
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 دقائق
+  max: 300,
+  keyGenerator: (req) => req.session?.user?.sessionId || req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress || "local",
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    status: 429,
+    error: "لقد تجاوزت الحد الأقصى للطلبات.",
+    message: "لقد أرسلت الكثير من الطلبات في فترة قصيرة. يرجى الانتظار قليلاً قبل المحاولة مرة أخرى."
+  }
+});
+
+app.use(limiter);
+
+// ===============================================
 // إعداد Cloudinary
 // ===============================================
 cloudinary.config({
@@ -140,18 +162,6 @@ cloudinary.config({
     api_key: "955798727236253",
     api_secret: "Art43qa10C8-3pOliHqiV92JbHw"
 });
-
-// ===============================================
-// نموذج ديناميكي
-// ===============================================
-const productSchema = new mongoose.Schema(
-    {},
-    {
-        strict: false,
-        timestamps: { createdAt: "createdAt", updatedAt: false }
-    }
-);
-const Product = mongoose.model("Product", productSchema);
 
 // ===============================================
 // دالة إدخال دفعات
@@ -331,23 +341,30 @@ app.post("/api/products", isAuthenticated, async (req, res) => {
 // ===============================================
 app.get("/api/search", isAuthenticated, async (req, res) => {
     const { q } = req.query;
-    if (!q) return res.status(400).send("يرجى إرسال كلمة للبحث");
+    if (!q || typeof q !== "string" || q.trim().length === 0) {
+        return res.status(400).json({ error: "يرجى إرسال كلمة بحث غير فارغة" });
+    }
 
-    const qStr = q.toString();
-    const qInt = parseInt(q, 10);
+    const qStr = q.trim();
+    const qInt = Number(qStr); // أكثر دقة من parseInt (يتعامل مع 3.14 كـ NaN)
 
     const conditions = [{ LIBELLE: qStr }, { ANPF: qStr }, { GENCOD_P: qStr }];
 
-    if (!isNaN(qInt)) {
+    // أضف المطابقة الرقمية فقط إذا كان qStr رقمًا صحيحًا (بدون كسور)
+    if (Number.isInteger(qInt)) {
         conditions.push({ GENCOD_P: qInt });
     }
 
     try {
-        const results = await Product.find({ $or: conditions }).limit(10);
+        const results = await Product.find({ $or: conditions })
+            .sort({ LIBELLE: 1 }) // أو { _id: 1 } إذا أردت أسرع
+            .limit(3)
+            .lean(); // ⚡ مهم جدًا للأداء
+
         res.json(results);
     } catch (error) {
-        console.error(error);
-        res.status(500).send("حدث خطأ أثناء البحث");
+        console.error("[Search API Error]", error);
+        res.status(500).json({ error: "حدث خطأ أثناء معالجة البحث" });
     }
 });
 // ===============================================
@@ -389,7 +406,7 @@ app.get("/search", isAuthenticated, async (req, res) => {
     ];
 
     try {
-        const results = await Product.find({ $or: conditions }).limit(10);
+        const results = await Product.find({ $or: conditions }).limit(3).lean();
         res.json(results);
     } catch (err) {
         console.error(err);
@@ -489,6 +506,8 @@ const resetAttempts = username => {
 // ======================================
 // مسار تسجيل الدخول
 // ======================================
+const { v4: uuidv4 } = require("uuid");
+
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -512,10 +531,14 @@ app.post("/login", async (req, res) => {
                 .json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
         }
 
-        // حفظ بيانات المستخدم في الجلسة
+        // إنشاء معرف فريد للجلسة لكل تسجيل دخول
+        const sessionId = uuidv4();
+
+        // حفظ بيانات المستخدم في الجلسة مع معرف فريد
         req.session.user = {
             username: user.username,
-            role: user.role
+            role: user.role,
+            sessionId // معرف فريد لكل جهاز/جلسة
         };
 
         return res.status(200).json({ message: "success" });
@@ -651,7 +674,8 @@ app.get("/api/inventairePro/:vendeur", isAuthenticated, async (req, res) => {
         produits = await Inventaire.find({ nameVendeur })
             .sort({ createdAt: -1 })
             .skip((pageNumber - 1) * limitNumber)
-            .limit(limitNumber);
+            .limit(limitNumber)
+            .lean();
 
         const total = await Inventaire.countDocuments({ nameVendeur });
 
@@ -674,21 +698,20 @@ app.get("/api/inventairePro/:vendeur", isAuthenticated, async (req, res) => {
 // ===============================================
 app.get("/api/inventaireProo", isAuthenticated, async (req, res) => {
     try {
-        const { nameVendeur } = req.query;
-        let filter = {};
+        const { nameVendeur, page = 1, limit = 5000 } = req.query;
 
-        // إذا تم إرسال اسم بائع، نبحث فقط عن منتجاته
-        if (nameVendeur) {
-            filter.nameVendeur = nameVendeur;
-        }
+        const filter = nameVendeur ? { nameVendeur } : {};
 
-        // 🔽 ترتيب تنازلي حسب تاريخ الإنشاء (الأحدث أولاً)
-        const products = await Inventaire.find(filter).sort({ createdAt: -1 });
+        const products = await Inventaire.find(filter) // ✅ كل الحقول كما هي
+            .sort({ createdAt: -1 }) // ✅ ترتيب سريع
+            .skip((page - 1) * limit) // ✅ Pagination
+            .limit(Number(limit)) // ✅ Pagination
+            .lean(); // ✅ تسريع كبير بدون تغيير البيانات
 
-        res.json(products);
+        res.json(products); // ✅ نفس الفورمات القديم (Array فقط)
     } catch (error) {
         console.error("Error loading products:", error);
-        res.status(500).send({ message: "Error loading products", error });
+        res.status(500).send({ message: "Error loading products" });
     }
 });
 // ===============================================
@@ -703,12 +726,11 @@ app.get("/api/inventaireProoo", isAuthenticated, async (req, res) => {
 
     try {
         const produits = await Inventaire.find({
-            nameVendeur: { $regex: new RegExp(nameVendeur, "i") }
-        });
+            nameVendeur: { $regex: nameVendeur, $options: "i" }
+        }).lean(); // ✅ تسريع كبير بدون تغيير البيانات
 
-        // 🔹 تعديل الاسم قبل الإرسال (إزالة @ وما بعدها)
-        const produitsModifies = produits.map(prod => {
-            const obj = prod.toObject();
+        // ✅ نفس التعديل كما هو (بدون Mongoose overhead)
+        const produitsModifies = produits.map(obj => {
             if (obj.nameVendeur && obj.nameVendeur.includes("@")) {
                 obj.nameVendeur = obj.nameVendeur.split("@")[0];
             }
@@ -841,7 +863,8 @@ app.get("/api/InventaireRaw", async (req, res) => {
         const produits = await Inventaire.find(query)
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limit);
+            .limit(limit)
+            .lean();
 
         res.json({
             page,
