@@ -293,12 +293,10 @@ async function initDashboard() {
         vendeursCountMap,
         sharedAddresses: shared,
         addressesType: types,
-        produitsParAdresseSample: Object.values(produitsParAdr).slice(
-          0,
-          20
-        )
+        produitsParAdresseSample: Object.values(produitsParAdr)
       };
     }
+
 
     // quick counters
     setText("usersCount", agg.vendeursUnique.length);
@@ -593,7 +591,10 @@ async function initDashboard() {
             dom: "Blfrtip",
             buttons: ["excelHtml5"],
             pageLength: 5,
-            lengthMenu: [5, 10, 20, 50, 100],
+            lengthMenu: [
+              [5, 10, 20, 50, -1],
+              [5, 10, 20, 50, "Tout"]
+            ],
             language: {
               url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
             },
@@ -755,7 +756,10 @@ async function initDashboard() {
         ],
         pageLength: 5,
         responsive: true,
-        lengthMenu: [5, 10, 25],
+        lengthMenu: [
+          [5, 10, 20, 50, -1],
+          [5, 10, 20, 50, "Tout"]
+        ],
         pagingType: "full_numbers",
         language: {
           url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
