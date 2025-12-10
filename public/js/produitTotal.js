@@ -160,32 +160,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const exportData = [
           [
+            'Adresse',
             'Libellé',
             'Gencode',
             'ANPF',
+            'Comptage',
             'Fournisseur',
-            'Stock System',
-            'Prix',
-            'Quantité Réel',
-            'Adresse',
             'Vendeur',
             'Emplacement',
+            'Stock System',
+            'Prix',
             'Date Création',
           ],
         ];
 
         produits.forEach((p) => {
           exportData.push([
+            p.adresse || '',
             p.libelle || '',
             p.gencode || '',
             p.anpf || '',
-            p.fournisseur || '',
-            p.stock || 0,
-            p.prix || 0,
             p.qteInven || 0,
-            p.adresse || '',
+            p.fournisseur || '',
             p.nameVendeur.split('@')[0] || '',
             p.calcul || '',
+            p.stock || 0,
+            p.prix || 0,
             p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : '',
           ]);
         });
