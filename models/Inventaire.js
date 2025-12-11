@@ -17,12 +17,12 @@ const productSchema = new mongoose.Schema(
 );
 
 // 🔹 تحسين البحث على الحقول المهمة
-productSchema.index({ libelle: 1 });
+//productSchema.index({ libelle: 1 });
 productSchema.index({ gencode: 1 });
 productSchema.index({ anpf: 1 });
 productSchema.index({ adresse: 1 });
-productSchema.index({ calcul: 1 });
-productSchema.index({ nameVendeur: 1 });
+//productSchema.index({ calcul: 1 });
+//productSchema.index({ nameVendeur: 1 });
 
 // 🔹 تحسين الترتيب حسب التاريخ (createdAt)
 productSchema.index({ createdAt: -1 });

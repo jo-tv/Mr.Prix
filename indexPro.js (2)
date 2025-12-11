@@ -341,83 +341,7 @@ app.post("/api/products", isAuthenticated, async (req, res) => {
     res.status(500).json({ error: "حدث خطأ في الخادم" });
   }
 });
-// ===============================================
-// نقطة البحث في قاعدة بيانات المنتجات (API)
-// ===============================================
-app.get("/api/search", isAuthenticated, async (req, res) => {
-  const { q } = req.query;
-  if (!q || typeof q !== "string" || q.trim().length === 0) {
-    return res.status(400).json({ error: "يرجى إرسال كلمة بحث غير فارغة" });
-  }
 
-  const qStr = q.trim();
-  const qInt = Number(qStr); // أكثر دقة من parseInt (يتعامل مع 3.14 كـ NaN)
-
-  const conditions = [{ LIBELLE: qStr }, { ANPF: qStr }, { GENCOD_P: qStr }];
-
-  // أضف المطابقة الرقمية فقط إذا كان qStr رقمًا صحيحًا (بدون كسور)
-  if (Number.isInteger(qInt)) {
-    conditions.push({ GENCOD_P: qInt });
-  }
-
-  try {
-    const results = await Product.find({ $or: conditions })
-      .sort({ LIBELLE: 1 }) // أو { _id: 1 } إذا أردت أسرع
-      .limit(3)
-      .lean(); // ⚡ مهم جدًا للأداء
-
-    res.json(results);
-  } catch (error) {
-    console.error("[Search API Error]", error);
-    res.status(500).json({ error: "حدث خطأ أثناء معالجة البحث" });
-  }
-});
-// ===============================================
-// GET /api/produit/:code → جلب السعر حسب GENCOD_P
-// ===============================================
-app.get("/api/Produit/:code", isAuthenticated, async (req, res) => {
-  try {
-    const code = req.params.code;
-    const produit = await Product.findOne({
-      $or: [{ GENCOD_P: code }, { ANPF: code }]
-    });
-
-    if (!produit)
-      return res.status(404).json({ message: "Produit non trouvé" });
-
-    res.json({
-      prix: produit.PV_TTC,
-      libelle: produit.LIBELLE,
-      anpf: produit.ANPF
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-});
-// ======================================
-// نقطة بحث أخرى (معادلة لنقطة /api/search) إن أردت
-// ======================================
-app.get("/search", isAuthenticated, async (req, res) => {
-  const { q } = req.query;
-  if (!q) return res.status(400).send("يرجى إرسال كلمة للبحث");
-
-  const searchText = q.toString();
-
-  const conditions = [
-    { LIBELLE: searchText },
-    { ANPF: searchText },
-    { GENCOD_P: searchText }
-  ];
-
-  try {
-    const results = await Product.find({ $or: conditions }).limit(3).lean();
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("حدث خطأ أثناء البحث");
-  }
-});
 // ======================================
 // نقطة تسجيل مستخدم جديد
 // ======================================
@@ -573,6 +497,14 @@ app.get("/login", (req, res) => {
   }
   res.sendFile(path.join(__dirname, "views/login-register/login.html"));
 });
+// ===============================================
+// تسجيل الخروج وتدمير الجلسة
+// ===============================================
+app.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/login");
+  });
+});
 // ======================================
 // صفحة التسجيل (نفس منطق صفحة تسجيل الدخول)
 // ======================================
@@ -584,21 +516,87 @@ app.get("/tassgile", (req, res) => {
   }
   res.sendFile(path.join(__dirname, "views/login-register/register.html"));
 });
+// ===============================================
+// نقطة البحث في قاعدة بيانات المنتجات (API)
+// ===============================================
+app.get("/api/search", isAuthenticated, async (req, res) => {
+  const { q } = req.query;
+  if (!q || typeof q !== "string" || q.trim().length === 0) {
+    return res.status(400).json({ error: "يرجى إرسال كلمة بحث غير فارغة" });
+  }
 
+  const qStr = q.trim();
+  const qInt = Number(qStr); // أكثر دقة من parseInt (يتعامل مع 3.14 كـ NaN)
+
+  const conditions = [{ LIBELLE: qStr }, { ANPF: qStr }, { GENCOD_P: qStr }];
+
+  // أضف المطابقة الرقمية فقط إذا كان qStr رقمًا صحيحًا (بدون كسور)
+  if (Number.isInteger(qInt)) {
+    conditions.push({ GENCOD_P: qInt });
+  }
+
+  try {
+    const results = await Product.find({ $or: conditions })
+      .sort({ LIBELLE: 1 }) // أو { _id: 1 } إذا أردت أسرع
+      .limit(3)
+      .lean(); // ⚡ مهم جدًا للأداء
+
+    res.json(results);
+  } catch (error) {
+    console.error("[Search API Error]", error);
+    res.status(500).json({ error: "حدث خطأ أثناء معالجة البحث" });
+  }
+});
+// ===============================================
+// GET /api/produit/:code → جلب السعر حسب GENCOD_P
+// ===============================================
+app.get("/api/Produit/:code", isAuthenticated, async (req, res) => {
+  try {
+    const code = req.params.code;
+    const produit = await Product.findOne({
+      $or: [{ GENCOD_P: code }, { ANPF: code }]
+    });
+
+    if (!produit)
+      return res.status(404).json({ message: "Produit non trouvé" });
+
+    res.json({
+      prix: produit.PV_TTC,
+      libelle: produit.LIBELLE,
+      anpf: produit.ANPF
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+// ======================================
+// نقطة بحث أخرى (معادلة لنقطة /api/search) إن أردت
+// ======================================
+app.get("/search", isAuthenticated, async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.status(400).send("يرجى إرسال كلمة للبحث");
+
+  const searchText = q.toString();
+
+  const conditions = [
+    { LIBELLE: searchText },
+    { ANPF: searchText },
+    { GENCOD_P: searchText }
+  ];
+
+  try {
+    const results = await Product.find({ $or: conditions }).limit(3).lean();
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("حدث خطأ أثناء البحث");
+  }
+});
 // ===============================================
 //fin الصفحة الرئيسية الخاصة بالمسؤول
 // ===============================================
 app.use("/", indexRoutes);
-
-// ===============================================
-// تسجيل الخروج وتدمير الجلسة
-// ===============================================
-
-app.get("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/login");
-  });
-});
 
 // ===============================================
 // API لاستقبال المنتجات وحفظها في قاعدة البيانات
@@ -738,7 +736,9 @@ const aggregateProducts = (products) => {
     if (p.adresse) {
       adressesSet.add(p.adresse);
       if (!produitsParAdr[p.adresse]) produitsParAdr[p.adresse] = p;
+
     }
+
 
     if (p.anpf && !anpfMap[p.anpf]) anpfMap[p.anpf] = p;
 
@@ -790,7 +790,7 @@ const aggregateProducts = (products) => {
 
   // تعديل جزء Shared Addresses Finalization
   const shared = [];
-for (const adr in grouped) {
+  for (const adr in grouped) {
     // 1. **تطابق العنوان أولاً (التجميع الأولي):**
     //    نحن بالفعل داخل حلقة تكرارية على 'adr' (العنوان).
     const info = grouped[adr];
@@ -798,39 +798,39 @@ for (const adr in grouped) {
 
     // 2. الشرط الأول: التأكد من أن العنوان مشترك (بائعين متعددين)
     if (vendeurs.length > 1) {
-        
-        // --- بدء شرط تطابق calcul ثانياً ---
-        const rawCalculSet = groupedCalcul[adr] || new Set();
-        
-        // تنظيف قيم 'calcul' لإزالة السلاسل الفارغة (مثل: "" أو " ")
-        const nonBlankCalculs = Array.from(rawCalculSet)
-                                      .map(c => (c || '').trim())
-                                      .filter(c => c !== '');
 
-        // إنشاء مجموعة فريدة من القيم النظيفة
-        const uniqueCalculs = new Set(nonBlankCalculs);
-        
-        // 3. الشرط الثاني (التصفية النهائية): يجب أن يكون هناك قيمة 'calcul' فريدة واحدة فقط (أو لا شيء)
-        if (uniqueCalculs.size <= 1) {
-            
-            // تحديد القيمة النهائية لـ 'calcul'
-            const displayCalcul = uniqueCalculs.size === 1 
-                                  ? uniqueCalculs.values().next().value 
-                                  : '- (No Calcul)';
+      // --- بدء شرط تطابق calcul ثانياً ---
+      const rawCalculSet = groupedCalcul[adr] || new Set();
 
-            // ✅ يتم طباعة العنوان المشترك فقط إذا تحقق الشرطان (vendeurs.length > 1 AND uniqueCalculs.size <= 1)
-            shared.push({
-                adresse: adr,
-                vendeurs,
-                vendeursCount: vendeurs.length,
-                produitsCount: info.produitsCount,
-                calcul: displayCalcul 
-            });
-        }
-        // else: إذا كان uniqueCalculs.size > 1، يعني عدم تطابق في 'calcul' رغم تطابق العنوان، ويتم تجاهل العنوان.
+      // تنظيف قيم 'calcul' لإزالة السلاسل الفارغة (مثل: "" أو " ")
+      const nonBlankCalculs = Array.from(rawCalculSet)
+        .map(c => (c || '').trim())
+        .filter(c => c !== '');
+
+      // إنشاء مجموعة فريدة من القيم النظيفة
+      const uniqueCalculs = new Set(nonBlankCalculs);
+
+      // 3. الشرط الثاني (التصفية النهائية): يجب أن يكون هناك قيمة 'calcul' فريدة واحدة فقط (أو لا شيء)
+      if (uniqueCalculs.size <= 1) {
+
+        // تحديد القيمة النهائية لـ 'calcul'
+        const displayCalcul = uniqueCalculs.size === 1
+          ? uniqueCalculs.values().next().value
+          : '- (No Calcul)';
+
+        // ✅ يتم طباعة العنوان المشترك فقط إذا تحقق الشرطان (vendeurs.length > 1 AND uniqueCalculs.size <= 1)
+        shared.push({
+          adresse: adr,
+          vendeurs,
+          vendeursCount: vendeurs.length,
+          produitsCount: info.produitsCount,
+          calcul: displayCalcul
+        });
+      }
+      // else: إذا كان uniqueCalculs.size > 1، يعني عدم تطابق في 'calcul' رغم تطابق العنوان، ويتم تجاهل العنوان.
     }
-}
-result.sharedAddresses = shared;
+  }
+  result.sharedAddresses = shared;
 
 
   // ...
@@ -842,14 +842,14 @@ result.sharedAddresses = shared;
     if (c.casquette > 0 || c.fondrayon > 0 || c.reserve > 0) types.push({ adresse: adr, casquette: c.casquette, fondrayon: c.fondrayon, reserve: c.reserve });
   }
   result.addressesType = types;
-  result.produitsParAdresseSample = Object.values(produitsParAdr).slice(0, 20);
-
+  result.produitsParAdresseSample = Object.values(produitsParAdr);
+  console.log(produitsParAdr);
   return result;
 };
 
 
 // ✅ تعديل دالة مسار الخادم (Node.js/Express)
-app.get("/api/inventaireProo", isAuthenticated, async (req, res) => {
+app.get("/api/inventaireProoo", isAuthenticated, async (req, res) => {
   try {
     const { nameVendeur } = req.query; // لا نحتاج لـ limit و page
     const filter = nameVendeur ? { nameVendeur } : {};
@@ -874,30 +874,22 @@ app.get("/api/inventaireProo", isAuthenticated, async (req, res) => {
 // ===============================================
 // GET /api/inventairePro?nameVendeur=xxx
 // ===============================================
-app.get("/api/inventaireProoo", isAuthenticated, async (req, res) => {
-  const { nameVendeur } = req.query;
-
-  if (!nameVendeur) {
-    return res.status(400).json({ error: "Nom du vendeur requis" });
-  }
-
+app.get("/api/inventaireProo", isAuthenticated, async (req, res) => {
   try {
-    const produits = await Inventaire.find({
-      nameVendeur: { $regex: nameVendeur, $options: "i" }
-    }).lean(); // ✅ تسريع كبير بدون تغيير البيانات
+    const { nameVendeur, page = 1, limit = 5000 } = req.query;
 
-    // ✅ نفس التعديل كما هو (بدون Mongoose overhead)
-    const produitsModifies = produits.map(obj => {
-      if (obj.nameVendeur && obj.nameVendeur.includes("@")) {
-        obj.nameVendeur = obj.nameVendeur.split("@")[0];
-      }
-      return obj;
-    });
+    const filter = nameVendeur ? { nameVendeur } : {};
 
-    res.json(produitsModifies);
+    const products = await Inventaire.find(filter) // ✅ كل الحقول كما هي
+      .sort({ createdAt: -1 }) // ✅ ترتيب سريع
+      .skip((page - 1) * limit) // ✅ Pagination
+      .limit(Number(limit)) // ✅ Pagination
+      .lean(); // ✅ تسريع كبير بدون تغيير البيانات
+
+    res.json(products); // ✅ نفس الفورمات القديم (Array فقط)
   } catch (error) {
-    console.error("Erreur serveur :", error);
-    res.status(500).json({ error: "Erreur serveur interne" });
+    console.error("Error loading products:", error);
+    res.status(500).send({ message: "Error loading products" });
   }
 });
 // ===============================================

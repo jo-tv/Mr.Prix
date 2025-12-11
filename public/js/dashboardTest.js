@@ -31,9 +31,9 @@ function destroyChart(chartRef) {
 ========================= */
 async function initDashboard() {
   // ----------------- خيارات الأداء -----------------
-  const ENABLE_WORKER = true; // يمكن إبقاؤها أو حذفها
-  const WORKER_THRESHOLD = 20000; // يمكن إبقاؤها أو حذفها
-  const BATCH_ROWS = 50;
+  const ENABLE_WORKER = true;
+  const WORKER_THRESHOLD = 80000;
+  const BATCH_ROWS = 1000;
   const CHARTS = window._charts || (window._charts = {});
 
   // ----------------- Helpers -----------------
@@ -78,35 +78,225 @@ async function initDashboard() {
     domQueue.length = 0;
   }
 
-  // ❌ تم حذف دالة createWorker() بالكامل
+  // worker factory (embedded)
+  function createWorker() {
+    const src = `
+      self.onmessage = function(e) {
+        const produits = e.data.produits || [];
+        const result = {
+          vendeursUnique: [],
+          adressesUnique: [],
+          produitsByAnpfCount: 0,
+          produitsByAnpfSample: [],
+          produitsInexistants: [],
+          vendeursCountMap: {},
+          sharedAddresses: [],
+          addressesType: [],
+          produitsParAdresseSample: []
+        };
+
+        const vendeursSet = new Set();
+        const adressesSet = new Set();
+        const anpfMap = Object.create(null);
+        const vendeursCountMap = Object.create(null);
+        const grouped = Object.create(null);
+        const groupedType = Object.create(null);
+        const produitsParAdr = Object.create(null);
+        const inexistants = [];
+
+        for (let i=0;i<produits.length;i++){
+          const p = produits[i];
+          if (!p) continue;
+          if (p.nameVendeur) { vendeursSet.add(p.nameVendeur); vendeursCountMap[p.nameVendeur] = (vendeursCountMap[p.nameVendeur]||0)+1; }
+          if (p.adresse) { adressesSet.add(p.adresse); if (!produitsParAdr[p.adresse]) produitsParAdr[p.adresse]=p; }
+          if (p.anpf && !anpfMap[p.anpf]) anpfMap[p.anpf]=p;
+          if (typeof p.libelle === 'string' && p.libelle.includes('Produit Inexistant')) inexistants.push(p);
+          if (p.adresse) {
+            if (!grouped[p.adresse]) grouped[p.adresse] = { vendeursSet: new Set(), produitsCount: 0 };
+            if (p.nameVendeur) grouped[p.adresse].vendeursSet.add(p.nameVendeur);
+            grouped[p.adresse].produitsCount++;
+            if (!groupedType[p.adresse]) groupedType[p.adresse] = { casquette:0, fondrayon:0, reserve:0 };
+            const type = (p.calcul || p['calcul '] || '').trim().toLowerCase();
+            if (type==='casquette') groupedType[p.adresse].casquette++;
+            else if (type==='fondrayon') groupedType[p.adresse].fondrayon++;
+            else if (type==='reserve') groupedType[p.adresse].reserve++;
+          }
+        }
+
+        result.vendeursUnique = Array.from(vendeursSet);
+        result.adressesUnique = Array.from(adressesSet);
+        result.produitsByAnpfCount = Object.keys(anpfMap).length;
+        result.produitsByAnpfSample = Object.values(anpfMap).slice(0,20);
+        result.produitsInexistants = inexistants;
+        result.vendeursCountMap = vendeursCountMap;
+
+        const shared = [];
+        for (const adr in grouped) {
+          const info = grouped[adr];
+          const vendeurs = Array.from(info.vendeursSet);
+          if (vendeurs.length > 1) shared.push({ adresse: adr, vendeurs, vendeursCount: vendeurs.length, produitsCount: info.produitsCount });
+        }
+        result.sharedAddresses = shared;
+
+        const types = [];
+        for (const adr in groupedType) {
+          const c = groupedType[adr];
+          if (c.casquette>0 || c.fondrayon>0 || c.reserve>0) types.push({ adresse: adr, casquette: c.casquette, fondrayon: c.fondrayon, reserve: c.reserve });
+        }
+        result.addressesType = types;
+        result.produitsParAdresseSample = Object.values(produitsParAdr).slice(0,20);
+
+        self.postMessage({ ok: true, payload: result });
+      };
+    `;
+    const blob = new Blob([src], { type: "application/javascript" });
+    return new Worker(URL.createObjectURL(blob));
+  }
 
   // ----------------- Main -----------------
-  let agg = null; // سيتم تعبئته من استجابة الخادم
-  let produits = []; // سيتم تعبئته بالمنتجات غير الموجودة (منتجات خام) أو يمكن جلبه لاحقًا إذا لزم الأمر
-
   try {
     setLoading(true);
 
-    const [aggResp, metaResp] = await Promise.all([
-      fetch("/api/inventaireProo"), // ✅ الآن يتوقع أن يرجع كائن التجميع (agg) مباشرةً
+    const [resp, response] = await Promise.all([
+      fetch("/api/inventaireProo"),
       fetch("/api/Produits")
     ]);
-    if (!aggResp.ok) throw new Error("HTTP " + aggResp.status);
-    if (!metaResp.ok) throw new Error("HTTP " + metaResp.status);
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    if (!response.ok) throw new Error("HTTP " + response.status);
 
-    // ✅ agg الآن هو كائن التجميع المحسوب على الخادم
-    agg = await aggResp.json();
-    const meta = await metaResp.json();
+    const produits = await resp.json();
+    const meta = await response.json();
 
-    // **تجهيز البيانات الخام المطلوبة للدوال اللاحقة:**
-    // نحتاج إلى مصفوفة المنتجات الخام لأجل دوال `getExtraAdresses` و `showAdressesStats`
-    // سنفترض مؤقتًا أن `produits` هي فقط المنتجات التي تحتاجها هذه الدوال
-    // (وهو ليس تحسينًا كاملاً، لكنه يضمن عمل الدوال التي تحتاج بيانات خام).
-    // بما أن `agg.produitsInexistants` هي مصفوفة منتجات خام، سنستخدمها مؤقتًا حيث تكون هناك حاجة لمصفوفة منتجات.
-    // **الأهم:** لن نحتاج إلى جلب مصفوفة `produits` الكبيرة مرة أخرى.
-    produits = agg.produitsInexistants || [];
+    if (!Array.isArray(produits))
+      throw new Error("Problème: produits ليست مصفوفة");
 
-    // ❌ تم حذف منطق محاولة استخدام Worker ومنطق main-thread aggregation بالكامل.
+    // محاولة استخدام Worker إذا مفعل والكم كبير
+    let agg = null;
+    const tryUseWorker =
+      ENABLE_WORKER &&
+      window.Worker &&
+      produits.length >= WORKER_THRESHOLD;
+    if (tryUseWorker) {
+      try {
+        agg = await new Promise((resolve, reject) => {
+          const w = createWorker();
+          const timer = setTimeout(() => {
+            w.terminate();
+            reject(new Error("Worker timeout"));
+          }, 30000);
+          w.onmessage = e => {
+            clearTimeout(timer);
+            w.terminate();
+            if (e.data && e.data.ok) resolve(e.data.payload);
+            else reject(new Error("Worker error"));
+          };
+          w.onerror = err => {
+            clearTimeout(timer);
+            w.terminate();
+            reject(err || new Error("Worker failed"));
+          };
+          w.postMessage({ produits });
+        });
+      } catch (err) {
+        console.warn("Worker failed, fallback to main thread:", err);
+        agg = null;
+      }
+    }
+
+    if (!agg) {
+      // main-thread aggregation
+      const vendeursSet = new Set();
+      const adressesSet = new Set();
+      const anpfMap = Object.create(null);
+      const produitsInexistants = [];
+      const vendeursCountMap = Object.create(null);
+      const grouped = Object.create(null);
+      const groupedType = Object.create(null);
+      const produitsParAdr = Object.create(null);
+
+      for (let i = 0; i < produits.length; i++) {
+        const p = produits[i];
+        if (!p) continue;
+        if (p.nameVendeur) {
+          vendeursSet.add(p.nameVendeur);
+          vendeursCountMap[p.nameVendeur] =
+            (vendeursCountMap[p.nameVendeur] || 0) + 1;
+        }
+        if (p.adresse) {
+          adressesSet.add(p.adresse);
+          if (!produitsParAdr[p.adresse])
+            produitsParAdr[p.adresse] = p;
+        }
+        if (p.anpf && !anpfMap[p.anpf]) anpfMap[p.anpf] = p;
+        if (
+          typeof p.libelle === "string" &&
+          p.libelle.includes("Produit Inexistant")
+        )
+          produitsInexistants.push(p);
+
+        if (p.adresse) {
+          if (!grouped[p.adresse])
+            grouped[p.adresse] = {
+              vendeursSet: new Set(),
+              produitsCount: 0
+            };
+          if (p.nameVendeur)
+            grouped[p.adresse].vendeursSet.add(p.nameVendeur);
+          grouped[p.adresse].produitsCount++;
+          if (!groupedType[p.adresse])
+            groupedType[p.adresse] = {
+              casquette: 0,
+              fondrayon: 0,
+              reserve: 0
+            };
+          const t = (p.calcul || p["calcul "] || "")
+            .trim()
+            .toLowerCase();
+          if (t === "casquette") groupedType[p.adresse].casquette++;
+          else if (t === "fondrayon")
+            groupedType[p.adresse].fondrayon++;
+          else if (t === "reserve") groupedType[p.adresse].reserve++;
+        }
+      }
+
+      const shared = [];
+      for (const adr in grouped) {
+        const info = grouped[adr];
+        const vendeurs = Array.from(info.vendeursSet);
+        if (vendeurs.length > 1)
+          shared.push({
+            adresse: adr,
+            vendeurs,
+            vendeursCount: vendeurs.length,
+            produitsCount: info.produitsCount
+          });
+      }
+
+      const types = [];
+      for (const adr in groupedType) {
+        const c = groupedType[adr];
+        if (c.casquette > 0 || c.fondrayon > 0 || c.reserve > 0)
+          types.push({
+            adresse: adr,
+            casquette: c.casquette,
+            fondrayon: c.fondrayon,
+            reserve: c.reserve
+          });
+      }
+
+      agg = {
+        vendeursUnique: Array.from(vendeursSet),
+        adressesUnique: Array.from(adressesSet),
+        produitsByAnpfCount: Object.keys(anpfMap).length,
+        produitsByAnpfSample: Object.values(anpfMap).slice(0, 20),
+        produitsInexistants,
+        vendeursCountMap,
+        sharedAddresses: shared,
+        addressesType: types,
+        produitsParAdresseSample: Object.values(produitsParAdr)
+      };
+    }
+
 
     // quick counters
     setText("usersCount", agg.vendeursUnique.length);
@@ -119,7 +309,6 @@ async function initDashboard() {
 
     // fill produits inexistants (batched)
     (async function fillInexistants() {
-      // ✅ تستخدم agg.produitsInexistants (مصفوفة المنتجات الخام Inexistants)
       const arr = agg.produitsInexistants || [];
       setText("jsonAdressesCount", arr.length);
       applyDomQueue();
@@ -207,9 +396,12 @@ async function initDashboard() {
 
     async function showAdressesStats() {
       const jsonAdrs = await loadAdressesJSON();
-
-      // ✅ نستخدم agg.adressesUnique مباشرة بدلاً من إعادة حسابها من المنتجات الخام
-      const computed = new Set(agg.adressesUnique);
+      const computed = new Set();
+      for (let i = 0; i < produits.length; i++) {
+        const p = produits[i];
+        if (p && (p.calcul || "").trim() !== "" && p.adresse)
+          computed.add(p.adresse);
+      }
       const computedArr = Array.from(computed);
       const missingInDB = jsonAdrs.filter(a => !computed.has(a));
       const extraInDB = computedArr;
@@ -222,10 +414,9 @@ async function initDashboard() {
         openAdressModal(missingInDB, extraInDB)
       );
 
-      // ⚠️ هنا نمرر `produits` (التي هي الآن agg.produitsInexistants)
       const extra = getExtraAdresses(produits, jsonAdrs);
       fillExtraAdressTable(extra);
-      initExtraAdressTable(extra); // تم تعديلها لتأخذ `extra` كـ argument
+      initExtraAdressTable();
     }
 
     function getExtraAdresses(dbProducts, jsonAddresses) {
@@ -400,7 +591,10 @@ async function initDashboard() {
             dom: "Blfrtip",
             buttons: ["excelHtml5"],
             pageLength: 5,
-            lengthMenu: [5, 10, 20, 50, 100],
+            lengthMenu: [
+              [5, 10, 20, 50, -1],
+              [5, 10, 20, 50, "Tout"]
+            ],
             language: {
               url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
             },
@@ -475,40 +669,72 @@ async function initDashboard() {
       }
       requestAnimationFrame(batch);
     }
-    
-// ✅ التعديل المطلوب في دالة displaySharedAddresses في المتصفح
-(function displaySharedAddresses() {
-      const sharedList = agg.sharedAddresses || [];
+
+    // fill shared addresses table
+    function fillSharedAddressesTable(produits) {
       const tbody = document.querySelector("#sharedTable tbody");
       if (!tbody) return;
       tbody.innerHTML = "";
 
-      const rowsHtml = sharedList
-        .map(item => {
-          const vendorsStr = item.vendeurs
-            .map(v => esc(v.split("@")[0].toUpperCase()))
+      // تجميع البائعين حسب adresse ثم حسب calcul
+      // structure: { adresse: { calculValue: Set(vendeur), ... }, ... }
+      const grouped = {};
+
+      produits.forEach(p => {
+        if (!p || !p.adresse || !p.nameVendeur) return;
+        const adr = String(p.adresse).trim();
+        const vendeur = String(p.nameVendeur).trim();
+        const calcul = String(p.calcul || "")
+          .trim()
+          .toLowerCase();
+
+        if (!grouped[adr]) grouped[adr] = {};
+        const calcKey = calcul || "__NO_CALC__"; // نميز القيم الفارغة
+        if (!grouped[adr][calcKey]) grouped[adr][calcKey] = new Set();
+        grouped[adr][calcKey].add(vendeur);
+      });
+
+      const rows = [];
+      let totalRows = 0;
+
+      // الآن نمر على كل adresse وكل calcul داخلها
+      for (const adr in grouped) {
+        const calcGroups = grouped[adr];
+        for (const calcKey in calcGroups) {
+          const vendeursSet = calcGroups[calcKey];
+          const vendeurs = Array.from(vendeursSet);
+
+          // شرط الطباعة: على الأقل بائعان يشتركان في نفس adresse و same calcul
+          // إن أردت طباعة حتى المفردات غيّر الشرط إلى vendeurs.length >= 1
+          if (vendeurs.length < 2) continue;
+
+          // جهّز السطر للطباعة
+          const vendeursStr = vendeurs
+            .map(v => v.split("@")[0].toUpperCase())
             .join(" ; ");
-            
-          // ✅ استخراج قيمة calcul من الكائن item (المُعاد من الخادم)
-          const displayCalcul = item.calcul || "N/A"; // نستخدم القيمة التي وفرها الخادم
+          const displayCalcul =
+            calcKey === "__NO_CALC__" ? "" : calcKey;
 
-          return `
-                    <tr>
-                        <td class="text-bg-danger">${esc(item.adresse)}</td>
-                        <td class="text-bg-primary">${vendorsStr}</td>
-                        <td class="text-bg-warning">${esc(displayCalcul)}</td>
-                        <td class="text-bg-danger">${item.vendeursCount}</td>
-                    </tr>
-                `;
-        })
-        .join("");
+          rows.push(`
+                <tr>
+                    <td class="text-bg-danger">${esc(adr)}</td>
+                    <td class="text-bg-primary">${esc(vendeursStr)}</td>
+                    <td class="text-bg-warning">${esc(displayCalcul)}</td>
+                    <td class="text-bg-danger">${vendeurs.length}</td>
+                </tr>
+            `);
 
-      const totalRows = sharedList.length;
+          totalRows++;
+        }
+      }
+
+      // اكتب العدد النهائي (عدد المجموعات المطابقة)
       const counterEl = qId("sharedAddresses");
       if (counterEl) counterEl.textContent = totalRows;
+
       if (totalRows > 0) q(".Adresses")?.classList.add("jello-vertical");
 
-      tbody.innerHTML = rowsHtml;
+      tbody.innerHTML = rows.join("");
 
       // إعادة تهيئة DataTable بأمان
       if (
@@ -530,18 +756,24 @@ async function initDashboard() {
         ],
         pageLength: 5,
         responsive: true,
-        lengthMenu: [5, 10, 25],
+        lengthMenu: [
+          [5, 10, 20, 50, -1],
+          [5, 10, 20, 50, "Tout"]
+        ],
         pagingType: "full_numbers",
         language: {
           url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
         }
       });
-    })();
+    }
 
+    // مثال على الاستخدام:
+    fetch("/api/inventaireProo")
+      .then(r => r.json())
+      .then(produits => fillSharedAddressesTable(produits));
 
     // fill shared type table
     (function fillSharedType() {
-      // ✅ تستخدم agg.addressesType
       const rows = agg.addressesType || [];
       const tbody = q("#sharedTableType tbody");
       if (!tbody) return;
@@ -590,8 +822,6 @@ async function initDashboard() {
     })();
 
     // Charts
-    // ... (تستخدم agg مباشرةً ولا تحتاج تغيير) ...
-
     try {
       destroyChart(CHARTS.countProduct);
       const ctx = qId("countProduct")?.getContext("2d");
@@ -674,7 +904,6 @@ async function initDashboard() {
           TêteCaisse: { regex: /^TC-/i, objectif: 3 }
         };
 
-        // ✅ تستخدم agg.produitsParAdresseSample (جزء من التجميع)
         const sample = agg.produitsParAdresseSample || [];
         const names = Object.keys(rayons);
         const counts = names.map(
@@ -732,7 +961,6 @@ async function initDashboard() {
       destroyChart(CHARTS.vendeur);
       const ctxV = qId("vendeurChart")?.getContext("2d");
       if (ctxV) {
-        // ✅ تستخدم agg.vendeursCountMap (جزء من التجميع)
         const vc = agg.vendeursCountMap || {};
         const top10 = Object.entries(vc)
           .sort((a, b) => b[1] - a[1])
@@ -805,7 +1033,6 @@ async function initDashboard() {
       const ctxA = qId("adressChart")?.getContext("2d");
       if (ctxA) {
         const total = 741;
-        // ✅ تستخدم agg.adressesUnique.length (جزء من التجميع)
         const used = agg.adressesUnique.length || 0;
         const pctUsed = ((used / total) * 100).toFixed(2);
         CHARTS.adress = new Chart(ctxA, {
@@ -868,11 +1095,14 @@ async function initDashboard() {
     }
 
     // addresses stats & extra table
-    await (async function showAdressesStatsRunner() {
+    await (async function showAdressesStats() {
       const jsonAdrs = await loadAdressesJSON();
-
-      // ✅ نستخدم agg.adressesUnique
-      const computed = new Set(agg.adressesUnique);
+      const computed = new Set();
+      for (let i = 0; i < produits.length; i++) {
+        const p = produits[i];
+        if (p && (p.calcul || "").trim() !== "" && p.adresse)
+          computed.add(p.adresse);
+      }
       const computedArr = Array.from(computed);
       const missingInDB = jsonAdrs.filter(a => !computed.has(a));
       const extraInDB = computedArr;
@@ -885,12 +1115,32 @@ async function initDashboard() {
         openAdressModal(missingInDB, extraInDB)
       );
 
-      // ⚠️ نمرر المصفوفة `produits` التي تم تعريفها أعلاه (agg.produitsInexistants)
       const extra = getExtraAdresses(produits, jsonAdrs);
-      initExtraAdressTable(extra);
+      initExtraAdressTable(extra); // كل شيء يعمل مباشرة
     })();
 
-    // ❌ تم حذف دالة getExtraAdresses المكررة هنا لأنها موجودة أعلاه.
+    function getExtraAdresses(dbProducts, jsonAddresses) {
+      const jsonSet = new Set(jsonAddresses || []);
+      const map = Object.create(null);
+      for (let i = 0; i < dbProducts.length; i++) {
+        const p = dbProducts[i];
+        if (!p || !p.adresse || jsonSet.has(p.adresse)) continue;
+        const key = p.adresse + "__" + (p.nameVendeur || "");
+        if (!map[key])
+          map[key] = {
+            adresse: p.adresse,
+            vendeur: p.nameVendeur,
+            count: 0,
+            lastDate: p.createdAt || "Inconnu"
+          };
+        map[key].count++;
+        if (p.createdAt && p.createdAt > map[key].lastDate)
+          map[key].lastDate = p.createdAt;
+      }
+      return Object.values(map);
+    }
+
+    // (تم تعريف fillExtraAdressTable و initExtraAdressTable و openAdressModal و fillAdressTableAsync أعلاه)
   } catch (err) {
     console.error("Erreur dashboard:", err);
     const container =

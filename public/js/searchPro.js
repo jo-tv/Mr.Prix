@@ -757,7 +757,7 @@ document.getElementById("searchLocal").addEventListener("input", function () {
         const gencode = row.children[1]?.textContent.toLowerCase() || "";
         const anpf = row.children[2]?.textContent.toLowerCase() || "";
         const fournisseur = row.children[3]?.textContent.toLowerCase() || "";
-        const adresse = row.children[6]?.textContent.toLowerCase() || "";
+        const adresse = row.children[7]?.textContent.toLowerCase() || "";
 
         const match =
             gencode.includes(searchTerm) ||
