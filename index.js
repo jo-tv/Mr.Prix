@@ -69,7 +69,7 @@ async function connectDB() {
 
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      maxPoolSize: 10, // عدد الاتصالات المتزامنة
+      maxPoolSize: 20, // عدد الاتصالات المتزامنة
       minPoolSize: 4, // أقل عدد اتصالات دائمًا مفتوح
       socketTimeoutMS: 30000,
       connectTimeoutMS: 30000,
