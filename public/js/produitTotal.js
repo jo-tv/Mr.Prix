@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingEl.style.display = 'flex';
 
         const search = searchInput.value.trim();
-        const limit = 1000000; // عدد كبير لجلب كل البيانات
+        const limit = 80000; // عدد كبير لجلب كل البيانات
         const res = await fetch(
           `/api/InventaireRaw?page=1&limit=${limit}&search=${encodeURIComponent(search)}`
         );
@@ -189,11 +189,22 @@ document.addEventListener('DOMContentLoaded', () => {
             p.createdAt ? new Date(p.createdAt).toLocaleString('fr-FR') : '',
           ]);
         });
+        const now = new Date();
+
+        const date = now.toLocaleDateString('fr-FR'); // 12/12/2025
+        const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); // 17:30
+
+        // استبدال الرموز الممنوعة
+        const safeDate = date.replace(/\//g, '-'); // 12-12-2025
+        const safeTime = time.replace(/:/g, '-'); // 17-30
+
+        const fileName = `Inventaire_${safeDate}_${safeTime}.xlsx`;
+
 
         const ws = XLSX.utils.aoa_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Inventaire_Raw');
-        XLSX.writeFile(wb, 'Inventaire_Raw.xlsx');
+        XLSX.writeFile(wb, fileName);
 
         const toastEl = document.getElementById('excelToast');
         if (toastEl) new bootstrap.Toast(toastEl).show();

@@ -69,7 +69,7 @@ async function connectDB() {
 
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      maxPoolSize: 35, // عدد الاتصالات المتزامنة
+      maxPoolSize: 25, // عدد الاتصالات المتزامنة
       minPoolSize: 4, // أقل عدد اتصالات دائمًا مفتوح
       socketTimeoutMS: 30000,
       connectTimeoutMS: 30000,
@@ -141,7 +141,7 @@ app.use((req, res, next) => {
 // Rate limiter مع fallback بين User ID و IP
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 دقائق
-  max: 300,
+  max: 200,
   keyGenerator: (req) => req.session?.user?.sessionId || req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress || "local",
   standardHeaders: true,
   legacyHeaders: false,
@@ -840,7 +840,7 @@ app.get("/api/ProduitsTotal", isAuthenticated, async (req, res) => {
 app.get("/api/InventaireRaw", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
+    const limit = parseInt(req.query.limit) || 50000;
     const search = req.query.search?.trim() || "";
 
     const skip = (page - 1) * limit;
