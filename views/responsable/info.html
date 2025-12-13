@@ -1,297 +1,385 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=0.5"
-    />
-    <title>Détails des vendeurs — Name / Status</title>
-    <!-- ✅ استدعاء مكتبة Bootstrap + FontAwesome + Excel -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-    />
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-    />
-    <link
-      rel="stylesheet"
-      href="/css/navb.css"
-    />
-    <style>
-      body {
-        background: #f8f9fa;
-        text-align: center;
-      }
-      .password-box {
-        letter-spacing: 3px;
-        font-weight: bold;
-      }
-      input {
-        border: solid 1px red !important;
-      }
-      #btn {
-        height: 50px;
-        box-shadow:
-          rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
-          rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
-          rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
-        font-size: 20px;
-      }
-      #btn i {
-        font-size: 25px;
-        font-weight: 700;
-      }
-      #topLoad {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        inset: 0; /* يغطي كامل الصفحة */
-        background-image: linear-gradient(-60deg, #ff5858 0%, #f09819 100%);
-        width: 100vw;
-        height: 100vh;
-        z-index: 9999;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      #loading {
-        /* محاذاة المحتوى في منتصف الشاشة */
-        /* نص التحميل */
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #3734cee1;
-        font-weight: 700;
-        text-shadow: 3px 5px 2px rgba(128, 0, 0, 0.69);
-        text-align: center;
-        text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
-        /* تموضع العنصر بدقة في منتصف الشاشة */
-      }
-      #loading i {
-        font-size: 120px;
-        margin-right: 30px;
-        color: #41c72de1;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="topLoad">
-      <div id="loading"><i class="bi bi-battery-charging"></i> Chargement des données...</div>
-    </div>
-    <!-- خلفية تغطي الشاشة -->
-    <div
-      id="passwordOverlay"
-      style="
-        position: fixed;
-        inset: 0;
-        background: rgb(128, 120, 120);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-      "
-    >
-      <div
-        style="
-          background: white;
-          padding: 25px;
-          border-radius: 10px;
-          width: 80%;
-          margin: 0 auto;
-          text-align: center;
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        "
-      >
-        <h3>🔐 Accès protégé</h3>
-        <p>Veuillez entrer le mot de passe :</p>
-        <input
-          id="passwordInput"
-          type="password"
-          style="
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #aaa;
-          "
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.5" />
+        <title>Détails des vendeurs — Name / Status</title>
+        <!-- ✅ استدعاء مكتبة Bootstrap + FontAwesome + Excel -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         />
-        <button
-          onclick="submitPassword()"
-          style="
-            padding: 10px;
-            width: 100%;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-          "
-        >
-          Entrer
-        </button>
 
-        <p
-          id="errorMsg"
-          style="color: red; margin-top: 10px"
-        ></p>
-      </div>
-    </div>
-    <div class="container mt-5">
-      <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white text-center fs-4">
-          <i class="bi bi-shield-lock-fill me-2 fs-4"></i>
-          Panneau de gestion des mots de passe des pages
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+        />
+        <link rel="stylesheet" href="/css/navb.css" />
+        <style>
+            body {
+                background: #f8f9fa;
+                text-align: center;
+            }
+
+            .password-box {
+                letter-spacing: 3px;
+                font-weight: bold;
+            }
+
+            input {
+                border: solid 1px red !important;
+            }
+
+            #btn {
+                height: 50px;
+                box-shadow:
+                    rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
+                    rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
+                    rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+                font-size: 20px;
+            }
+
+            #btn i {
+                font-size: 25px;
+                font-weight: 700;
+            }
+
+            #topLoad {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                inset: 0;
+                /* يغطي كامل الصفحة */
+                background-image: linear-gradient(
+                    -60deg,
+                    #ff5858 0%,
+                    #f09819 100%
+                );
+                width: 100vw;
+                height: 100vh;
+                z-index: 9999;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            #loading {
+                /* محاذاة المحتوى في منتصف الشاشة */
+                /* نص التحميل */
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: #3734cee1;
+                font-weight: 700;
+                text-shadow: 3px 5px 2px rgba(128, 0, 0, 0.69);
+                text-align: center;
+                text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 100%;
+                /* تموضع العنصر بدقة في منتصف الشاشة */
+            }
+
+            #loading i {
+                font-size: 120px;
+                margin-right: 30px;
+                color: #41c72de1;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- مكان الرسائل -->
+        <div id="toast" class="toast"></div>
+        <div id="topLoad">
+            <div id="loading">
+                <i class="bi bi-battery-charging"></i> Chargement des données...
+            </div>
         </div>
-
-        <div class="card-body">
-          <!-- جدول عرض كلمات السر -->
-          <h5 class="mb-3 text-secondary">
-            <i class="bi bi-table me-1 fs-3"></i>
-            Tableau des mots de passe actuels
-          </h5>
-
-          <table class="table table-bordered align-middle text-center">
-            <thead class="table-light">
-              <tr>
-                <th><i class="bi bi-eye-fill"></i> Afficher</th>
-                <th><i class="bi bi-key-fill"></i> Mot de passe</th>
-                <th><i class="bi bi-file-earmark-text"></i> Nom de la page</th>
-              </tr>
-            </thead>
-            <tbody id="passwordTable"></tbody>
-          </table>
-
-          <hr />
-
-          <!-- نموذج تعديل كلمات السر -->
-          <h5 class="text-secondary">
-            <i class="bi bi-pencil-square me-1 fs-3"></i>
-            Modifier les mots de passe
-          </h5>
-
-          <form
-            id="passForm"
-            class="row g-3 mt-3"
-          >
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-upload me-1 fs-3"></i>
-                Mot de passe — <span class="fs-4 text-info"> Page Upload</span>
-              </label>
-              <input
-                name="pasPageUploade"
-                id="pasPageUploade"
-                class="form-control"
-                placeholder="Changer PasseWord Page Upload"
-              />
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-archive me-1 fs-3"></i>
-                Mot de passe — <span class="fs-4 text-info">Page Inventaire </span>
-              </label>
-              <input
-                name="pasPageInventaire"
-                id="pasPageInventaire"
-                class="form-control"
-                placeholder="Changer PasseWord Page Inventaire"
-              />
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-person-dash me-1 fs-3"></i>
-                Mot de passe — <span class="fs-4 text-info">Suppression d’un vendeur </span>
-              </label>
-              <input
-                name="passDeletOneVendeur"
-                id="passDeletOneVendeur"
-                class="form-control"
-                placeholder="Changer PasseWord Suppression d’un vendeur"
-              />
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-people-fill me-1 fs-3"></i>
-                Mot de passe — <span class="fs-4 text-info">Suppression de tous les vendeurs </span>
-              </label>
-              <input
-                name="passDeletAllVendeur"
-                id="passDeletAllVendeur"
-                class="form-control"
-                placeholder="Changer PasseWord Suppression de tous les vendeurs"
-              />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">
-                <i class="bi bi-people-fill me-1 fs-3"></i>
-                Page — <span class="fs-4 text-info">Panneau de gestion des mots </span>
-              </label>
-              <input
-                name="PanneauMotss"
-                id="PanneauMotss"
-                class="form-control"
-                placeholder="Changer PasseWord Page Panneau des mots de passe"
-              />
-            </div>
-
-            <div class="col-12 mt-4">
-              <button
-                id="btn"
-                class="btn btn-success w-100"
-              >
-                <i class="bi bi-save me-2"></i>
-                Sauvegarder les modifications
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <!--nav FAB Button -->
-    <div
-      class="containeer"
-      
-    >
-      <div class="menu-toggle">
-        <span class="fa fa-plus"></span>
-      </div>
-      <div class="menu-round">
+        <!-- خلفية تغطي الشاشة -->
         <div
-          class="btn-app"
-          data-label="Data Vendeurs"
+            id="passwordOverlay"
+            style="
+                position: fixed;
+                inset: 0;
+                background: rgb(128, 120, 120);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            "
         >
-          <div class="fa">
-            <a href="/listVendeurs"
-              ><i
-                class="fa-solid fa-circle-left"
-                style="color: white"
-              ></i>
-            </a>
-          </div>
+            <div
+                style="
+                    background: white;
+                    padding: 25px;
+                    border-radius: 10px;
+                    width: 80%;
+                    margin: 0 auto;
+                    text-align: center;
+                    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+                "
+            >
+                <h3>🔐 Accès protégé</h3>
+                <p>Veuillez entrer le mot de passe :</p>
+                <input
+                    id="passwordInput"
+                    type="password"
+                    style="
+                        width: 100%;
+                        padding: 10px;
+                        margin: 10px 0;
+                        border-radius: 8px;
+                        border: 1px solid #aaa;
+                    "
+                />
+                <button
+                    onclick="submitPassword()"
+                    style="
+                        padding: 10px;
+                        width: 100%;
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                    "
+                >
+                    Entrer
+                </button>
+
+                <p id="errorMsg" style="color: red; margin-top: 10px"></p>
+            </div>
         </div>
-      </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/main2.js"></script>
-    <script src="js/info.js"></script>
-  </body>
+        <div class="container mt-5">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center fs-4">
+                    <i class="bi bi-shield-lock-fill me-2 fs-4"></i>
+                    Panneau de gestion des mots de passe des pages
+                </div>
+
+                <div class="card-body">
+                    <!-- جدول عرض كلمات السر -->
+                    <h5 class="mb-3 text-secondary">
+                        <i class="bi bi-table me-1 fs-3"></i>
+                        Tableau des mots de passe actuels
+                    </h5>
+
+                    <table
+                        class="table table-bordered align-middle text-center"
+                    >
+                        <thead class="table-light">
+                            <tr>
+                                <th><i class="bi bi-eye-fill"></i> Afficher</th>
+                                <th>
+                                    <i class="bi bi-key-fill"></i> Mot de passe
+                                </th>
+                                <th>
+                                    <i class="bi bi-file-earmark-text"></i> Nom
+                                    de la page
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="passwordTable"></tbody>
+                    </table>
+
+                    <hr />
+
+                    <!-- نموذج تعديل كلمات السر -->
+                    <h5 class="text-secondary">
+                        <i class="bi bi-pencil-square me-1 fs-3"></i>
+                        Modifier les mots de passe
+                    </h5>
+
+                    <form id="passForm" class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-upload me-1 fs-3"></i>
+                                Mot de passe —
+                                <span class="fs-4 text-info"> Page Upload</span>
+                            </label>
+                            <input
+                                name="pasPageUploade"
+                                id="pasPageUploade"
+                                class="form-control"
+                                placeholder="Changer PasseWord Page Upload"
+                            />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-archive me-1 fs-3"></i>
+                                Mot de passe —
+                                <span class="fs-4 text-info"
+                                    >Page Inventaire
+                                </span>
+                            </label>
+                            <input
+                                name="pasPageInventaire"
+                                id="pasPageInventaire"
+                                class="form-control"
+                                placeholder="Changer PasseWord Page Inventaire"
+                            />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-person-dash me-1 fs-3"></i>
+                                Mot de passe —
+                                <span class="fs-4 text-info"
+                                    >Suppression d’un vendeur
+                                </span>
+                            </label>
+                            <input
+                                name="passDeletOneVendeur"
+                                id="passDeletOneVendeur"
+                                class="form-control"
+                                placeholder="Changer PasseWord Suppression d’un vendeur"
+                            />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-people-fill me-1 fs-3"></i>
+                                Mot de passe —
+                                <span class="fs-4 text-info"
+                                    >Suppression de tous les vendeurs
+                                </span>
+                            </label>
+                            <input
+                                name="passDeletAllVendeur"
+                                id="passDeletAllVendeur"
+                                class="form-control"
+                                placeholder="Changer PasseWord Suppression de tous les vendeurs"
+                            />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-people-fill me-1 fs-3"></i>
+                                Page —
+                                <span class="fs-4 text-info"
+                                    >Panneau de gestion des mots
+                                </span>
+                            </label>
+                            <input
+                                name="PanneauMotss"
+                                id="PanneauMotss"
+                                class="form-control"
+                                placeholder="Changer PasseWord Page Panneau des mots de passe"
+                            />
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <button id="btn" class="btn btn-success w-100">
+                                <i class="bi bi-save me-2"></i>
+                                Sauvegarder les modifications
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--nav FAB Button -->
+        <div class="containeer">
+            <div class="menu-toggle">
+                <span class="fa fa-plus"></span>
+            </div>
+            <div class="menu-round">
+                <div class="btn-app" data-label="Data Vendeurs">
+                    <div class="fa">
+                        <a href="/listVendeurs"
+                            ><i
+                                class="fa-solid fa-circle-left"
+                                style="color: white"
+                            ></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container mt-5">
+            <div class="card shadow-lg border-0">
+                <!-- Header -->
+                <div
+                    class="card-header bg-danger text-white text-center fs-5 d-flex align-items-center justify-content-center"
+                >
+                    <i class="bi bi-trash-fill me-2 fs-3"></i>
+                    Suppression d'adresses dans l'inventaire
+                </div>
+
+                <!-- Body -->
+                <div class="card-body">
+                    <!-- Titre -->
+                    <h5
+                        class="mb-4 text-secondary d-flex align-items-center justify-content-center"
+                    >
+                        <i class="bi bi-clipboard2-check-fill fs-3 me-2"></i>
+                        Supprimer une ou plusieurs adresses
+                    </h5>
+
+                    <!-- Inputs -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label
+                                for="adresseToDelete"
+                                class="form-label fw-bold"
+                                >Adresse à supprimer</label
+                            >
+                            <input
+                                type="text"
+                                id="adresseToDelete"
+                                class="form-control"
+                                placeholder="Entrez l'adresse"
+                            />
+                        </div>
+                        <div class="col-md-3">
+                            <label
+                                for="countToDelete"
+                                class="form-label fw-bold"
+                                >Nombre à supprimer</label
+                            >
+                            <input
+                                type="number"
+                                id="countToDelete"
+                                class="form-control"
+                                placeholder="1"
+                                min="1"
+                            />
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button
+                                id="deleteBtn"
+                                class="btn btn-danger w-100 d-flex align-items-center justify-content-center"
+                            >
+                                <i class="bi bi-trash-fill me-2 fs-5"></i>
+                                Supprimer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Info / Alerte -->
+                    <div
+                        id="deleteInfo"
+                        class="alert alert-info d-none"
+                        role="alert"
+                    >
+                        Veuillez entrer une adresse et le nombre d'entrées à
+                        supprimer.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="js/main2.js"></script>
+        <script src="js/info.js"></script>
+    </body>
 </html>

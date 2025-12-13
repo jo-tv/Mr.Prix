@@ -394,30 +394,7 @@ async function initDashboard() {
       }
     }
 
-    async function showAdressesStats() {
-      const jsonAdrs = await loadAdressesJSON();
-      const computed = new Set();
-      for (let i = 0; i < produits.length; i++) {
-        const p = produits[i];
-        if (p && (p.calcul || "").trim() !== "" && p.adresse)
-          computed.add(p.adresse);
-      }
-      const computedArr = Array.from(computed);
-      const missingInDB = jsonAdrs.filter(a => !computed.has(a));
-      const extraInDB = computedArr;
 
-      setText("dbAdressesCount", computedArr.length);
-      setText("missingCount", missingInDB.length);
-      applyDomQueue();
-
-      q(".adressCount")?.addEventListener("click", () =>
-        openAdressModal(missingInDB, extraInDB)
-      );
-
-      const extra = getExtraAdresses(produits, jsonAdrs);
-      fillExtraAdressTable(extra);
-      initExtraAdressTable();
-    }
 
     function getExtraAdresses(dbProducts, jsonAddresses) {
       const jsonSet = new Set(jsonAddresses || []);
@@ -1106,6 +1083,7 @@ async function initDashboard() {
       const computedArr = Array.from(computed);
       const missingInDB = jsonAdrs.filter(a => !computed.has(a));
       const extraInDB = computedArr;
+
 
       setText("dbAdressesCount", computedArr.length);
       setText("missingCount", missingInDB.length);

@@ -14,7 +14,7 @@ function ipCheck(req, res, next) {
         "127.0.0.1",
         "105.74.74.250",
         "10.50.223.",
-        "154.144.255."
+        "154.144.255.22"
     ];
 
     function isIPAllowed(userIP) {

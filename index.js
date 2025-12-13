@@ -601,7 +601,7 @@ app.get("/logout", (req, res) => {
 // ===============================================
 // 🔹 ملخص البائعين
 // ===============================================
-app.get("/api/inventairePro", isAuthenticated, async (req, res) => {
+app.get("/api/inventairePro", isAuthenticated, isResponsable, async (req, res) => {
   try {
     const result = await Inventaire.aggregate([
       { $sort: { createdAt: -1 } },
@@ -644,7 +644,7 @@ app.post("/api/inventairePro", isAuthenticated, async (req, res) => {
 // ===============================================
 // 🔹 جلب منتجات بائع مع Pagination
 // ===============================================
-app.get("/api/inventairePro/:vendeur", isAuthenticated, async (req, res) => {
+app.get("/api/inventairePro/:vendeur", isAuthenticated, isResponsable, async (req, res) => {
   try {
     const { page, limit } = req.query;
     const nameVendeur = req.params.vendeur;
@@ -790,7 +790,7 @@ function mergeProducts(produits) {
 // ===============================================
 // GET Raw Inventaire (مع دمج)
 // ===============================================
-app.get("/api/ProduitsTotal", isAuthenticated, async (req, res) => {
+app.get("/api/ProduitsTotal", isAuthenticated, isResponsable, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 80000;
@@ -837,7 +837,7 @@ app.get("/api/ProduitsTotal", isAuthenticated, async (req, res) => {
 // ===============================================
 // GET Raw Inventaire (بدون دمج)
 // ===============================================
-app.get("/api/InventaireRaw", async (req, res) => {
+app.get("/api/InventaireRaw", isAuthenticated, isResponsable, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 50000;
@@ -976,7 +976,7 @@ async function exportExcelByVendeur(nameVendeur, res) {
 // ===============================================
 // ✅ المسار العام لتصدير ملف Excel لأي بائع
 // ===============================================
-app.get("/api/exportExcel/:vendeur", isResponsable, async (req, res) => {
+app.get("/api/exportExcel/:vendeur", isAuthenticated, isResponsable, async (req, res) => {
   await exportExcelByVendeur(req.params.vendeur, res);
 });
 // ===============================================
@@ -1055,7 +1055,7 @@ async function exportAllProducts(res) {
 // ===============================================
 // 🔹 المسار العام لتصدير كل البيانات
 // ===============================================
-app.get("/api/exportExcel", isAuthenticated, async (req, res) => {
+app.get("/api/exportExcel", isAuthenticated, isResponsable, async (req, res) => {
   await exportAllProducts(res);
 });
 
@@ -1065,7 +1065,7 @@ app.get("/api/exportExcel", isAuthenticated, async (req, res) => {
 // ===============================================
 //جلب جميع بيانات products
 // ===============================================
-app.get("/api/Produits", isAuthenticated, async (req, res) => {
+app.get("/api/Produits", isAuthenticated, isResponsable, async (req, res) => {
   try {
     // جلب عدد المنتجات فقط
     const produitsCount = await Product.countDocuments(); // بدلاً من find()
@@ -1153,10 +1153,45 @@ app.delete("/api/InvSmartManager/:id", isAuthenticated, async (req, res) => {
     });
   }
 });
+
+// DELETE by adresse with limit
+app.delete("/deleteAdresse", isAuthenticated, isResponsable, async (req, res) => {
+  try {
+    const { adresse, count } = req.body;
+
+    if (!adresse) {
+      return res.status(400).json({ message: "Adresse requise" });
+    }
+
+    let deleteCount = parseInt(count);
+    if (isNaN(deleteCount) || deleteCount < 1) deleteCount = 1; // défaut 1
+
+    // Récupérer les documents à supprimer
+    const docs = await Inventaire.find({ adresse }).limit(deleteCount);
+
+    if (docs.length === 0) {
+      return res.status(404).json({ message: "Aucun inventaire trouvé pour cette adresse" });
+    }
+
+    // Supprimer les documents trouvés
+    const idsToDelete = docs.map(d => d._id);
+    const result = await Inventaire.deleteMany({ _id: { $in: idsToDelete } });
+
+    res.json({
+      message: `${result.deletedCount} inventaire(s) supprimé(s) pour l'adresse ${adresse}`
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
+
 // ===============================================
 // ✅ مسح كل المنتجات من جميع المستخدمين
 // ===============================================
-app.delete("/api/inventairePro", isAuthenticated, async (req, res) => {
+app.delete("/api/inventairePro", isAuthenticated, isResponsable, async (req, res) => {
   try {
     const result = await Inventaire.deleteMany({});
     res.json({
