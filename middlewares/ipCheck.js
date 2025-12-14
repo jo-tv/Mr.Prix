@@ -1,38 +1,38 @@
 function ipCheck(req, res, next) {
-    let userIP =
-        req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-        req.socket.remoteAddress;
+  let userIP =
+    req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
+    req.socket.remoteAddress;
 
-    // ✅ تحويل localhost
+  // ✅ تحويل localhost
+  if (userIP === "::1") userIP = "127.0.0.1";
+
+  // ✅ إزالة ::ffff: في حال وجودها (مهم جدًا في الاستضافات)
+  userIP = userIP.replace("::ffff:", "");
+
+  // ✅ البادئات المسموح بها
+  const allowedIPs = [
+    "127.0.0.1",
+    "196.77.61.107",
+    "10.50.223.",
+    "154.144.255.22"
+  ];
+
+  function isIPAllowed(userIP) {
     if (userIP === "::1") userIP = "127.0.0.1";
-
-    // ✅ إزالة ::ffff: في حال وجودها (مهم جدًا في الاستضافات)
     userIP = userIP.replace("::ffff:", "");
 
-    // ✅ البادئات المسموح بها
-    const allowedIPs = [
-        "127.0.0.1",
-        "105.74.74.250",
-        "10.50.223.",
-        "154.144.255.22"
-    ];
+    return allowedIPs.some(item => {
+      // ✅ IP دقيق
+      if (!item.endsWith(".")) {
+        return userIP === item;
+      }
+      // ✅ شبكة (prefix)
+      return userIP.startsWith(item);
+    });
+  }
 
-    function isIPAllowed(userIP) {
-        if (userIP === "::1") userIP = "127.0.0.1";
-        userIP = userIP.replace("::ffff:", "");
-
-        return allowedIPs.some(item => {
-            // ✅ IP دقيق
-            if (!item.endsWith(".")) {
-                return userIP === item;
-            }
-            // ✅ شبكة (prefix)
-            return userIP.startsWith(item);
-        });
-    }
-
-    if (!isIPAllowed(userIP)) {
-        return res.status(403).send(`
+  if (!isIPAllowed(userIP)) {
+    return res.status(403).send(`
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -80,9 +80,9 @@ function ipCheck(req, res, next) {
 </body>
 </html>
     `);
-    }
+  }
 
-    next();
+  next();
 }
 
 module.exports = ipCheck;
