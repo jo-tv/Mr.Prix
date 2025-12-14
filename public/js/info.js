@@ -63,7 +63,7 @@ document.getElementById('passForm').addEventListener('submit', async (e) => {
 
   btn.innerHTML = `<i class="bi bi-save me-2"></i> Sauvegarder les modifications`;
 
-  
+
   showToast(
     await res.text() ||
     "✅ Toutes les Adresse ont été supprimées",
@@ -77,54 +77,40 @@ document.getElementById('passForm').addEventListener('submit', async (e) => {
 loadPasswords();
 
 
-document
-  .getElementById("deleteBtn")
-  .addEventListener("click", async () => {
-    const adresse = document
-      .getElementById("adresseToDelete")
-      .value.trim();
-    const count =
-      parseInt(
-        document
-          .getElementById("countToDelete")
-          .value.trim()
-      ) || 1;
+document.getElementById("deleteBtn").addEventListener("click", async () => {
+  const adresse = document.getElementById("adresseToDelete").value.trim();
+  const calculType = document.getElementById("calculType").value; // peut être vide
+  let count = parseInt(document.getElementById("countToDelete").value.trim());
+  if (isNaN(count) || count < 1) count = 1; // défaut 1
 
-    if (!adresse) {
-      showToast("Aucune donnée supprimée", "warning", 4000);
+  if (!adresse) {
+    showToast("Veuillez entrer une adresse", "warning", 4000);
+    return;
+  }
+
+  const confirmDelete = confirm(`Voulez-vous supprimer ${count} entrée(s) pour l'adresse ${adresse}${calculType ? ` avec calcul : ${calculType}` : ""} ?`);
+  if (!confirmDelete) return;
+
+  try {
+    const res = await fetch("/deleteAdresse", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ adresse, calculType, count })
+    });
+
+    const data = await res.json();
+    if (res.status === 404) {
+      showToast(data.message, "warning", 5000);
       return;
     }
-    const confirmDelete = confirm(
-      `Voulez-vous supprimer ${count} inventaire(s) pour l'adresse ${adresse} ?`
-    );
-    if (!confirmDelete) return;
+    showToast(data.message, "success", 5000);
+  } catch (err) {
+    console.error(err);
+    showToast("Erreur lors de la suppression", "danger", 5000);
+  }
+});
 
-    try {
-      const res = await fetch("/deleteAdresse", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ adresse, count })
-      });
 
-      const data = await res.json();
-
-      showToast(
-        data.message ||
-        "✅ Toutes les Adresse ont été supprimées",
-        "success",
-        8000
-      );
-    } catch (err) {
-      console.error(err);
-      showToast(
-        "❌ Erreur lors de la suppression",
-        "error",
-        8000
-      );
-    }
-  });
 // 🔹 دالة الرسائل
 function showToast(message, type = "info", duration = 3000) {
   const toast = document.getElementById("toast");

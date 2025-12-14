@@ -1157,7 +1157,7 @@ app.delete("/api/InvSmartManager/:id", isAuthenticated, async (req, res) => {
 // DELETE by adresse with limit
 app.delete("/deleteAdresse", isAuthenticated, isResponsable, async (req, res) => {
   try {
-    const { adresse, count } = req.body;
+    const { adresse, count, calculType } = req.body;
 
     if (!adresse) {
       return res.status(400).json({ message: "Adresse requise" });
@@ -1166,11 +1166,17 @@ app.delete("/deleteAdresse", isAuthenticated, isResponsable, async (req, res) =>
     let deleteCount = parseInt(count);
     if (isNaN(deleteCount) || deleteCount < 1) deleteCount = 1; // défaut 1
 
+    // Construire le filtre
+    const filter = { adresse };
+    if (calculType) {
+      filter.calcul = calculType; // ajouter filtrage par type calcul
+    }
+
     // Récupérer les documents à supprimer
-    const docs = await Inventaire.find({ adresse }).limit(deleteCount);
+    const docs = await Inventaire.find(filter).limit(deleteCount);
 
     if (docs.length === 0) {
-      return res.status(404).json({ message: "Aucun inventaire trouvé pour cette adresse" });
+      return res.status(404).json({ message: `Aucun inventaire trouvé pour cette adresse : ${adresse} et ce type de L'emplacement : ${calculType}` });
     }
 
     // Supprimer les documents trouvés
@@ -1178,7 +1184,7 @@ app.delete("/deleteAdresse", isAuthenticated, isResponsable, async (req, res) =>
     const result = await Inventaire.deleteMany({ _id: { $in: idsToDelete } });
 
     res.json({
-      message: `${result.deletedCount} inventaire(s) supprimé(s) pour l'adresse ${adresse}`
+      message: `${result.deletedCount} inventaire(s) supprimé(s) pour l'adresse ${adresse}${calculType ? ` et calcul : ${calculType}` : ""}`
     });
   } catch (err) {
     console.error(err);
