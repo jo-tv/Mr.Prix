@@ -332,7 +332,7 @@ async function initDashboard() {
           tr.innerHTML =
             "" +
             '<td style="padding:8px;background:#dd9261b6 ;">' +
-            esc((prod.nameVendeur || "").split("@")[0] || "-") +
+            esc((prod.nameVendeur || "").split("@")[0].toUpperCase() || "-") +
             "</td>" +
             '<td style="padding:8px;background:#dd9261b6 ;">' +
             esc(prod.libelle) +
@@ -743,7 +743,6 @@ async function initDashboard() {
         }
       });
     }
-
     // مثال على الاستخدام:
     fetch("/api/inventaireProo")
       .then(r => r.json())
@@ -942,7 +941,7 @@ async function initDashboard() {
         const top10 = Object.entries(vc)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 10);
-        const labels = top10.map(v => v[0].replace(/@.*/, "").trim());
+        const labels = top10.map(v => v[0].replace(/@.*/, "").trim().toUpperCase());
         const vals = top10.map(v => v[1]);
 
         CHARTS.vendeur = new Chart(ctxV, {
