@@ -90,23 +90,6 @@ async function connectDB() {
 // ===============================================
 connectDB(); // اتصال واحد فقط
 
-let idleTimer;
-
-function resetIdleTimer() {
-  clearTimeout(idleTimer);
-  idleTimer = setTimeout(async () => {
-    if (mongoose.connection.readyState === 1) {
-      await mongoose.disconnect();
-      isConnected = false;
-      console.log("🔌 MongoDB Disconnected (Idle)");
-    }
-  }, 15 * 60 * 1000); // 15 دقيقة
-}
-
-app.use((req, res, next) => {
-  resetIdleTimer();
-  next();
-});
 
 // ===============================================
 // صفحة رفع الملفات للمسؤول
