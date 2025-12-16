@@ -70,7 +70,7 @@ async function connectDB() {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       maxPoolSize: 25, // عدد الاتصالات المتزامنة
-      minPoolSize: 4, // أقل عدد اتصالات دائمًا مفتوح
+      minPoolSize: 0, // أقل عدد اتصالات دائمًا مفتوح
       socketTimeoutMS: 30000,
       connectTimeoutMS: 30000,
       serverSelectionTimeoutMS: 30000,
@@ -88,7 +88,31 @@ async function connectDB() {
 // ===============================================
 // استدعاء الاتصال عند بدء السيرفر
 // ===============================================
-connectDB();
+(async () => {
+  try {
+    await connectDB(); // اتصال واحد فقط
+  } catch (err) {
+    console.error(err);
+  }
+})();
+
+let idleTimer;
+
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(async () => {
+    if (mongoose.connection.readyState === 1) {
+      await mongoose.disconnect();
+      isConnected = false;
+      console.log("🔌 MongoDB Disconnected (Idle)");
+    }
+  }, 15 * 60 * 1000); // 15 دقيقة
+}
+
+app.use((req, res, next) => {
+  resetIdleTimer();
+  next();
+});
 
 // ===============================================
 // صفحة رفع الملفات للمسؤول
