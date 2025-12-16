@@ -1302,6 +1302,45 @@ app.delete("/api/InvSmartManager/:id", isAuthenticated, async (req, res) => {
     });
   }
 });
+
+// DELETE by adresse with limit
+app.delete("/deleteAdresse", isAuthenticated, isResponsable, async (req, res) => {
+  try {
+    const { adresse, count, calculType } = req.body;
+
+    if (!adresse) {
+      return res.status(400).json({ message: "Adresse requise" });
+    }
+
+    let deleteCount = parseInt(count);
+    if (isNaN(deleteCount) || deleteCount < 1) deleteCount = 1; // défaut 1
+
+    // Construire le filtre
+    const filter = { adresse };
+    if (calculType) {
+      filter.calcul = calculType; // ajouter filtrage par type calcul
+    }
+
+    // Récupérer les documents à supprimer
+    const docs = await Inventaire.find(filter).limit(deleteCount);
+
+    if (docs.length === 0) {
+      return res.status(404).json({ message: `Aucun inventaire trouvé pour cette adresse : ${adresse} et ce type de L'emplacement : ${calculType}` });
+    }
+
+    // Supprimer les documents trouvés
+    const idsToDelete = docs.map(d => d._id);
+    const result = await Inventaire.deleteMany({ _id: { $in: idsToDelete } });
+
+    res.json({
+      message: `${result.deletedCount} inventaire(s) supprimé(s) pour l'adresse ${adresse}${calculType ? ` et calcul : ${calculType}` : ""}`
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
 // ===============================================
 // ✅ مسح كل المنتجات من جميع المستخدمين
 // ===============================================
@@ -1489,6 +1528,6 @@ app.get("/api/searchee", isAuthenticated, async (req, res) => {
 // ========================================
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Server is running on http://localhost:${PORT} indexPro.js`);
 });
 // ===============================================
