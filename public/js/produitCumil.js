@@ -50,13 +50,18 @@ function cleanKey(value) {
 // 3.1. دمج المنتجات وحساب mergeCount وecar
 function mergeAndCalculateProducts(produits) {
   const merged = produits.reduce((acc, p) => {
-    const key = `${cleanKey(p.anpf)}_${cleanKey(p.gencode)}_${cleanKey(p.libelle)}`;
+
+    if (!p.anpf) return acc; // حماية
+
+    const key = cleanKey(String(p.anpf));
+
     const qte = Number(p.qteInven) || 0;
     const stock = Number(p.stock) || 0;
 
     if (!acc[key]) {
       acc[key] = {
         ...p,
+        anpf: p.anpf,
         qteInven: qte,
         stock: stock,
         mergeCount: 1,
@@ -68,17 +73,15 @@ function mergeAndCalculateProducts(produits) {
       acc[key].adresseSet.add(p.adresse || '');
     }
 
-    // تحديث العنوان الموحد بدون تكرار
     acc[key].adresse = [...acc[key].adresseSet].filter(Boolean).join(' | ');
-
-    // حساب الفرق
     acc[key].ecar = acc[key].qteInven - acc[key].stock;
 
     return acc;
   }, {});
 
-  return Object.values(merged);
+  return Object.values(merged).map(({ adresseSet, ...rest }) => rest);
 }
+
 
 // ===========================
 // 4. عرض الجدول (RenderTable)
@@ -100,7 +103,8 @@ async function renderTable(page = 1) {
     currentPage = data.page || 1;
     totalPages = data.totalPages || 1;
 
-    const produits = Array.isArray(data.produits) ? data.produits : [];
+    const rawProduits = Array.isArray(data.produits) ? data.produits : [];
+    const produits = mergeAndCalculateProducts(rawProduits); // ✅ الدمج هنا
 
     // --- ترتيب المنتجات إذا تم الضغط على رأس العمود ---
     let sortedProduits = [...produits];
@@ -122,15 +126,14 @@ async function renderTable(page = 1) {
           ecar === 0
             ? 'background-color: #dee2e6; color: #495057;'
             : ecar < 0
-            ? 'background-color: #dc3545; color: white; font-weight: bold;'
-            : 'background-color: #198754; color: white; font-weight: bold;';
+              ? 'background-color: #dc3545; color: white; font-weight: bold;'
+              : 'background-color: #198754; color: white; font-weight: bold;';
 
         return `
           <tr>
             <td>${p.libelle || ''}</td>
-            <td>${p.gencode || ''} <span class="badge bg-secondary ms-1">(${
-              p.mergeCount || 1
-            })</span></td>
+            <td>${p.gencode || ''} <span class="badge bg-secondary ms-1">(${p.mergeCount || 1
+          })</span></td>
             <td>${p.anpf || ''}</td>
             <td>${p.fournisseur || ''}</td>
             <td>${p.stock ?? 0}</td>
@@ -294,9 +297,10 @@ async function exportExcel() {
     }
 
     const search = searchInput.value.trim();
-    const produits = await fetchAllProductsForExcel(search);
 
-    // إنشاء مصفوفة لتصدير Excel
+    const rawProduits = await fetchAllProductsForExcel(search);
+    const produits = mergeAndCalculateProducts(rawProduits); // ✅ الدمج هنا
+
     const exportData = [
       [
         'Libellé',
@@ -318,7 +322,7 @@ async function exportExcel() {
       exportData.push([
         p.libelle || '',
         p.gencode || '',
-        p.mergeCount || 1, // mergeCount من السيرفر
+        p.mergeCount || 1,
         p.anpf || '',
         p.fournisseur || '',
         p.stock || 0,
@@ -331,15 +335,14 @@ async function exportExcel() {
       ]);
     });
 
-    // إنشاء ملف Excel
     const ws = XLSX.utils.aoa_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Inventaire_Merge');
     XLSX.writeFile(wb, 'TotalProduit.xlsx');
 
-    // عرض Toast نجاح
     const toastEl = document.getElementById('excelToast');
     if (toastEl) new bootstrap.Toast(toastEl).show();
+
   } catch (err) {
     console.error(err);
     alert("❌ Erreur lors de l'export Excel");
@@ -353,8 +356,8 @@ btnSearch?.addEventListener('click', () => renderTable(1));
 rowsPerPageEl?.addEventListener('change', () => renderTable(1));
 btnExcel?.addEventListener('click', exportExcel);
 document.getElementById('btnRefresh')?.addEventListener('click', () => {
-    renderTable(1);
-  });
+  renderTable(1);
+});
 
 
 // Modal
