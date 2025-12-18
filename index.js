@@ -88,8 +88,36 @@ async function connectDB() {
 // ===============================================
 // استدعاء الاتصال عند بدء السيرفر
 // ===============================================
-connectDB(); // اتصال واحد فقط
+//connectDB();
+(async () => {
+  try {
+    await connectDB(); // اتصال واحد فقط
+    const User = require("./models/user.js");
+    const Inventaire = require("./models/Inventaire.js");
+    const Product = require("./models/Product.js");
+    const PagePasswords = require("./models/PagePasswords.js");
+  } catch (err) {
+    console.error(err);
+  }
+})();
 
+let idleTimer;
+
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(async () => {
+    if (mongoose.connection.readyState === 1) {
+      await mongoose.disconnect();
+      isConnected = false;
+      console.log("🔌 MongoDB Disconnected (Idle)");
+    }
+  }, 2 * 60 * 1000); // 15 دقيقة
+}
+
+app.use((req, res, next) => {
+  resetIdleTimer();
+  next();
+});
 
 // ===============================================
 // صفحة رفع الملفات للمسؤول
