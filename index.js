@@ -60,63 +60,55 @@ app.use(express.static("public"));
 // ===============================================
 // الاتصال بقاعدة البيانات MongoDB مع تفعيل ضغط zlib
 // ===============================================
-let isConnected = false;
 
+
+let connecting = false;
 async function connectDB() {
-  if (isConnected) {
+  if (mongoose.connection.readyState === 1) {
     return;
   }
 
+  if (connecting) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return connectDB();
+  }
+
+  connecting = true;
+
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      maxPoolSize: 25, // عدد الاتصالات المتزامنة
-      minPoolSize: 0, // أقل عدد اتصالات دائمًا مفتوح
+      maxPoolSize: 10,        // مناسب لـ Flex
+      minPoolSize: 0,         // مهم جدًا
       socketTimeoutMS: 30000,
       connectTimeoutMS: 30000,
       serverSelectionTimeoutMS: 30000,
       compressors: "zlib",
-      bufferCommands: false // يمنع تراكم الطلبات أثناء انقطاع الاتصال
+      bufferCommands: false,
+      autoIndex: false        // يمنع createIndex وقت التشغيل
     });
 
-    isConnected = true;
-    console.log("✅ MongoDB Connected Successfully");
+    console.log("✅ MongoDB Connected");
   } catch (err) {
     console.error("❌ MongoDB Connection Failed:", err);
-    process.exit(1);
+    throw err;
+  } finally {
+    connecting = false;
   }
 }
 // ===============================================
 // استدعاء الاتصال عند بدء السيرفر
 // ===============================================
-//connectDB();
-(async () => {
+
+
+app.use(async (req, res, next) => {
   try {
-    await connectDB(); // اتصال واحد فقط
-    const User = require("./models/user.js");
-    const Inventaire = require("./models/Inventaire.js");
-    const Product = require("./models/Product.js");
-    const PagePasswords = require("./models/PagePasswords.js");
+    await connectDB();
+    next();
   } catch (err) {
-    console.error(err);
+    return res.status(503).json({
+      message: "Database temporarily unavailable"
+    });
   }
-})();
-
-let idleTimer;
-
-function resetIdleTimer() {
-  clearTimeout(idleTimer);
-  idleTimer = setTimeout(async () => {
-    if (mongoose.connection.readyState === 1) {
-      await mongoose.disconnect();
-      isConnected = false;
-      console.log("🔌 MongoDB Disconnected (Idle)");
-    }
-  }, 2 * 60 * 1000); // 15 دقيقة
-}
-
-app.use((req, res, next) => {
-  resetIdleTimer();
-  next();
 });
 
 // ===============================================
