@@ -60,57 +60,35 @@ app.use(express.static("public"));
 // ===============================================
 // الاتصال بقاعدة البيانات MongoDB مع تفعيل ضغط zlib
 // ===============================================
+let isConnected = false;
 
-
-let connecting = false;
 async function connectDB() {
-  if (mongoose.connection.readyState === 1) {
+  if (isConnected) {
     return;
   }
 
-  if (connecting) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    return connectDB();
-  }
-
-  connecting = true;
-
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      maxPoolSize: 10,        // مناسب لـ Flex
-      minPoolSize: 0,         // مهم جدًا
+      maxPoolSize: 13, // عدد الاتصالات المتزامنة
+      minPoolSize: 0, // أقل عدد اتصالات دائمًا مفتوح
       socketTimeoutMS: 30000,
       connectTimeoutMS: 30000,
       serverSelectionTimeoutMS: 30000,
       compressors: "zlib",
-      bufferCommands: false,
-      autoIndex: false        // يمنع createIndex وقت التشغيل
+      bufferCommands: false // يمنع تراكم الطلبات أثناء انقطاع الاتصال
     });
 
-    console.log("✅ MongoDB Connected");
+    isConnected = true;
+    console.log("✅ MongoDB Connected Successfully");
   } catch (err) {
     console.error("❌ MongoDB Connection Failed:", err);
-    throw err;
-  } finally {
-    connecting = false;
+    process.exit(1);
   }
 }
 // ===============================================
 // استدعاء الاتصال عند بدء السيرفر
 // ===============================================
-
-
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (err) {
-    return res.status(503).json({
-      message: "Database temporarily unavailable"
-    });
-  }
-});
-
+connectDB();
 // ===============================================
 // صفحة رفع الملفات للمسؤول
 // ===============================================
