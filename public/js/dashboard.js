@@ -304,7 +304,7 @@ async function initDashboard() {
       "productsCount",
       `${agg.produitsByAnpfCount} / ${meta.count || 0}`
     );
-    setText("adressCount", `${agg.adressesUnique.length} / 741`);
+    setText("adressCount", `${agg.adressesUnique.length} / 742`);
     applyDomQueue();
 
     // fill produits inexistants (batched)
@@ -876,7 +876,7 @@ async function initDashboard() {
           TG: { regex: /^TG-/i, objectif: 18 },
           Podiome: { regex: /^P-/i, objectif: 33 },
           Persentoir: { regex: /^PR-/i, objectif: 9 },
-          Réserve: { regex: /^R-/i, objectif: 52 },
+          Réserve: { regex: /^R-/i, objectif: 53 },
           TêteCaisse: { regex: /^TC-/i, objectif: 3 }
         };
 
@@ -1008,7 +1008,7 @@ async function initDashboard() {
       destroyChart(CHARTS.adress);
       const ctxA = qId("adressChart")?.getContext("2d");
       if (ctxA) {
-        const total = 741;
+        const total = 742;
         const used = agg.adressesUnique.length || 0;
         const pctUsed = ((used / total) * 100).toFixed(2);
         CHARTS.adress = new Chart(ctxA, {
