@@ -697,7 +697,7 @@ app.get("/api/inventairePro/:vendeur", isAuthenticated, isResponsable, async (re
 // ===============================================
 app.get("/api/inventaireProo", isAuthenticated, async (req, res) => {
   try {
-    const { nameVendeur, page = 1, limit = 5000 } = req.query;
+    const { nameVendeur, page = 1, limit  } = req.query;
 
     const filter = nameVendeur ? { nameVendeur } : {};
 
