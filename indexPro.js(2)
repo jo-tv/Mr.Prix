@@ -849,7 +849,7 @@ const aggregateProducts = (products) => {
 
 
 // ✅ تعديل دالة مسار الخادم (Node.js/Express)
-app.get("/api/inventaireProoo", isAuthenticated, async (req, res) => {
+app.get("/api/o", isAuthenticated, async (req, res) => {
   try {
     const { nameVendeur } = req.query; // لا نحتاج لـ limit و page
     const filter = nameVendeur ? { nameVendeur } : {};
@@ -874,9 +874,9 @@ app.get("/api/inventaireProoo", isAuthenticated, async (req, res) => {
 // ===============================================
 // GET /api/inventairePro?nameVendeur=xxx
 // ===============================================
-app.get("/api/inventaireProo", isAuthenticated, async (req, res) => {
+app.get("/api/", isAuthenticated, async (req, res) => {
   try {
-    const { nameVendeur, page = 1, limit = 5000 } = req.query;
+    const { nameVendeur, page = 1, limit  } = req.query;
 
     const filter = nameVendeur ? { nameVendeur } : {};
 

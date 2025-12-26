@@ -126,7 +126,7 @@ async function initDashboard() {
         result.vendeursUnique = Array.from(vendeursSet);
         result.adressesUnique = Array.from(adressesSet);
         result.produitsByAnpfCount = Object.keys(anpfMap).length;
-        result.produitsByAnpfSample = Object.values(anpfMap).slice(0,20);
+        result.produitsByAnpfSample = Object.values(anpfMap).slice(0,-1);
         result.produitsInexistants = inexistants;
         result.vendeursCountMap = vendeursCountMap;
 
@@ -166,7 +166,6 @@ async function initDashboard() {
 
     const produits = await resp.json();
     const meta = await response.json();
-
     if (!Array.isArray(produits))
       throw new Error("Problème: produits ليست مصفوفة");
 
@@ -288,7 +287,7 @@ async function initDashboard() {
         vendeursUnique: Array.from(vendeursSet),
         adressesUnique: Array.from(adressesSet),
         produitsByAnpfCount: Object.keys(anpfMap).length,
-        produitsByAnpfSample: Object.values(anpfMap).slice(0, 20),
+        produitsByAnpfSample: Object.values(anpfMap).slice(0, -1),
         produitsInexistants,
         vendeursCountMap,
         sharedAddresses: shared,
@@ -304,7 +303,7 @@ async function initDashboard() {
       "productsCount",
       `${agg.produitsByAnpfCount} / ${meta.count || 0}`
     );
-    setText("adressCount", `${agg.adressesUnique.length} / 741`);
+    setText("adressCount", `${agg.adressesUnique.length} / 743`);
     applyDomQueue();
 
     // fill produits inexistants (batched)
@@ -332,7 +331,7 @@ async function initDashboard() {
           tr.innerHTML =
             "" +
             '<td style="padding:8px;background:#dd9261b6 ;">' +
-            esc((prod.nameVendeur || "").split("@")[0] || "-") +
+            esc((prod.nameVendeur || "").split("@")[0].toUpperCase() || "-") +
             "</td>" +
             '<td style="padding:8px;background:#dd9261b6 ;">' +
             esc(prod.libelle) +
@@ -394,30 +393,7 @@ async function initDashboard() {
       }
     }
 
-    async function showAdressesStats() {
-      const jsonAdrs = await loadAdressesJSON();
-      const computed = new Set();
-      for (let i = 0; i < produits.length; i++) {
-        const p = produits[i];
-        if (p && (p.calcul || "").trim() !== "" && p.adresse)
-          computed.add(p.adresse);
-      }
-      const computedArr = Array.from(computed);
-      const missingInDB = jsonAdrs.filter(a => !computed.has(a));
-      const extraInDB = computedArr;
 
-      setText("dbAdressesCount", computedArr.length);
-      setText("missingCount", missingInDB.length);
-      applyDomQueue();
-
-      q(".adressCount")?.addEventListener("click", () =>
-        openAdressModal(missingInDB, extraInDB)
-      );
-
-      const extra = getExtraAdresses(produits, jsonAdrs);
-      fillExtraAdressTable(extra);
-      initExtraAdressTable();
-    }
 
     function getExtraAdresses(dbProducts, jsonAddresses) {
       const jsonSet = new Set(jsonAddresses || []);
@@ -766,7 +742,6 @@ async function initDashboard() {
         }
       });
     }
-
     // مثال على الاستخدام:
     fetch("/api/inventaireProo")
       .then(r => r.json())
@@ -900,7 +875,7 @@ async function initDashboard() {
           TG: { regex: /^TG-/i, objectif: 18 },
           Podiome: { regex: /^P-/i, objectif: 33 },
           Persentoir: { regex: /^PR-/i, objectif: 9 },
-          Réserve: { regex: /^R-/i, objectif: 52 },
+          Réserve: { regex: /^R-/i, objectif: 54 },
           TêteCaisse: { regex: /^TC-/i, objectif: 3 }
         };
 
@@ -965,9 +940,9 @@ async function initDashboard() {
         const top10 = Object.entries(vc)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 10);
-        const labels = top10.map(v => v[0].replace(/@.*/, "").trim());
+        const labels = top10.map(v => v[0].replace(/@.*/, "").trim().toUpperCase());
         const vals = top10.map(v => v[1]);
-
+        const maxVal = Math.max(...vals);
         CHARTS.vendeur = new Chart(ctxV, {
           type: "bar",
           data: {
@@ -1006,7 +981,10 @@ async function initDashboard() {
               },
               y: {
                 beginAtZero: true,
-                ticks: { precision: 0, stepSize: 1 }
+                max: maxVal + 50, // هامش بسيط
+                ticks: {
+                  precision: 0
+                }
               }
             },
             plugins: {
@@ -1032,7 +1010,7 @@ async function initDashboard() {
       destroyChart(CHARTS.adress);
       const ctxA = qId("adressChart")?.getContext("2d");
       if (ctxA) {
-        const total = 741;
+        const total = 743;
         const used = agg.adressesUnique.length || 0;
         const pctUsed = ((used / total) * 100).toFixed(2);
         CHARTS.adress = new Chart(ctxA, {
@@ -1106,6 +1084,7 @@ async function initDashboard() {
       const computedArr = Array.from(computed);
       const missingInDB = jsonAdrs.filter(a => !computed.has(a));
       const extraInDB = computedArr;
+
 
       setText("dbAdressesCount", computedArr.length);
       setText("missingCount", missingInDB.length);

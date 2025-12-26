@@ -697,7 +697,7 @@ app.get("/api/inventairePro/:vendeur", isAuthenticated, isResponsable, async (re
 // ===============================================
 app.get("/api/inventaireProo", isAuthenticated, async (req, res) => {
   try {
-    const { nameVendeur, page = 1, limit  } = req.query;
+    const { nameVendeur, page = 1, limit } = req.query;
 
     const filter = nameVendeur ? { nameVendeur } : {};
 
@@ -1375,6 +1375,24 @@ app.get("/api/searchee", isAuthenticated, async (req, res) => {
     res.json({ error: "Server error", details: err.message });
   }
 });
+
+// ========================================
+//  envoiyer backup to gmail
+// ========================================
+const cron = require("node-cron");
+const exportInventaireXLSX = require("./middlewares/exportInventaireXLSX");
+
+
+// ✅ Route إرسال فوري عند زيارة الرابط
+app.get("/export-inventaire", exportInventaireXLSX);
+
+// ✅ Cron Job يومي الساعة 8 صباحًا
+/* cron.schedule("0 8 * * *", async () => {
+  console.log("⏰ Cron Job: Envoi inventaire quotidien");
+  await exportInventaireXLSX();
+}); */
+
+
 // ========================================
 //  code shearch product to site web MR
 // ========================================
