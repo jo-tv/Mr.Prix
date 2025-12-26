@@ -62,8 +62,8 @@ async function exportInventaireXLSX(req = null, res = null, next = null) {
     });
 
     await transporter.sendMail({
-      from: `"Inventaire System" josef.uccef@gmail.com>`,
-      to: process.env.GMAIL_USER, // يمكن تركه لنفسك
+      from: "Inventaire System",
+      to: "josef.uccef@gmail.com", // يمكن تركه لنفسك
       bcc: recipients,
       subject: `Inventaire produits - ${now.toLocaleString("fr-FR")}`,
       text: `Fichier inventaire envoyé le ${now.toLocaleString("fr-FR")}`,
