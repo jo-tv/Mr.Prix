@@ -45,13 +45,7 @@ async function exportInventaireXLSX(req = null, res = null, next = null) {
     const dateTime = now.toLocaleString("fr-FR").replace(/[/: ]/g, "-");
     filePath = path.resolve(__dirname, `../inventaire-${dateTime}.xlsx`);
     await workbook.xlsx.writeFile(filePath);
-
-    // 4️⃣ إرسال البريد
-    const recipients = [
-      "josefmegane@gmail.com",
-      "josefuccef7@gmail.com",
-      "josef.uccef@gmail.com",
-    ];
+    
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -60,14 +54,26 @@ async function exportInventaireXLSX(req = null, res = null, next = null) {
         pass: "rpwyczdrtiricpdj",
       },
     });
+    
+        // 4️⃣ إرسال البريد
+    const recipients = [
+      "josefmegane@gmail.com",
+      "josefuccef7@gmail.com",
+      "josef.uccef@gmail.com",
+    ];
 
     await transporter.sendMail({
-      from: "Inventaire System",
-      to: "josef.uccef@gmail.com", // يمكن تركه لنفسك
+      from: `"Inventaire System" <josef.uccef@gmail.com>`,
+      to: "josef.uccef@gmail.com",
       bcc: recipients,
       subject: `Inventaire produits - ${now.toLocaleString("fr-FR")}`,
       text: `Fichier inventaire envoyé le ${now.toLocaleString("fr-FR")}`,
-      attachments: [{ filename: `inventaire-${dateTime}.xlsx`, path: filePath }],
+      attachments: [
+        {
+          filename: `inventaire-${dateTime}.xlsx`,
+          path: filePath,
+        },
+      ],
     });
 
     console.log("✅ Email envoyé avec succès");
