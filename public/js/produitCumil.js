@@ -35,55 +35,6 @@ async function fetchProducts(page = 1, limit = 10, search = '') {
 }
 
 // ===========================
-// 3. دوال معالجة البيانات (دمج + حسابات)
-// ===========================
-
-// تنظيف القيم لإنشاء مفتاح دمج موثوق
-function cleanKey(value) {
-  if (!value) return '';
-  return String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
-}
-
-// 3.1. دمج المنتجات وحساب mergeCount وecar
-function mergeAndCalculateProducts(produits) {
-  const merged = produits.reduce((acc, p) => {
-
-    if (!p.anpf) return acc; // حماية
-
-    const key = cleanKey(String(p.anpf));
-
-    const qte = Number(p.qteInven) || 0;
-    const stock = Number(p.stock) || 0;
-
-    if (!acc[key]) {
-      acc[key] = {
-        ...p,
-        anpf: p.anpf,
-        qteInven: qte,
-        stock: stock,
-        mergeCount: 1,
-        adresseSet: new Set(p.adresse ? [p.adresse] : []),
-      };
-    } else {
-      acc[key].qteInven += qte;
-      acc[key].mergeCount += 1;
-      acc[key].adresseSet.add(p.adresse || '');
-    }
-
-    acc[key].adresse = [...acc[key].adresseSet].filter(Boolean).join(' | ');
-    acc[key].ecar = acc[key].qteInven - acc[key].stock;
-
-    return acc;
-  }, {});
-
-  return Object.values(merged).map(({ adresseSet, ...rest }) => rest);
-}
-
-
-// ===========================
 // 4. عرض الجدول (RenderTable)
 // ===========================
 // حالة التخزين للترتيب
@@ -104,7 +55,7 @@ async function renderTable(page = 1) {
     totalPages = data.totalPages || 1;
 
     const rawProduits = Array.isArray(data.produits) ? data.produits : [];
-    const produits = mergeAndCalculateProducts(rawProduits); // ✅ الدمج هنا
+    const produits = rawProduits; // جاهزة من السيرفر
 
     // --- ترتيب المنتجات إذا تم الضغط على رأس العمود ---
     let sortedProduits = [...produits];
@@ -299,7 +250,7 @@ async function exportExcel() {
     const search = searchInput.value.trim();
 
     const rawProduits = await fetchAllProductsForExcel(search);
-    const produits = mergeAndCalculateProducts(rawProduits); // ✅ الدمج هنا
+    const produits = rawProduits; // جاهزة
 
     const exportData = [
       [

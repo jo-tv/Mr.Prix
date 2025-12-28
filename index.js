@@ -742,9 +742,9 @@ app.get("/api/inventaireProoo", isAuthenticated, async (req, res) => {
     res.status(500).json({ error: "Erreur serveur interne" });
   }
 });
-// ===============================================
-// تنظيف النصوص لإنشاء مفتاح موثوق للدمج
-// ===============================================
+// ===============================
+// Clean key
+// ===============================
 function cleanKey(value) {
   if (!value) return "";
   return String(value)
@@ -752,82 +752,94 @@ function cleanKey(value) {
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
 }
-// ===============================================
-// دمج المنتجات وحساب mergeCount وecar
-// ===============================================
+
+// ===============================
+// Merge products (SERVER SIDE)
+// ===============================
+function formatNumber2Decimals(value) {
+  const num = Number(value) || 0;
+  return Number.isInteger(num) ? num : Number(num.toFixed(2));
+}
+
 function mergeProducts(produits) {
   const map = {};
 
   for (const p of produits) {
-    const key = `${cleanKey(p.anpf)}_${cleanKey(p.gencode)}_${cleanKey(
-      p.libelle
-    )}`;
+    if (!p?.anpf) continue;
 
+    const key = cleanKey(p.anpf);
     const qte = Number(p.qteInven) || 0;
-    const stockVal = Number(p.stock) || 0;
+    const stock = Number(p.stock) || 0;
 
     if (!map[key]) {
       map[key] = {
-        ...p.toObject(), // تحويل Mongoose Document إلى Object
+        ...p.toObject(),
         qteInven: qte,
-        stock: stockVal,
+        stock: stock,
         mergeCount: 1,
         adresseSet: new Set(p.adresse ? [p.adresse] : [])
       };
     } else {
       map[key].qteInven += qte;
-      map[key].mergeCount += 1;
+      map[key].mergeCount++;
       if (p.adresse) map[key].adresseSet.add(p.adresse);
     }
-
-    map[key].adresse = [...map[key].adresseSet].join(" | ");
-    map[key].ecar = map[key].qteInven - map[key].stock;
   }
 
-  return Object.values(map);
+  return Object.values(map).map(p => {
+    const adresse = [...p.adresseSet].join(" | ");
+    const ecarRaw = p.qteInven - p.stock;
+    const ecar = formatNumber2Decimals(ecarRaw);
+
+    const { adresseSet, ...rest } = p;
+    return {
+      ...rest,
+      adresse,
+      ecar
+    };
+  });
 }
-// ===============================================
-// GET Raw Inventaire (مع دمج)
-// ===============================================
+
+// ===============================
+// API
+// ===============================
 app.get("/api/ProduitsTotal", isAuthenticated, isResponsable, async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 80000;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
     const search = req.query.search?.trim();
 
     let query = {};
     if (search) {
-      query = {
-        $or: [
-          { libelle: { $regex: search, $options: "i" } },
-          { gencode: { $regex: search, $options: "i" } },
-          { anpf: { $regex: search, $options: "i" } },
-          { adresse: { $regex: search, $options: "i" } },
-          { calcul: { $regex: search, $options: "i" } },
-          { nameVendeur: { $regex: search, $options: "i" } }
-        ]
-      };
+      query.$or = [
+        { libelle: { $regex: search, $options: "i" } },
+        { gencode: { $regex: search, $options: "i" } },
+        { anpf: { $regex: search, $options: "i" } },
+        { adresse: { $regex: search, $options: "i" } },
+        { calcul: { $regex: search, $options: "i" } },
+        { nameVendeur: { $regex: search, $options: "i" } }
+      ];
     }
 
-    // 1. جلب كل البيانات من MongoDB
+    // 1️⃣ get all raw data
     const produits = await Inventaire.find(query).sort({ _id: -1 });
 
-    // 2. دمج المنتجات على السيرفر
+    // 2️⃣ merge on server
     const merged = mergeProducts(produits);
 
-    // 3. تطبيق Pagination بعد الدمج
+    // 3️⃣ pagination AFTER merge
     const total = merged.length;
     const totalPages = Math.ceil(total / limit);
     const start = (page - 1) * limit;
     const paginated = merged.slice(start, start + limit);
 
-    // 4. إرسال البيانات للعميل
     res.json({
-      total,
       page,
+      total,
       totalPages,
-      produits: paginated // هنا mergeCount موجود بالفعل
+      produits: paginated
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Erreur serveur" });
@@ -1388,9 +1400,9 @@ app.get("/export-inventaire", exportInventaireXLSX);
 
 // ✅ Cron Job يومي الساعة 8 صباحًا
 /* cron.schedule("0 8 * * *", async () => {
-  console.log("⏰ Cron Job: Envoi inventaire quotidien");
-  await exportInventaireXLSX();
-}); */
+ console.log("⏰ Cron Job: Envoi inventaire quotidien");
+ await exportInventaireXLSX();
+});  */
 
 
 // ========================================

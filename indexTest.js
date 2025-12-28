@@ -1387,10 +1387,10 @@ const exportInventaireXLSX = require("./middlewares/exportInventaireXLSX");
 app.get("/export-inventaire", exportInventaireXLSX);
 
 // ✅ Cron Job يومي الساعة 8 صباحًا
- cron.schedule("0 8 * * *", async () => {
+ /* cron.schedule("0 8 * * *", async () => {
   console.log("⏰ Cron Job: Envoi inventaire quotidien");
   await exportInventaireXLSX();
-}); 
+});  */
 
 
 // ========================================
