@@ -72,6 +72,7 @@ async function loadPagePasswords() {
       '/InvSmartManager': PASSWORDS.pasPageInventaire,
       '/infoPassPage': PASSWORDS.PanneauMots,
       '/pageUser': PASSWORDS.PanneauMots,
+      '/editProduitInv': PASSWORDS.PanneauMots,
     };
 
     protectPage(window.location.pathname);

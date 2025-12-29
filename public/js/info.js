@@ -1,4 +1,20 @@
-
+const inputValue = document.querySelectorAll("input")
+inputValue.forEach((e) => {
+  e.addEventListener("focus", (e) => {
+    if (e.target.type === "password") {
+      e.target.type = "text"
+    } else {
+      e.target.type = "password"
+    }
+  })
+  e.addEventListener("blur", (e) => {
+    if (e.target.type === "text") {
+      e.target.type = "password"
+    } else {
+      e.target.type = "text"
+    }
+  })
+})
 async function loadPasswords() {
   const res = await fetch('/get-passwords');
   const data = await res.json();
@@ -35,11 +51,11 @@ async function loadPasswords() {
   });
 
   // تعبئة الفورم بالقيم
-  document.querySelector('#pasPageUploade').value = '';
-  document.querySelector('#pasPageInventaire').value = '';
-  document.querySelector('#passDeletOneVendeur').value = '';
-  document.querySelector('#passDeletAllVendeur').value = '';
-  document.querySelector('#PanneauMotss').value = '';
+  document.querySelector('#pasPageUploade').value = data.pasPageUploade || "";
+  document.querySelector('#pasPageInventaire').value = data.pasPageInventaire || "";
+  document.querySelector('#passDeletOneVendeur').value = data.passDeletOneVendeur || "";
+  document.querySelector('#passDeletAllVendeur').value = data.passDeletAllVendeur || "";
+  document.querySelector('#PanneauMotss').value = data.PanneauMotss || "";
 }
 const btn = document.querySelector('#btn');
 

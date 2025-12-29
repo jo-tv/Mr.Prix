@@ -67,6 +67,12 @@ router.get("/produitTotal", isAuthenticated, isResponsable, (req, res) => {
     ); // ✅ صفحة فارغة مؤقتاً
 });
 
+router.get("/editProduitInv", isAuthenticated, isResponsable, (req, res) => {
+    res.sendFile(
+        path.join(__dirname, "../views/responsable/editProduitInv.html")
+    ); // ✅ صفحة فارغة مؤقتاً
+});
+
 // ===================
 // صفحة الأسعار الخاصة بالبائع
 // ===================

@@ -565,7 +565,7 @@ async function saveProductChanges() {
         }
         </td>
         <td>
-          <i class="fa fa-map-marker-alt text-red"></i> ${updatedProduct.adresse.toUpperCase() || "!"
+          <i class="fa fa-map-marker-alt text-red"></i> ${updatedProduct.adresse || "!"
         }
         </td>
         <td class="actions">

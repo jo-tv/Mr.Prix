@@ -692,6 +692,33 @@ app.get("/api/inventairePro/:vendeur", isAuthenticated, isResponsable, async (re
     });
   }
 });
+
+// ===============================
+// GET produit by ID
+// ===============================
+app.get('/editInventairePro/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: 'ID غير صالح' });
+    }
+
+    const produit = await Inventaire.findById(id);
+
+    if (!produit) {
+      return res.status(404).json({ message: 'المنتج غير موجود' });
+    }
+
+    res.json(produit);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'خطأ في السيرفر' });
+  }
+});
+
+
 // ===============================================
 // GET /api/dashboard
 // ===============================================
@@ -1097,17 +1124,38 @@ app.get("/api/Produits", isAuthenticated, isResponsable, async (req, res) => {
 // ===============================================
 app.put("/api/inventairePro/:id", isAuthenticated, async (req, res) => {
   const { id } = req.params;
+
   try {
     const updatedProduct = await Inventaire.findByIdAndUpdate(
       id,
       req.body,
-      { new: true }
+      {
+        new: true,
+        runValidators: true, // تحسين
+      }
     );
-    if (!updatedProduct)
-      return res.status(404).json({ message: "Product not found" });
-    res.status(200).json(updatedProduct);
+
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
+
   } catch (error) {
-    res.status(500).json({ message: "Error updating product", error });
+    console.error("Update error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error updating product",
+      error: error.message,
+    });
   }
 });
 // ===============================================
