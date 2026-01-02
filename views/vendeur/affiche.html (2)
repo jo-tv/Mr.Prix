@@ -97,7 +97,7 @@
             }
             .price .unit {
                 font-size: 25pt;
-                margin-right: 5px;
+                margin-left: 5px;
                 vertical-align: top;
             }
             .price #cente {
@@ -161,15 +161,14 @@
     <body>
         <div class="actions">
             <button id="addCardBtn">
-                <i class="bi bi-plus-circle"></i> Ajouter une Affiche
+                <i class="bi bi-plus-circle"></i> إضافة بطاقة
             </button>
             <button id="downloadAll">
-                <i class="bi bi-file-earmark-pdf-fill"></i> Télécharger le PDF
-            </button><button id="clearStorage" style="background: #777">
-    <i class="bi bi-trash"></i> Effacer la mémoire
-</button>
-
-            
+                <i class="bi bi-file-earmark-pdf-fill"></i> تحميل PDF
+            </button>
+            <button id="clearStorage" style="background: #777">
+                مسح الذاكرة
+            </button>
         </div>
 
         <div id="cardsContainer"></div>
@@ -181,12 +180,10 @@
             function saveToLocal() {
                 const cardsData = [];
                 document.querySelectorAll(".card").forEach(card => {
-                    // نأخذ innerText لتجاهل الـ <span> والحصول على الرقم فقط (مثل 139,90)
-                    let rawPrice = card.querySelector(".amount").innerText;
-
                     cardsData.push({
                         title: card.querySelector(".title").textContent,
-                        amount: rawPrice.replace(",", ".").trim(), // نحول الفاصلة لنقطة للتخزين البرمجي
+                        amount: card.querySelector(".amount").childNodes[0]
+                            .textContent,
                         ref: card.querySelector(".Ref").value,
                         sku: card.querySelector(".sku").textContent,
                         date: card.querySelector(".date").textContent
@@ -211,51 +208,42 @@
             function addCard(data = null) {
                 const card = document.createElement("div");
                 card.className = "card";
-
-                // نستخدم الدالة لتنسيق المبلغ سواء كان قادماً من الـ API أو الـ LocalStorage
-                const displayAmount = data ? formatPrice(data.amount) : "0";
-
                 card.innerHTML = `
-        <div class="remove-btn">X</div>
-        <div class="title" contenteditable="true">${
-            data ? data.title : ""
-        }</div>
-        <div class="arc">
-            <svg viewBox="0 0 1000 300" preserveAspectRatio="none" style="width: 100%; height: 100%">
-                <path d="M0,200 C200,60 800,60 1000,200 L1000,300 L0,300 Z" fill="#fff"/>
-                <path d="M0,210 C200,80 800,80 1000,210" stroke="#c73f3a" stroke-width="50" fill="none" />
-            </svg>
-        </div>
-        <div class="price">
-            <span class="amount" contenteditable="true">${displayAmount}</span>
-            <span class="unit">Dh</span>
-        </div>
-        <div class="small-box"></div>
-        <div class="meta">
-            <div>Réf : <input type="number" class="Ref" value="${
-                data ? data.ref : ""
-            }" placeholder="GenCode.."></div>
-            <div style="margin-top:10px">SKU : <span class="sku">${
-                data ? data.sku : ""
-            }</span></div>
-        </div>
-        <div class="date">${data ? data.date : getFormattedDate()}</div>
-    `;
+                <div class="remove-btn">X</div>
+                <div class="title" contenteditable="true">${
+                    data ? data.title : ""
+                }</div>
+                <div class="arc">
+                    <svg viewBox="0 0 1000 300" preserveAspectRatio="none" style="width: 100%; height: 100%">
+                        <path d="M0,200 C200,60 800,60 1000,200 L1000,300 L0,300 Z" fill="#fff"/>
+                        <path d="M0,210 C200,80 800,80 1000,210" stroke="#c73f3a" stroke-width="60" fill="none" />
+                    </svg>
+                </div>
+                <div class="price">
+                    <span class="amount" contenteditable="true">
+                        ${
+                            data
+                                ? formatPrice(data.amount)
+                                : `0<span id="cente">,00</span>`
+                        }
+                    </span>
+                    <span class="unit">Dh</span>
+                </div>
 
-                // --- أحداث الحفظ التلقائي ---
+                <div class="small-box"></div>
+                <div class="meta">
+                    <div>Réf : <input type="number" class="Ref" value="${
+                        data ? data.ref : ""
+                    }" placeholder="GenCode.."></div>
+                    <div style="margin-top:10px">SKU : <span class="sku">${
+                        data ? data.sku : ""
+                    }</span></div>
+                </div>
+                <div class="date">${data ? data.date : getFormattedDate()}</div>
+            `;
 
-                // عند الكتابة في أي مكان داخل الكارد
-                card.addEventListener("input", () => {
-                    saveToLocal();
-                });
-
-                // عند خروج المؤشر من حقل السعر (blur)، نعيد تنسيقه فوراً لضمان الشكل الصحيح
-                const amountSpan = card.querySelector(".amount");
-                amountSpan.addEventListener("blur", () => {
-                    amountSpan.innerHTML = formatPrice(amountSpan.innerText);
-                    saveToLocal();
-                });
-
+                // أحداث التغيير للحفظ التلقائي
+                card.addEventListener("input", saveToLocal);
                 card.querySelector(".remove-btn").onclick = () => {
                     card.remove();
                     saveToLocal();
@@ -308,70 +296,44 @@
                 .addEventListener("click", async () => {
                     const { jsPDF } = window.jspdf;
                     const cards = document.querySelectorAll(".card");
-
-                    // إنشاء PDF بمقاس A4
                     const pdf = new jsPDF("p", "mm", "a4");
 
-                    // مقاسات الورقة والبطاقة ملم
-                    const pageWidth = 210;
-                    const pageHeight = 297;
-                    const cardWidth = 105;
-                    const cardHeight = 148;
-
-                    // حساب إحداثيات الوسط
-                    const xCentered = (pageWidth - cardWidth) / 2;
-                    const yCentered = (pageHeight - cardHeight) / 2;
-
                     for (let i = 0; i < cards.length; i++) {
-                        // إنشاء نسخة للرندر
                         const clone = cards[i].cloneNode(true);
-
-                        // تنظيف النسخة من العناصر غير المرغوبة
-                        const removeBtn = clone.querySelector(".remove-btn");
-                        if (removeBtn) removeBtn.remove();
+                        // إخفاء زر الحذف في النسخة
+                        clone.querySelector(".remove-btn").remove();
 
                         Object.assign(clone.style, {
                             position: "fixed",
                             left: "-10000px",
                             top: "0",
                             width: "105mm",
-                            height: "148mm",
-                            display: "block"
+                            height: "148mm"
                         });
                         document.body.appendChild(clone);
 
-                        // معالجة الـ SVG
+                        // حل مشكلة الـ SVG
                         await prepareSvg(clone);
 
-                        // التقاط الصورة بدقة عالية
                         const canvas = await html2canvas(clone, {
-                            scale: 3,
-                            useCORS: true,
-                            backgroundColor: "#ffffff"
+                            scale: 2,
+                            useCORS: true
                         });
-
                         const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
-                        // إضافة الصورة في وسط الصفحة
-                        pdf.addImage(
-                            imgData,
-                            "JPEG",
-                            xCentered,
-                            yCentered,
-                            cardWidth,
-                            cardHeight
-                        );
+                        const x = (i % 2) * 105;
+                        const y = (Math.floor(i / 2) % 2) * 148;
 
-                        // إذا كانت هناك بطاقة تالية، نفتح صفحة A4 جديدة
-                        if (i < cards.length - 1) {
-                            pdf.addPage("a4", "p");
-                        }
+                        pdf.addImage(imgData, "JPEG", x, y, 105, 148);
+
+                        if ((i + 1) % 4 === 0 && i + 1 < cards.length)
+                            pdf.addPage();
 
                         document.body.removeChild(clone);
                     }
-
-                    pdf.save("cards_centered_A4.pdf");
+                    pdf.save("tags.pdf");
                 });
+
             // دوال مساعدة
             function getFormattedDate() {
                 return new Date().toLocaleDateString("fr-FR");
@@ -379,29 +341,16 @@
 
             /*--- دالة التنسيق الذكي ---*/
             function formatPrice(priceValue) {
-                if (
-                    priceValue === undefined ||
-                    priceValue === null ||
-                    priceValue === ""
-                )
-                    return "0";
+                if (!priceValue) return `0<span id="cente">,00</span>`;
+                let priceStr = String(priceValue).replace(",", ".");
+                let parts = priceStr.split(".");
 
-                // تنظيف القيمة من أي رموز غير رقمية باستثناء النقطة والفاصلة
-                let cleanValue = String(priceValue)
-                    .replace(/[^\d.,]/g, "")
-                    .replace(",", ".");
-                let parts = cleanValue.split(".");
-
-                let mainPart = parts[0] || "0";
+                let mainPart = parts[0];
                 let centsPart = parts[1]
                     ? parts[1].padEnd(2, "0").substring(0, 2)
                     : "00";
 
-                if (centsPart === "00") {
-                    return mainPart;
-                } else {
-                    return `${mainPart}<span id="cente">,${centsPart}</span>`;
-                }
+                return `${mainPart}<span id="cente">,${centsPart}</span>`;
             }
 
             /*--- تحديث دالة جلب البيانات ---*/
@@ -426,17 +375,8 @@
 
             document.getElementById("addCardBtn").onclick = () => addCard();
             document.getElementById("clearStorage").onclick = () => {
-                // عبارة تأكيد احترافية بالفرنسية (أو العربية)
-                const confirmation = confirm(
-                    "Êtes-vous sûr de vouloir supprimer toutes les étiquettes ? Cette action est irréversible."
-                );
-
-                // إذا ضغط المستخدم على "OK" يتم المسح
-                if (confirmation) {
-                    localStorage.clear();
-                    location.reload();
-                }
-                // إذا ضغط على "Annuler" لا يحدث شيء
+                localStorage.clear();
+                location.reload();
             };
 
             // عند فتح الصفحة
