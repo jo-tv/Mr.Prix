@@ -83,11 +83,12 @@
                 top: 25mm;
                 height: 35mm;
                 z-index: 1;
+                display: block;
             }
             .price {
                 position: relative;
                 right: 20px;
-                top: 52mm;
+                top: 62mm;
                 text-align: center;
                 font-weight: 900;
                 font-size: 80pt;
@@ -111,8 +112,8 @@
                 position: absolute;
                 left: 6mm;
                 bottom: 12mm;
-                width: 45mm;
-                height: 40mm;
+                width: 35mm;
+                height: 30mm;
                 border: 1px solid #6e5f52;
             }
             .meta {
@@ -323,6 +324,7 @@
 
                         // تنظيف النسخة من زر الحذف
                         const removeBtn = clone.querySelector(".remove-btn");
+                        clone.querySelector(".arc").style.display = "none"
                         if (removeBtn) removeBtn.remove();
 
                         Object.assign(clone.style, {
