@@ -2,7 +2,7 @@
 <html lang="fr">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="viewport" content="width=device-width,initial-scale=0.9" />
         <title>Price Tag A6 - Optimized</title>
         <link
             rel="stylesheet"
@@ -15,7 +15,7 @@
             @import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
             /* التنسيقات (بقيت كما هي مع تعديلات طفيفة للطباعة) */
             @page {
-                size: 105mm 148mm;
+                size: 210mm 148mm;
                 margin: 0;
             }
             body {
@@ -48,13 +48,16 @@
                 font-weight: bold;
                 border-radius: 5px;
                 cursor: pointer;
+                width: 8rem;font-size: 16px;
             }
+
             button#downloadAll {
                 background: #e74c3c;
+                font-size: 14px;
             }
             .card {
-                width: 105mm;
-                height: 148mm;
+                width: 148mm;
+                height: 210mm;
                 background: #fff;
                 position: relative;
                 overflow: hidden;
@@ -69,17 +72,18 @@
                 left: 6mm;
                 right: 6mm;
                 font-weight: 800;
-                font-size: 17pt;
-                color: #6e5f52;
+                font-size: 25pt;
+                color: #000;
                 height: 40px;
-                line-height: 2rem;
+                line-height: 3rem;
                 letter-spacing: 1px;
+                width: 80%;
             }
             .arc {
                 position: absolute;
                 left: 0;
                 right: 0;
-                top: 25mm;
+                top: 35mm;
                 height: 35mm;
                 z-index: 1;
                 display: block;
@@ -87,7 +91,7 @@
             .price {
                 position: relative;
                 right: 25px;
-                top: 57mm;
+                top: 67mm;
                 text-align: center;
                 font-weight: 900;
                 letter-spacing: 3px;
@@ -95,50 +99,58 @@
                 z-index: 2;
             }
             .price .amount {
-                font-size: 135px;
+                font-size: 12.5rem;
             }
             .price .unit {
                 position: absolute;
-                font-size: 25pt;
+                font-size: 35pt;
                 vertical-align: top;
-                padding: 10px;
-                margin-top: 15px;
+                padding: 5px;
+                margin-top: 30px;
+                font-weight: 800;
             }
             .price #cente {
                 position: absolute;
                 bottom: 0;
                 margin-bottom: 20px;
-                font-size: 30pt;
+                font-size: 35pt;
                 vertical-align: bottom;
             }
             .small-box {
                 position: absolute;
                 left: 6mm;
                 bottom: 12mm;
-                width: 35mm;
-                height: 30mm;
-                border: 1px solid #6e5f52;
+                width: 55mm;
+                height: 50mm;
+                border: 1px solid #000;
             }
             .meta {
                 position: absolute;
                 right: 6mm;
                 bottom: 12mm;
-                font-size: 10pt;
+                font-size: 15pt;
                 font-weight: 800;
+                width: 250px;
+                padding: 10px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: start;
             }
             .meta input {
-                border: 1px solid #eee;
+                border: none;
                 padding: 2px;
-                width: 120px;
-                font-size: 10pt;
+                width: 180px;
+                font-size: 15pt;
                 font-weight: 900;
+                outline: none;
             }
             .date {
                 position: absolute;
                 bottom: 5mm;
                 left: 6mm;
-                font-size: 8pt;
-                color: #999;
+                font-size: 10pt;
+                color: #000;
             }
             .remove-btn {
                 position: absolute;
@@ -172,8 +184,14 @@
             </button>
             <button id="downloadAll">
                 <i class="bi bi-file-earmark-pdf-fill"></i> Télécharger le PDF</button
-            ><button id="clearStorage" style="background: #777">
+            ><button
+                id="clearStorage"
+                style="background: #777; font-size: 16px"
+            >
                 <i class="bi bi-trash"></i> Effacer la mémoire
+            </button>
+            <button id="scaner" style="background: #8e63d2; font-size: 16px">
+                <i class="bi bi-upc-scan"></i> scan Code-Barre
             </button>
         </div>
 
@@ -228,7 +246,7 @@
         <div class="arc">
             <svg viewBox="0 0 1000 300" preserveAspectRatio="none" style="width: 100%; height: 100%">
                 <path d="M0,200 C200,60 800,60 1000,200 L1000,300 L0,300 Z" fill="#fff"/>
-                <path d="M0,210 C200,80 800,80 1000,210" stroke="#a82d29" stroke-width="50" fill="none" />
+                <path d="M0,210 C200,80 800,80 1000,210" stroke="#a82d29" stroke-width="60" fill="none" />
             </svg>
         </div>
         <div class="price">
@@ -334,8 +352,8 @@
                             position: "fixed",
                             left: "-10000px",
                             top: "0",
-                            width: "105mm",
-                            height: "148mm",
+                            width: "148mm",
+                            height: "210mm",
                             display: "block"
                         });
                         document.body.appendChild(clone);
@@ -424,7 +442,23 @@
                     });
             }
 
-            document.getElementById("addCardBtn").onclick = () => addCard();
+            /*  document.getElementById("addCardBtn").onclick = () => addCard();*/
+            document
+                .getElementById("addCardBtn")
+                .addEventListener("click", () => {
+                    addCard();
+                    scrollToLastCard();
+                });
+
+            function scrollToLastCard() {
+                const cards = document.querySelectorAll(".card");
+                const lastCard = cards[cards.length - 1];
+
+                lastCard.scrollIntoView({
+                    behavior: "smooth"
+                });
+            }
+
             document.getElementById("clearStorage").onclick = () => {
                 // عبارة تأكيد احترافية بالفرنسية (أو العربية)
                 const confirmation = confirm(
