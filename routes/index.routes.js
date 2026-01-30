@@ -114,7 +114,7 @@ router.get("/devis", isAuthenticated, isVendeur, (req, res) => {
 });
 
 router.get("/afficheA6", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/afficheA6.html"));
+  res.sendFile(path.join(__dirname, "../views/vendeur/afficheA6Group.html"));
 });
 router.get("/afficheA5", isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, "../views/vendeur/afficheA5.html"));
