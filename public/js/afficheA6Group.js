@@ -141,19 +141,28 @@ btnFermer.addEventListener("click", stopReader);
 const container = document.getElementById("cardsContainer");
 // 1. وظيفة حفظ البيانات في LocalStorage
 function saveToLocal() {
+  const cards = document.querySelectorAll(".card");
+
+  // إذا لم يبقَ أي كارد، امسح التخزين
+  if (cards.length === 0) {
+    localStorage.removeItem("saved_cardsA6");
+    return;
+  }
+
   const cardsData = [];
-  document.querySelectorAll(".card").forEach(card => {
-    // نأخذ innerText لتجاهل الـ <span> والحصول على الرقم فقط (مثل 139,90)
+
+  cards.forEach(card => {
     let rawPrice = card.querySelector(".amount").innerText;
 
     cardsData.push({
       title: card.querySelector(".title").textContent,
-      amount: rawPrice.replace(",", ".").trim(), // نحول الفاصلة لنقطة للتخزين البرمجي
+      amount: rawPrice.replace(",", ".").trim(),
       ref: card.querySelector(".Ref").value,
       sku: card.querySelector(".sku").textContent,
       date: card.querySelector(".date").textContent
     });
   });
+
   localStorage.setItem("saved_cardsA6", JSON.stringify(cardsData));
 }
 
@@ -262,48 +271,48 @@ async function prepareSvg(cardElement) {
 }
 
 // 5. تحميل الـ PDF
-            document
-                .getElementById("downloadAll")
-                .addEventListener("click", async () => {
-                    const { jsPDF } = window.jspdf;
-                    const cards = document.querySelectorAll(".card");
-                    const pdf = new jsPDF("p", "mm", "a4");
+document
+  .getElementById("downloadAll")
+  .addEventListener("click", async () => {
+    const { jsPDF } = window.jspdf;
+    const cards = document.querySelectorAll(".card");
+    const pdf = new jsPDF("p", "mm", "a4");
 
-                    for (let i = 0; i < cards.length; i++) {
-                        const clone = cards[i].cloneNode(true);
-                        // إخفاء زر الحذف في النسخة
-                        clone.querySelector(".remove-btn").remove();
+    for (let i = 0; i < cards.length; i++) {
+      const clone = cards[i].cloneNode(true);
+      // إخفاء زر الحذف في النسخة
+      clone.querySelector(".remove-btn").remove();
 
-                        Object.assign(clone.style, {
-                            position: "fixed",
-                            left: "-10000px",
-                            top: "0",
-                            width: "105mm",
-                            height: "148mm"
-                        });
-                        document.body.appendChild(clone);
+      Object.assign(clone.style, {
+        position: "fixed",
+        left: "-10000px",
+        top: "0",
+        width: "105mm",
+        height: "148mm"
+      });
+      document.body.appendChild(clone);
 
-                        // حل مشكلة الـ SVG
-                        await prepareSvg(clone);
+      // حل مشكلة الـ SVG
+      await prepareSvg(clone);
 
-                        const canvas = await html2canvas(clone, {
-                            scale: 2,
-                            useCORS: true
-                        });
-                        const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      const canvas = await html2canvas(clone, {
+        scale: 2,
+        useCORS: true
+      });
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
-                        const x = (i % 2) * 105;
-                        const y = (Math.floor(i / 2) % 2) * 148;
+      const x = (i % 2) * 105;
+      const y = (Math.floor(i / 2) % 2) * 148;
 
-                        pdf.addImage(imgData, "JPEG", x, y, 105, 148);
+      pdf.addImage(imgData, "JPEG", x, y, 105, 148);
 
-                        if ((i + 1) % 4 === 0 && i + 1 < cards.length)
-                            pdf.addPage();
+      if ((i + 1) % 4 === 0 && i + 1 < cards.length)
+        pdf.addPage();
 
-                        document.body.removeChild(clone);
-                    }
-                    pdf.save("AfficheA6.pdf");
-                });
+      document.body.removeChild(clone);
+    }
+    pdf.save("AfficheA6.pdf");
+  });
 // دوال مساعدة
 function getFormattedDate() {
   return new Date().toLocaleDateString("fr-FR");

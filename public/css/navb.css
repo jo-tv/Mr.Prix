@@ -7,8 +7,8 @@
 }
 
 .menu-toggle {
-    width: 45px;
-    height: 45px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background-color: #1ef0a0;
     box-shadow:
@@ -40,7 +40,7 @@
     background-color: #4644fd;
     color: #fff;
     text-align: center;
-    margin: 5px auto;
+    cursor: pointer;
 }
 .btn-app .fa {
     line-height: 2.1em;
@@ -89,39 +89,31 @@
     transition-delay: 0.5s;
 }
 .menu-line.open .btn-app:nth-of-type(1) {
-    bottom: 4.25em;
+    bottom: 4em;
 }
 .menu-line.open .btn-app:nth-of-type(1) {
-    bottom: 7.25em;
+    bottom: 7em;
 }
 .menu-line.open .btn-app:nth-of-type(2) {
-    bottom: 10.25em;
+    bottom: 10em;
 }
 .menu-line.open .btn-app:nth-of-type(3) {
-    bottom: 13.25em;
+    bottom: 13em;
 }
 .menu-line.open .btn-app:nth-of-type(4) {
-    bottom: 16.25em;
+    bottom: 16em;
 }
 .menu-line.open .btn-app:nth-of-type(5) {
-    bottom: 19.25em;
+    bottom: 19em;
 }
 .menu-line.open .btn-app:nth-of-type(6) {
-    bottom: 22.25em;
+    bottom: 22em;
 }
 .menu-line.open .btn-app:nth-of-type(7) {
-    bottom: 25.25em;
+    bottom: 25em;
 }
-.btn-app {
-    width: 2.5em;
-    height: 2.5em;
-    border-radius: 50%;
-    position: absolute;
-    background-color: #4644fd;
-    color: #fff;
-    text-align: center;
-    margin: 5px auto;
-    cursor: pointer;
+.menu-line.open .btn-app:nth-of-type(8) {
+    bottom: 28em;
 }
 
 /* النص عند المرور */
