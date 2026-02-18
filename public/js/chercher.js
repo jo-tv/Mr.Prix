@@ -17,6 +17,8 @@ $(document).ready(function () {
       { data: 'GENCOD_P' },
       { data: 'ANPF' },
       { data: 'FOURNISSEUR_P' },
+      { data: 'PV_TTC' },
+      { data: 'PRIXVT' },
       { data: 'REFFOUR_P' },
       { data: 'SOUS_SOLUTION' },
       { data: 'STOCK' },
