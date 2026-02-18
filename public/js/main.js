@@ -168,7 +168,7 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
       <div><span class="i1">Stock</span><span class="i2"><i class="fa-solid
       fa-boxes-stacked"></i></span><span id="stk" class="i3">${product.STOCK
         }</span></div>
-      <div><span class="i1">SOLUTION</span><span class="i2"><i class="fa-solid fa-map-pin"></i></span><span id="stk" class="i3" style="color:#8147ed;font-weight: 900;background: #dfd59d;">${product.SOUS_SOLUTION
+      <div><span class="i1">SOUS SOLUTION</span><span class="i2"><i class="fa-solid fa-map-pin"></i></span><span id="stk" class="i3" style="color:#8147ed;font-weight: 900;background: #dfd59d;">${product.SOUS_SOLUTION
         }</span></div>
       <div><span class="i1">Status</span><span class="i2"><i class="fas fa-exclamation-triangle"></i></span><span class="i3" id="etatProduit" ></span></div>
     </div>

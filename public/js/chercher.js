@@ -18,6 +18,7 @@ $(document).ready(function () {
       { data: 'ANPF' },
       { data: 'FOURNISSEUR_P' },
       { data: 'REFFOUR_P' },
+      { data: 'SOUS_SOLUTION' },
       { data: 'STOCK' },
     ],
     scrollX: true,
