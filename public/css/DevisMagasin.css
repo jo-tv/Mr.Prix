@@ -303,7 +303,6 @@ th {
     .containeer {
         display: none;
     }
-
     /* ⭐ إجبار المتصفح على طباعة الألوان */
     * {
         -webkit-print-color-adjust: exact !important;
