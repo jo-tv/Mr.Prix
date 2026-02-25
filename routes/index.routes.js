@@ -113,6 +113,10 @@ router.get("/devis", isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, "../views/vendeur/Devis.html"));
 });
 
+router.get("/devisMagazin", isAuthenticated, isVendeur, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/vendeur/DevisMagasin.html"));
+});
+
 router.get("/afficheA6", isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, "../views/vendeur/afficheA6Group.html"));
 });
