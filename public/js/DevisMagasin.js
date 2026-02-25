@@ -124,7 +124,7 @@ function afficherPanier() {
                 <td>${item.libelle}</td>
                 <td></td>
                 <td>${item.qte}</td>
-                <td>${item.taxe.toFixed(3)}</td>
+                <td>${item.prix.toFixed(2)}</td>
                 <td>${total.toFixed(3)}</td>
                 <td id="sup">
                     <button onclick="supprimer(${index})">❌</button>
@@ -375,9 +375,9 @@ function showReader() {
 
             // ✨ نضع الكود في آخر كارت
             refInput.value = decodedText;
-            
+
             const btnRecherche = document.getElementById("btnRecherche");
-            
+
             if (btnRecherche) btnRecherche.click();
 
             // محاكاة الضغط على زر Enter
@@ -446,7 +446,7 @@ btnFermer.addEventListener("click", stopReader);
 
 // code script menu toggel-------------->
 
- const menuToggle = document.querySelector('.menu-toggle');
+const menuToggle = document.querySelector('.menu-toggle');
 const menuRound = document.querySelector('.menu-round');
 const menuLines = document.querySelectorAll('.menu-line');
 
