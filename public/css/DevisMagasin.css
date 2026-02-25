@@ -33,30 +33,44 @@ td {
 }
 
 th {
-    background: lavender;
+    background: #d8d8f5;
     font-weight: bold;
     text-align: center;
 }
 
 .titelDevis {
     text-align: center;
-    font-size: 16px;
-    background: lavender;
+    font-size: 18px;
+    font-weight: 800;
+    background: #d8d8f5;
     border: none;
 }
 
 .ExClient {
     text-align: center;
-    background: lavender;
-    font-size: 12px;
+    background: #d8d8f5;
+    font-size: 14px;
+    font-weight: 500;
     border: none;
 }
 
 .label {
+    font-size: 14px;
     font-weight: 600;
 }
+.td-info {
+    font-size: 13px;
+    font-weight: 400;
+}
 
+.grid th {
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+}
 .grid td {
+    font-size: 15px;
+    font-weight: 500;
     text-align: center;
 }
 
@@ -69,10 +83,15 @@ th {
     justify-content: space-between;
     margin-top: 20px;
 }
+.client {
+    margin-bottom: 50px;
+}
 
 .totals td {
     border: none;
     font-weight: 600;
+    font-size: 15px;
+    text-align: left;
 }
 
 .right {
@@ -91,7 +110,15 @@ th {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    margin: 25px auto;
+    margin: 30px auto;
+    padding: 20px;
+    justify-content: space-around;
+    background: #add8e6;
+    box-shadow:
+        rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+        rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    border-radius: 10px;
+    border: 1px solid #000;
 }
 
 .action-btn {
@@ -101,7 +128,7 @@ th {
     padding: 12px 20px;
     border: none;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -161,7 +188,8 @@ th {
     padding: 20px;
     max-width: 1000px;
     border: 1px solid #000;
-    background: #fafafa;
+    border-radius: 10px;
+    background: #add8e6;
     margin-bottom: 20px;
     box-shadow:
         rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,

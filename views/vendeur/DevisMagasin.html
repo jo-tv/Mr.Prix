@@ -2,7 +2,7 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=0.6" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.7" />
         <title>DEVIS</title>
         <link rel="stylesheet" href="/css/DevisMagasin.css" />
 
@@ -11,8 +11,13 @@
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
             rel="stylesheet"
         />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <link rel="stylesheet" href="css/navb.css" />
     </head>
 
     <body>
@@ -55,7 +60,6 @@
                         class="Ref"
                     />
                 </div>
-
                 <div class="form-group button-group">
                     <button
                         id="btnRecherche"
@@ -66,24 +70,26 @@
                     </button>
                 </div>
 
-                <div class="form-group">
-                    <label>Anpf</label>
-                    <input
-                        id="anpf"
-                        type="number"
-                        placeholder="Entrer code article"
-                        readonly
-                    />
-                </div>
+                <div class="group-input">
+                    <div class="form-group">
+                        <label>Anpf</label>
+                        <input
+                            id="anpf"
+                            type="number"
+                            placeholder="Entrer code article"
+                            readonly
+                        />
+                    </div>
 
-                <div class="form-group">
-                    <label>Libelle</label>
-                    <input
-                        id="libelle"
-                        type="text"
-                        placeholder="Entrer libelle"
-                        readonly
-                    />
+                    <div class="form-group">
+                        <label>Libelle</label>
+                        <input
+                            id="libelle"
+                            type="text"
+                            placeholder="Entrer libelle"
+                            readonly
+                        />
+                    </div>
                 </div>
                 <div class="group-input">
                     <div class="form-group small">
@@ -131,30 +137,30 @@
                 <table class="full info client">
                     <tr>
                         <td class="label">Devis No :</td>
-                        <td>12345</td>
+                        <td class="td-info">12345</td>
                         <td class="label">Site magasin</td>
-                        <td>2</td>
-                        <td>MARRAKECH</td>
+                        <td class="td-info">2</td>
+                        <td class="td-info">MARRAKECH</td>
                     </tr>
                     <tr>
                         <td class="label">Date de vente</td>
-                        <td id="date">26/09/24</td>
+                        <td class="td-info" id="date">26/09/24</td>
                         <td></td>
                         <td></td>
-                        <td>
+                        <td class="td-info">
                             Lot 15 - 16 - 17 Parc d'activité commercial Marjane
                         </td>
                     </tr>
                     <tr>
                         <td class="label">Code conso.</td>
-                        <td>000</td>
+                        <td class="td-info">000</td>
                         <td></td>
                         <td></td>
-                        <td>MARRAKECH</td>
+                        <td class="td-info">MARRAKECH</td>
                     </tr>
                     <tr>
                         <td class="label">Nom conso.</td>
-                        <td contenteditable="" class="name-client">
+                        <td contenteditable="" class="name-client td-info">
                             NAME CLIENT
                         </td>
                         <td></td>
@@ -226,6 +232,58 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="containeer" id="smoll">
+            <div class="menu-toggle">
+                <span class="fa fa-plus"></span>
+            </div>
+            <div class="menu-round">
+                <div class="btn-app" data-label="Devis Parquet">
+                    <div class="fa">
+                        <a href="devis"
+                            ><i
+                                class="fas fa-file-invoice"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Devis Gerflex">
+                    <a href="calc"></a>
+                    <div class="fa">
+                        <a href="calc"
+                            ><i
+                                class="fas fa-calculator"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Lecteur Prix">
+                    <div class="fa">
+                        <a href="/prixVen"
+                            ><i
+                                class="fa-solid fa-circle-left"
+                                style="color: white"
+                            ></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-line">
+                <div class="btn-app" data-label="Devis magasin">
+                    <a href="devisMagazin"></a>
+                    <div class="fa">
+                        <a href="devisMagazin"
+                            ><i class="fa-solid fa-house"
+                                
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
             </div>
         </div>
         <script src="js/codebar.min.js"></script>

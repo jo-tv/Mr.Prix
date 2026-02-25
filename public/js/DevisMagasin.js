@@ -446,7 +446,7 @@ btnFermer.addEventListener("click", stopReader);
 
 // code script menu toggel-------------->
 
-/* const menuToggle = document.querySelector('.menu-toggle');
+ const menuToggle = document.querySelector('.menu-toggle');
 const menuRound = document.querySelector('.menu-round');
 const menuLines = document.querySelectorAll('.menu-line');
 
@@ -454,4 +454,4 @@ menuToggle.addEventListener('click', () => {
   menuToggle.classList.toggle('open');
   menuRound.classList.toggle('open');
   menuLines.forEach(line => line.classList.toggle('open'));
-}); */
+}); 
