@@ -288,28 +288,6 @@ th {
     z-index: 10001;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
-/* ================================= */
-/* PRINT MODE */
-/* ================================= */
-/* إخفاؤه عند الطباعة إذا رغبت */
-@media print {
-    .page {
-        width: 100%;
-    }
-    /* ⭐ إجبار المتصفح على طباعة الألوان */
-    * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-    .article-form {
-        display: none !important;
-    }
-    .actions-container,
-    .containeer,
-    #sup {
-        display: none;
-    }
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -333,4 +311,39 @@ th {
     .add-btn {
         width: 100%;
     }
+}
+
+/* ================================= */
+/* PRINT MODE */
+/* ================================= */
+/* إخفاؤه عند الطباعة إذا رغبت */
+
+@media print {
+
+    @page {
+        size: A4;
+        margin: 10mm;
+    }
+
+    body {
+        margin: 0;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .article-form,
+    .actions-container,
+    #sup {
+        display: none !important;
+    }
+
+    .page {
+        width: 100%;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
 }
