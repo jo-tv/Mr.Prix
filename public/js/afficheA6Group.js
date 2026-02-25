@@ -282,6 +282,7 @@ document
       const clone = cards[i].cloneNode(true);
       // إخفاء زر الحذف في النسخة
       clone.querySelector(".remove-btn").remove();
+      clone.querySelector(".arc").style.display = "none";
 
       Object.assign(clone.style, {
         position: "fixed",
