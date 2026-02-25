@@ -296,18 +296,18 @@ th {
     .page {
         width: 100%;
     }
-
-    .actions-container,
-    .article-form,
-    .containeer, 
-    #sup{
-        display: none;
-    }
-
     /* ⭐ إجبار المتصفح على طباعة الألوان */
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+    }
+    .article-form {
+        display: none !important;
+    }
+    .actions-container,
+    .containeer,
+    #sup {
+        display: none;
     }
 }
 
