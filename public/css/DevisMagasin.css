@@ -299,10 +299,11 @@ th {
 
     .actions-container,
     .article-form,
-    #sup,
-    .containeer {
+    .containeer, 
+    #sup{
         display: none;
     }
+
     /* ⭐ إجبار المتصفح على طباعة الألوان */
     * {
         -webkit-print-color-adjust: exact !important;
