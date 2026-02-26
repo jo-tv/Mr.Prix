@@ -56,8 +56,9 @@ async function getProduit() {
 /* ===================================== */
 
 function remplirForm(data) {
+  let libelleClean = data.libelle.replace(/\s*\[[^\]]*\]\s*/g, '').trim();
   document.getElementById("anpf").value = data.anpf || "";
-  document.getElementById("libelle").value = data.libelle || "";
+  document.getElementById("libelle").value = libelleClean || "";
   document.getElementById("qte").value = 1;
   document.getElementById("prix").value = data.prix || 0;
   document.getElementById("taxe").value = data.taxe || 0;

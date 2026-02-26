@@ -1,6 +1,7 @@
 const scaner = document.getElementById("scaner");
 const readerDiv = document.getElementById("reader");
 const btnFermer = document.querySelector(".fermer");
+const containerScan = document.querySelector(".container-scan");
 
 let html5QrCode = null;
 let isScanning = false;
@@ -13,6 +14,7 @@ function showReader() {
 
   readerDiv.style.display = "block";
   btnFermer.style.display = "block";
+  containerScan.style.zIndex = "9999999";
 
   if (!html5QrCode) {
     html5QrCode = new Html5Qrcode("reader", {
@@ -131,6 +133,7 @@ function stopReader() {
 function hideReader() {
   readerDiv.style.display = "none";
   btnFermer.style.display = "none";
+  containerScan.style.zIndex = "-9999999";
 }
 
 btnFermer.addEventListener("click", stopReader);
