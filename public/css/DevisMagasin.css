@@ -336,6 +336,7 @@ th {
 
     .article-form,
     .actions-container,
+    .containeer,
     #sup {
         display: none !important;
     }
