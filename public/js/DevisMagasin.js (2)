@@ -44,7 +44,6 @@ async function getProduit() {
 
     produitActuel = data;
 
-
     remplirForm(data);
   } catch (err) {
     alert(err.message);
@@ -58,12 +57,10 @@ async function getProduit() {
 
 function remplirForm(data) {
   let libelleClean = data.libelle.replace(/\s*\[[^\]]*\]\s*/g, '').trim();
-
-  let PrixTotal = data.prixPro <= 0 || data.prixPro == "" ? data.prix : data.prixPro
   document.getElementById("anpf").value = data.anpf || "";
   document.getElementById("libelle").value = libelleClean || "";
   document.getElementById("qte").value = 1;
-  document.getElementById("prix").value = PrixTotal || 0;
+  document.getElementById("prix").value = data.prix || 0;
   document.getElementById("taxe").value = data.taxe || 0;
 }
 

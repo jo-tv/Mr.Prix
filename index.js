@@ -382,6 +382,7 @@ app.get("/api/Produit/:code", isAuthenticated, async (req, res) => {
     res.json({
       prix: produit.PV_TTC,
       libelle: produit.LIBELLE,
+      prixPro: produit.PRIXVT,
       anpf: produit.ANPF
     });
   } catch (err) {
