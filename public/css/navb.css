@@ -143,31 +143,6 @@
     right: 130%;
 }
 
-@media (max-width: 576px) {
-    /* كود التابلت */
-    .containeer {
-        zoom: 1;
-    }
-}
-@media (max-width: 768px) {
-    /* كود التابلت */
-    .containeer {
-        zoom: 1.2;
-    }
-}
-@media (max-width: 992px) {
-    /* كود التابلت */
-    .containeer {
-        zoom: 1.3;
-    }
-}
-@media (max-width: 1200px) {
-    /* كود الحواسيب */
-    .containeer {
-        zoom: 1.4 !important;
-    }
-}
-
 /* تصميم نافذة منبثقة */
 .toast {
     position: fixed;
@@ -350,4 +325,29 @@
 .custom-modal-content iframe {
     width: 100%;
     height: 100%;
+}
+
+@media (max-width: 576px) {
+    /* كود التابلت */
+    .containeer {
+        zoom: 1 !important;
+    }
+}
+@media (max-width: 768px) {
+    /* كود التابلت */
+    .containeer {
+        zoom: 1.2 !important;
+    }
+}
+@media (max-width: 992px) {
+    /* كود التابلت */
+    .containeer {
+        zoom: 1.3 !important;
+    }
+}
+@media (max-width: 1200px) {
+    /* كود الحواسيب */
+    .containeer {
+        zoom: 1.4 !important;
+    }
 }
