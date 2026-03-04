@@ -125,7 +125,7 @@ function afficherPanier() {
     tbody.innerHTML += `
             <tr>
                 <td>${item.anpf}</td>
-                <td>${item.libelle}</td>
+                <td style="text-align: left">${item.libelle}</td>
                 <td></td>
                 <td>${item.qte}</td>
                 <td>${item.prix.toFixed(2)}</td>

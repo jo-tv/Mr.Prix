@@ -6,6 +6,7 @@ body {
 .page {
     width: 90%;
     margin: auto;
+    
 }
 
 .table {
@@ -110,6 +111,7 @@ th {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
+    max-width: 1000px;
     margin: 30px auto;
     padding: 20px;
     justify-content: space-around;

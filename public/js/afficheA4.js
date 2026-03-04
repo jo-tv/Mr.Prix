@@ -157,7 +157,7 @@ function saveToLocal() {
       date: card.querySelector(".date").textContent
     });
   });
-  localStorage.setItem("saved_cardsA5", JSON.stringify(cardsData));
+  localStorage.setItem("saved_cardsA4", JSON.stringify(cardsData));
 }
 
 // 2. وظيفة استعادة البيانات
@@ -185,21 +185,21 @@ function addCard(data = null) {
         <div class="title" contenteditable="true">${data ? data.title : ""
     }</div>
         <div class="arc">
-<svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
-     style="width:100%; height:100%;">
-
-    <!-- الشكل الأبيض -->
-    <path d="M0,260 C250,-160 750,-160 1000,260 L1000,400 L0,400 Z"
-          fill="#ffffff"/>
-
-    <!-- القوس الأحمر -->
-    <path d="M0,260 C250,-60 750,-60 1000,260"
-          stroke="#a82d29"
-          stroke-width="60"
-          fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"/>
-</svg>
+          <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
+               style="width:100%; height:100%;">
+          
+              <!-- الشكل الأبيض -->
+              <path d="M0,260 C250,-160 750,-160 1000,260 L1000,400 L0,400 Z"
+                    fill="#ffffff"/>
+          
+              <!-- القوس الأحمر -->
+              <path d="M0,260 C250,-60 750,-60 1000,260"
+                    stroke="#a82d29"
+                    stroke-width="60"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+          </svg>
         </div>
         <div class="price">
             <span class="amount" contenteditable="true">${displayAmount}</span>
@@ -302,8 +302,8 @@ document
         position: "fixed",
         left: "-10000px",
         top: "0",
-        width: "148mm",
-        height: "210mm",
+        width: "210mm",
+        height: "297mm",
         display: "block"
       });
       document.body.appendChild(clone);

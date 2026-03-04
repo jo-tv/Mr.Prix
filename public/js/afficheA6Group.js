@@ -194,10 +194,21 @@ function addCard(data = null) {
         <div class="title" contenteditable="true">${data ? data.title : ""
     }</div>
         <div class="arc">
-            <svg viewBox="0 0 1000 300" preserveAspectRatio="none" style="width: 100%; height: 100%">
-                <path d="M0,200 C200,60 800,60 1000,200 L1000,300 L0,300 Z" fill="#fff"/>
-                <path d="M0,210 C200,80 800,80 1000,210" stroke="#a82d29" stroke-width="60" fill="none" />
-            </svg>
+            <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
+               style="width:100%; height:100%;">
+          
+              <!-- الشكل الأبيض -->
+              <path d="M0,260 C250,-160 750,-160 1000,260 L1000,400 L0,400 Z"
+                    fill="#ffffff"/>
+          
+              <!-- القوس الأحمر -->
+              <path d="M0,260 C250,-60 750,-60 1000,260"
+                    stroke="#a82d29"
+                    stroke-width="60"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+          </svg>
         </div>
         <div class="price">
             <span class="amount" contenteditable="true">${displayAmount}</span>
