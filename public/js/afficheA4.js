@@ -282,20 +282,18 @@ document
     const { jsPDF } = window.jspdf;
     const cards = document.querySelectorAll(".card");
 
-    // إنشاء PDF بمقاس A4
+    // إنشاء PDF بمقاس A4 عمودي
     const pdf = new jsPDF("p", "mm", "a4");
 
-    // مقاسات البطاقة بالمليمتر (A7)
-    const cardWidth = 148;
-    const cardHeight = 210;
+    // أبعاد A4 بالمليمتر
+    const cardWidth = 210;
+    const cardHeight = 297;
 
     for (let i = 0; i < cards.length; i++) {
-      // إنشاء نسخة للرندر
       const clone = cards[i].cloneNode(true);
 
-      // تنظيف النسخة من زر الحذف
       const removeBtn = clone.querySelector(".remove-btn");
-      clone.querySelector(".arc").style.display = "none";
+      clone.querySelector(".arc")?.style && (clone.querySelector(".arc").style.display = "block");
       if (removeBtn) removeBtn.remove();
 
       Object.assign(clone.style, {
@@ -306,12 +304,11 @@ document
         height: "297mm",
         display: "block"
       });
+
       document.body.appendChild(clone);
 
-      // معالجة الـ SVG (تأكد أن هذه الدالة موجودة في كودك)
       await prepareSvg(clone);
 
-      // التقاط الصورة بدقة عالية
       const canvas = await html2canvas(clone, {
         scale: 3,
         useCORS: true,
@@ -320,17 +317,8 @@ document
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
-      // نضع الإحداثيات 0 و 0 لوضعها في الزاوية اليسرى العليا تماماً
-      pdf.addImage(
-        imgData,
-        "JPEG",
-        0, // الإحداثي الأفقي (اليسار)
-        0, // الإحداثي الرأسي (الأعلى)
-        cardWidth,
-        cardHeight
-      );
+      pdf.addImage(imgData, "JPEG", 0, 0, cardWidth, cardHeight);
 
-      // إضافة صفحة جديدة لكل بطاقة (باستثناء الأخيرة)
       if (i < cards.length - 1) {
         pdf.addPage("a4", "p");
       }
@@ -338,7 +326,7 @@ document
       document.body.removeChild(clone);
     }
 
-    pdf.save("AfficheA5.pdf");
+    pdf.save("AfficheA4.pdf"); // تم تصحيح الاسم
   });
 // دوال مساعدة
 function getFormattedDate() {
