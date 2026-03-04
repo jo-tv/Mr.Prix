@@ -193,7 +193,7 @@ function addCard(data = null) {
                     fill="#ffffff"/>
           
               <!-- القوس الأحمر -->
-              <path d="M0,260 C250,-60 750,-60 1000,260"
+              <path d="M0,260 C250,50 750,50 1000,260"
                     stroke="#a82d29"
                     stroke-width="60"
                     fill="none"
