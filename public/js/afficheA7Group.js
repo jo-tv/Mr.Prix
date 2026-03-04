@@ -42,7 +42,7 @@ function showReader() {
         ) || devices[0];
 
       const config = {
-        fps: 10,
+        fps: 30,
         qrbox: { width: 350, height: 350 },
         aspectRatio: 1.7778, // 16:9 مثالي للآيفون
         facingMode: { exact: "environment" }
@@ -144,26 +144,35 @@ btnFermer.addEventListener("click", stopReader);
 const container = document.getElementById("cardsContainer");
 // 1. وظيفة حفظ البيانات في LocalStorage
 function saveToLocal() {
+  const cards = document.querySelectorAll(".card");
+
+  // إذا لم يبقَ أي كارد، امسح التخزين
+  if (cards.length === 0) {
+    localStorage.removeItem("saved_cardsA7");
+    return;
+  }
+
   const cardsData = [];
-  document.querySelectorAll(".card").forEach(card => {
-    // نأخذ innerText لتجاهل الـ <span> والحصول على الرقم فقط (مثل 139,90)
+
+  cards.forEach(card => {
     let rawPrice = card.querySelector(".amount").innerText;
 
     cardsData.push({
       title: card.querySelector(".title").textContent,
-      amount: rawPrice.replace(",", ".").trim(), // نحول الفاصلة لنقطة للتخزين البرمجي
+      amount: rawPrice.replace(",", ".").trim(),
       ref: card.querySelector(".Ref").value,
       sku: card.querySelector(".sku").textContent,
       date: card.querySelector(".date").textContent
     });
   });
-  localStorage.setItem("saved_cardsA4", JSON.stringify(cardsData));
+
+  localStorage.setItem("saved_cardsA7", JSON.stringify(cardsData));
 }
 
 // 2. وظيفة استعادة البيانات
 function loadFromLocal() {
   const data = JSON.parse(
-    localStorage.getItem("saved_cardsA4") || "[]"
+    localStorage.getItem("saved_cardsA7") || "[]"
   );
   if (data.length === 0) {
     addCard(); // إضافة بطاقة فارغة إذا كانت الذاكرة فارغة
@@ -179,23 +188,24 @@ function addCard(data = null) {
 
   // نستخدم الدالة لتنسيق المبلغ سواء كان قادماً من الـ API أو الـ LocalStorage
   const displayAmount = data ? formatPrice(data.amount) : "0";
+  
 
   card.innerHTML = `
         <div class="remove-btn">X</div>
         <div class="title" contenteditable="true">${data ? data.title : ""
     }</div>
         <div class="arc">
-          <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
+            <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
                style="width:100%; height:100%;">
           
               <!-- الشكل الأبيض -->
-              <path d="M0,260 C250,-160 750,-160 1000,260 L1000,400 L0,400 Z"
-                    fill="#ffffff"/>
+              <path d="M0,260 C250,-10 750,-10 1000,260 L1000,400 L0,400 Z"
+                    fill="transparent"/>
           
               <!-- القوس الأحمر -->
-              <path d="M0,260 C250,50 750,50 1000,260"
+              <path d="M0,260 C250,100 750,100 1000,260"
                     stroke="#a82d29"
-                    stroke-width="60"
+                    stroke-width="40"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"/>
@@ -205,7 +215,6 @@ function addCard(data = null) {
             <span class="amount" contenteditable="true">${displayAmount}</span>
             <span class="unit"> Dh</span>
         </div>
-        <div class="small-box"></div>
         <div class="meta">
             <div>Réf : <input type="number" class="Ref"  value="${data ? data.ref : ""
     }" placeholder="GenCode.."></div>
@@ -281,64 +290,46 @@ document
   .addEventListener("click", async () => {
     const { jsPDF } = window.jspdf;
     const cards = document.querySelectorAll(".card");
-
-    // إنشاء PDF بمقاس A4
     const pdf = new jsPDF("p", "mm", "a4");
 
-    // مقاسات البطاقة بالمليمتر (A7)
-    const cardWidth = 148;
-    const cardHeight = 210;
-
     for (let i = 0; i < cards.length; i++) {
-      // إنشاء نسخة للرندر
       const clone = cards[i].cloneNode(true);
 
-      // تنظيف النسخة من زر الحذف
-      const removeBtn = clone.querySelector(".remove-btn");
-      clone.querySelector(".arc").style.display = "none";
-      if (removeBtn) removeBtn.remove();
+      clone.querySelector(".remove-btn")?.remove();
 
       Object.assign(clone.style, {
         position: "fixed",
         left: "-10000px",
         top: "0",
-        width: "210mm",
-        height: "297mm",
-        display: "block"
+        width: "105mm",
+        height: "74mm"
       });
+
       document.body.appendChild(clone);
 
-      // معالجة الـ SVG (تأكد أن هذه الدالة موجودة في كودك)
       await prepareSvg(clone);
 
-      // التقاط الصورة بدقة عالية
       const canvas = await html2canvas(clone, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: "#ffffff"
+        scale: 2,
+        useCORS: true
       });
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
-      // نضع الإحداثيات 0 و 0 لوضعها في الزاوية اليسرى العليا تماماً
-      pdf.addImage(
-        imgData,
-        "JPEG",
-        0, // الإحداثي الأفقي (اليسار)
-        0, // الإحداثي الرأسي (الأعلى)
-        cardWidth,
-        cardHeight
-      );
+      // 2 أعمدة × 4 صفوف = 8 كروت
+      const x = (i % 2) * 105;
+      const y = (Math.floor(i / 2) % 4) * 74;
 
-      // إضافة صفحة جديدة لكل بطاقة (باستثناء الأخيرة)
-      if (i < cards.length - 1) {
-        pdf.addPage("a4", "p");
-      }
+      pdf.addImage(imgData, "JPEG", x, y, 105, 74);
+
+      // صفحة جديدة بعد 8 كروت
+      if ((i + 1) % 8 === 0 && i + 1 < cards.length)
+        pdf.addPage();
 
       document.body.removeChild(clone);
     }
 
-    pdf.save("AfficheA5.pdf");
+    pdf.save("AfficheA7.pdf");
   });
 // دوال مساعدة
 function getFormattedDate() {

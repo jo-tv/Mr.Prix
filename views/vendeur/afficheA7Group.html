@@ -2,27 +2,37 @@
 <html lang="fr">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=0.6" />
-        <title>Price Tag A5 - Optimized</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Price Tag A6 - Optimized</title>
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
         />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <!-- code css nav bar  -->
+        <link rel="stylesheet" href="/css/navb.css" />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
         <!-- 🎭 Icons -->
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         />
-        <!-- code css nav bar  -->
-        <link rel="stylesheet" href="/css/navb.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
             /* التنسيقات (بقيت كما هي مع تعديلات طفيفة للطباعة) */
             @page {
-                size: 210mm 148mm;
+                size: 105mm 74mm;
                 margin: 0;
+            }
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
             body {
                 display: flex;
@@ -36,131 +46,115 @@
             .actions {
                 background: #333;
                 width: 100%;
-                height: 70px;
+                height: 60px;
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
-                gap: 10px;
+                gap: 7px;
                 position: fixed;
                 top: 0;
                 z-index: 9999;
                 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             }
             .actions .btn-action {
-                padding: 10px;
+                padding: 8px;
                 border: none;
                 color: #fff;
                 font-weight: bold;
                 border-radius: 5px;
                 cursor: pointer;
-                font-size: 15px !important  ;
-                width: 100%;
-                height: 50px;
+                font-size: 10px !important  ;
+                width: 90%;
+                height: 40px;
                 overflow: hidden;
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
             }
             .actions .btn-action i {
-                font-size: 17px;
+                font-size: 14px;
                 font-weight: 900;
             }
             .card {
-                width: 148mm;
-                height: 210mm;
+                width: 105mm;
+                height: 74mm;
                 background: #fff;
                 position: relative;
                 overflow: hidden;
-                margin-top: 100px;
+                margin: 100px auto;
                 border: 1px solid #ddd;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
                 flex-shrink: 0;
-                z-index: 99;
             }
             .title {
                 position: absolute;
-                top: 6mm;
+                top: 5mm;
                 left: 6mm;
                 right: 6mm;
                 font-weight: 800;
-                font-size: 25pt;
+                font-size: 14pt;
                 color: #000;
-                height: 40px;
-                line-height: 3rem;
+                height: 30px;
+                line-height: 1.5rem;
                 letter-spacing: 1px;
                 width: 80%;
             }
             .arc {
-                position: absolute;
+                position: relative;
                 left: 0;
                 right: 0;
-                top: 8mm;
+                top: -15mm;
                 z-index: 1;
                 display: block;
             }
             .price {
                 position: relative;
                 right: 25px;
-                top: 80mm;
+                top: -39mm;
                 text-align: center;
-                font-weight: 600;
+                font-weight: 800;
                 letter-spacing: 3px;
                 color: #a82d29;
                 z-index: 2;
             }
             .price .amount {
-                font-size: 12rem;
+                font-size: 88px;
             }
             .price .unit {
                 position: absolute;
-                font-size: 35pt;
+                font-size: 20pt;
                 vertical-align: top;
-                padding: 5px;
-                margin-top: 30px;
-                font-weight: 800;
+                padding: 10px;
+                margin-top: 15px;
             }
             .price #cente {
                 position: absolute;
                 bottom: 0;
                 margin-bottom: 20px;
-                font-size: 35pt;
+                font-size: 30pt;
                 vertical-align: bottom;
-            }
-            .small-box {
-                position: absolute;
-                left: 6mm;
-                bottom: 12mm;
-                width: 55mm;
-                height: 50mm;
-                border: 1px solid #000;
             }
             .meta {
                 position: absolute;
-                right: 6mm;
-                bottom: 12mm;
-                font-size: 15pt;
+                right: -3mm;
+                bottom: 3mm;
+                font-size: 8pt;
                 font-weight: 800;
-                width: 250px;
-                padding: 10px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: start;
             }
             .meta input {
                 border: none;
                 padding: 2px;
-                width: 180px;
-                font-size: 15pt;
-                font-weight: 900;
+                width: 120px;
+                font-size: 8pt;
+                font-weight: 800;
                 outline: none;
             }
             .date {
                 position: absolute;
-                bottom: 5mm;
-                left: 6mm;
-                font-size: 10pt;
-                color: #000;
+                bottom: 2mm;
+                left: 3mm;
+                font-size: 8pt;
+                color: #999;
             }
             .remove-btn {
                 position: absolute;
@@ -169,19 +163,19 @@
                 background: red;
                 color: white;
                 border-radius: 50%;
-                width: 45px;
-                height: 45px;
+                width: 30px;
+                height: 30px;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.5rem;
+                font-size: 1rem;
                 font-weight: 700;
                 z-index: 10;
             }
             .container-scan {
                 width: 100%;
-                height: 300px;
+                height: 200px;
                 z-index: -9999999;
                 position: fixed;
                 top: 40%;
@@ -190,8 +184,8 @@
                 align-items: center;
             }
             #reader {
-                width: 90vw;
-                max-width: 420px;
+                width: 80vw;
+                max-width: 320px;
                 background: black;
                 border-radius: 16px;
                 overflow: hidden;
@@ -204,13 +198,13 @@
             /* زر الإغلاق */
             .fermer {
                 position: fixed;
-                top: 10%;
-                width: 86px;
-                height: 86px;
+                top: 7%;
+                width: 60px;
+                height: 60px;
                 border-radius: 50%;
                 background: red;
                 color: white;
-                font-size: 38px;
+                font-size: 25px;
                 font-weight: bold;
                 border: none;
                 outline: none;
@@ -218,6 +212,32 @@
                 z-index: 10001;
                 box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             }
+            /* === BASE HEADING === */
+
+            h1 {
+                position: relative;
+                padding: 0;
+                margin: 0;
+                font-family: "Raleway", sans-serif;
+                font-weight: 300;
+                font-size: 30px;
+                color: #080808;
+                -webkit-transition: all 0.4s ease 0s;
+                -o-transition: all 0.4s ease 0s;
+                transition: all 0.4s ease 0s;
+                color: #5700ff;
+            }
+
+            h1 span {
+                display: block;
+                font-size: 0.5em;
+                line-height: 1.3;
+            }
+            h1 em {
+                font-style: normal;
+                font-weight: 600;
+            }
+
             /* === HEADING STYLE #1 === */
             .one {
                 position: relative;
@@ -226,14 +246,11 @@
                 border: 1px solid #000;
                 padding: 50px;
                 box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-                scale: 1.1;
             }
             .one h1 {
-                font-size: 2.5rem;
                 text-align: center;
                 padding-bottom: 5px;
                 font-weight: 900;
-                color: #5700ff;
             }
             .one h1:before {
                 width: 28px;
@@ -260,7 +277,8 @@
 
             @media print {
                 .actions,
-                .remove-btn {
+                .remove-btn,
+                .containeer {
                     display: none;
                 }
             }
@@ -298,10 +316,10 @@
             <div id="reader"></div>
         </div>
         <div class="one">
-            <h1>Page affiche A5</h1>
+            <h1>Page affiche A7</h1>
         </div>
         <div id="cardsContainer"></div>
-        <div class="containeer" style="scale: 1.2">
+        <div class="containeer" style="scale: 0.8">
             <div class="menu-toggle">
                 <span class="fa fa-plus"></span>
             </div>
@@ -347,7 +365,7 @@
                         >
                     </div>
                 </div>
-                            <div class="btn-app" data-label="affiche A7">
+                <div class="btn-app" data-label="affiche A7">
                     <a href="afficheA7"></a>
                     <div class="fa">
                         <a href="afficheA7"
@@ -360,6 +378,6 @@
             </div>
         </div>
         <script src="js/codebar.min.js"></script>
-        <script src="js/afficheA5.js"></script>
+        <script src="js/afficheA7Group.js"></script>
     </body>
 </html>
