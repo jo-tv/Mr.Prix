@@ -190,7 +190,7 @@ function addCard(data = null) {
           
               <!-- الشكل الأبيض -->
               <path d="M0,260 C250,-160 750,-160 1000,260 L1000,400 L0,400 Z"
-                    fill="#ffffff"/>
+                    fill="transparent"/>
           
               <!-- القوس الأحمر -->
               <path d="M0,260 C250,50 750,50 1000,260"
