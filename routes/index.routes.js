@@ -129,6 +129,9 @@ router.get("/afficheA5", isAuthenticated, isVendeur, (req, res) => {
 router.get("/afficheA4", isAuthenticated, isVendeur, (req, res) => {
   res.sendFile(path.join(__dirname, "../views/vendeur/afficheA4.html"));
 });
+router.get("/test", isAuthenticated, isVendeur, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/vendeur/tesTafficheA4.html"));
+});
 
 // إضافة نقطة GET لعرض البيانات في صفحة HTML
 router.get("/InvSmartManager", isAuthenticated, isVendeur, (req, res) => {
