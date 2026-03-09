@@ -192,7 +192,7 @@ function addCard(data = null) {
 
   card.innerHTML = `
         <div class="remove-btn">X</div>
-        <div class="title" contenteditable="true">${data ? data.title : ""
+        <div class="title" >${data ? data.title : ""
     }</div>
         <div class="arc">
             <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
@@ -212,7 +212,7 @@ function addCard(data = null) {
           </svg>
         </div>
         <div class="price">
-            <span class="amount" contenteditable="true">${displayAmount}</span>
+            <span class="amount" >${displayAmount}</span>
             <span class="unit"> Dh</span>
         </div>
         <div class="meta">
