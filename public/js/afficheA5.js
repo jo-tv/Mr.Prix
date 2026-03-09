@@ -144,19 +144,37 @@ btnFermer.addEventListener("click", stopReader);
 const container = document.getElementById("cardsContainer");
 // 1. وظيفة حفظ البيانات في LocalStorage
 function saveToLocal() {
+
   const cardsData = [];
+
   document.querySelectorAll(".card").forEach(card => {
-    // نأخذ innerText لتجاهل الـ <span> والحصول على الرقم فقط (مثل 139,90)
-    let rawPrice = card.querySelector(".amount").innerText;
+
+    const amountEl = card.querySelector(".amount");
+    const oldPriceEl = card.querySelector(".old-price");
+
+    let rawPrice = amountEl.textContent.replace(",", ".").trim();
+    let oldPrice = oldPriceEl.textContent.replace(",", ".").trim();
+
+    let currentPrice = parseFloat(rawPrice) || 0;
+    let previousPrice = parseFloat(oldPrice) || 0;
+
+    // قلب القيم إذا كان هناك خصم
+    if (previousPrice > currentPrice && previousPrice > 0) {
+      [currentPrice, previousPrice] = [previousPrice, currentPrice];
+    }
 
     cardsData.push({
       title: card.querySelector(".title").textContent,
-      amount: rawPrice.replace(",", ".").trim(), // نحول الفاصلة لنقطة للتخزين البرمجي
+      amount: currentPrice,
       ref: card.querySelector(".Ref").value,
       sku: card.querySelector(".sku").textContent,
-      date: card.querySelector(".date").textContent
+      date: card.querySelector(".date").textContent,
+      oldPrice: previousPrice,
+      porcent: card.querySelector(".porcent").textContent
     });
+
   });
+
   localStorage.setItem("saved_cardsA5", JSON.stringify(cardsData));
 }
 
@@ -172,8 +190,47 @@ function loadFromLocal() {
   }
 }
 
+function updatePromotion(card) {
+
+  const amountEl = card.querySelector(".amount");
+  const oldPriceEl = card.querySelector(".old-price");
+  const percentEl = card.querySelector(".porcent");
+  const promoBox = card.querySelector(".promo-box");
+  const prixTest = card.querySelector(".price");
+
+  let rawPrice = amountEl.textContent.replace(",", ".").trim();
+  let oldPrice = oldPriceEl.textContent.replace(",", ".").trim();
+
+  let currentPrice = parseFloat(rawPrice) || 0;
+  let previousPrice = parseFloat(oldPrice) || 0;
+
+  if (previousPrice > 0) {
+
+    promoBox.style.display = "block";
+    prixTest.style.top = "68mm";
+    // قلب القيم
+    [currentPrice, previousPrice] = [previousPrice, currentPrice];
+
+    // تحديث الواجهة
+    amountEl.innerHTML = formatPrice(currentPrice);
+    oldPriceEl.innerHTML = formatPrice(previousPrice);
+
+    // حساب نسبة الخصم
+    let percent = ((previousPrice - currentPrice) / previousPrice) * 100;
+    percentEl.textContent = "-" + percent.toFixed(0) + "%";
+
+  } else {
+
+    // إخفاء البوكس إذا لم يوجد خصم
+    promoBox.style.display = "none";
+    percentEl.textContent = "0%";
+    prixTest.style.top = "77mm";
+  }
+}
+
 // 3. وظيفة إضافة بطاقة (إنشاء الـ DOM)
 function addCard(data = null) {
+
   const card = document.createElement("div");
   card.className = "card";
 
@@ -185,21 +242,28 @@ function addCard(data = null) {
         <div class="title" contenteditable="true">${data ? data.title : ""
     }</div>
         <div class="arc">
-<svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
-     style="width:100%; height:100%;">
-
-    <!-- الشكل الأبيض -->
-    <path d="M0,260 C250,-160 750,-160 1000,260 L1000,400 L0,400 Z"
-          fill="#ffffff"/>
-
-    <!-- القوس الأحمر -->
-    <path d="M0,260 C250,50 750,50 1000,260"
-          stroke="#a82d29"
-          stroke-width="60"
-          fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"/>
-</svg>
+          <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
+               style="width:100%; height:100%;">
+          
+              <!-- الشكل الأبيض -->
+              <path d="M0,260 C250,-160 750,-160 1000,260 L1000,400 L0,400 Z"
+                    fill="transparent"/>
+          
+              <!-- القوس الأحمر -->
+              <path d="M0,260 C250,50 750,50 1000,260"
+                    stroke="#a82d29"
+                    stroke-width="60"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="promo-box">
+          <div class="promo-title">Promotion</div>
+          <div class="promo-content">
+              <div class="porcent">${data ? data.porcent : ""}</div>
+              <div class="old-price">${data ? data.oldPrice : ""}</div>
+         </div>
         </div>
         <div class="price">
             <span class="amount" contenteditable="true">${displayAmount}</span>
@@ -214,11 +278,11 @@ function addCard(data = null) {
         </div>
         <div class="date">${data ? data.date : getFormattedDate()}</div>
     `;
-
+  updatePromotion(card)
   // --- أحداث الحفظ التلقائي ---
-
   // عند الكتابة في أي مكان داخل الكارد
   card.addEventListener("input", () => {
+    updatePromotion(card)
     saveToLocal();
   });
 
@@ -226,7 +290,9 @@ function addCard(data = null) {
   const amountSpan = card.querySelector(".amount");
   amountSpan.addEventListener("blur", () => {
     amountSpan.innerHTML = formatPrice(amountSpan.innerText);
+
     saveToLocal();
+    fetchPriceDynamic(card, input)
   });
 
   card.querySelector(".remove-btn").onclick = () => {
@@ -295,7 +361,7 @@ document
 
       // تنظيف النسخة من زر الحذف
       const removeBtn = clone.querySelector(".remove-btn");
-      clone.querySelector(".arc").style.display = "none";
+      clone.querySelector(".arc").style.display = "block";
       if (removeBtn) removeBtn.remove();
 
       Object.assign(clone.style, {
@@ -381,13 +447,16 @@ function fetchPriceDynamic(card, input) {
     .then(res => res.json())
     .then(data => {
       if (data) {
+
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");
         card.querySelector(".sku").textContent = data.anpf;
+        card.querySelector(".old-price").textContent = data.prixPro;
         // هنا التعديل الجوهري
         card.querySelector(".amount").innerHTML =
           formatPrice(data.prix);
         saveToLocal();
+        updatePromotion(card);
       }
     });
 }
@@ -427,7 +496,7 @@ document.getElementById("clearStorage").onclick = () => {
 
 
 window.onload = function () {
-  loadFromLocal(), scaner.addEventListener("click", showReader)
+  loadFromLocal(), scaner.addEventListener("click", showReader), updatePromotion
 };
 
 const menuToggle = document.querySelector('.menu-toggle');

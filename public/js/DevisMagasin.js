@@ -129,7 +129,7 @@ function afficherPanier() {
                 <td></td>
                 <td>${item.qte}</td>
                 <td>${item.prix.toFixed(2)}</td>
-                <td>${total.toFixed(3)}</td>
+                <td>${total.toFixed(2)}</td>
                 <td id="sup">
                     <button onclick="supprimer(${index})">❌</button>
                 </td>

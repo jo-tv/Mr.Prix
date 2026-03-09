@@ -144,37 +144,19 @@ btnFermer.addEventListener("click", stopReader);
 const container = document.getElementById("cardsContainer");
 // 1. وظيفة حفظ البيانات في LocalStorage
 function saveToLocal() {
-
   const cardsData = [];
-
   document.querySelectorAll(".card").forEach(card => {
-
-    const amountEl = card.querySelector(".amount");
-    const oldPriceEl = card.querySelector(".old-price");
-
-    let rawPrice = amountEl.textContent.replace(",", ".").trim();
-    let oldPrice = oldPriceEl.textContent.replace(",", ".").trim();
-
-    let currentPrice = parseFloat(rawPrice) || 0;
-    let previousPrice = parseFloat(oldPrice) || 0;
-
-    // قلب القيم إذا كان هناك خصم
-    if (previousPrice > currentPrice && previousPrice > 0) {
-      [currentPrice, previousPrice] = [previousPrice, currentPrice];
-    }
+    // نأخذ innerText لتجاهل الـ <span> والحصول على الرقم فقط (مثل 139,90)
+    let rawPrice = card.querySelector(".amount").innerText;
 
     cardsData.push({
       title: card.querySelector(".title").textContent,
-      amount: currentPrice,
+      amount: rawPrice.replace(",", ".").trim(), // نحول الفاصلة لنقطة للتخزين البرمجي
       ref: card.querySelector(".Ref").value,
       sku: card.querySelector(".sku").textContent,
-      date: card.querySelector(".date").textContent,
-      oldPrice: previousPrice,
-      porcent: card.querySelector(".porcent").textContent
+      date: card.querySelector(".date").textContent
     });
-
   });
-
   localStorage.setItem("saved_cardsA4", JSON.stringify(cardsData));
 }
 
@@ -190,46 +172,8 @@ function loadFromLocal() {
   }
 }
 
-function updatePromotion(card) {
-
-  const amountEl = card.querySelector(".amount");
-  const oldPriceEl = card.querySelector(".old-price");
-  const percentEl = card.querySelector(".porcent");
-  const promoBox = card.querySelector(".promo-box");
-
-  let rawPrice = amountEl.textContent.replace(",", ".").trim();
-  let oldPrice = oldPriceEl.textContent.replace(",", ".").trim();
-
-  let currentPrice = parseFloat(rawPrice) || 0;
-  let previousPrice = parseFloat(oldPrice) || 0;
-
-  if (previousPrice > 0 ) {
-
-    promoBox.style.display = "block";
-
-    // قلب القيم
-    [currentPrice, previousPrice] = [previousPrice, currentPrice];
-
-    // تحديث الواجهة
-    amountEl.innerHTML = formatPrice(currentPrice);
-    oldPriceEl.innerHTML = formatPrice(previousPrice);
-
-    // حساب نسبة الخصم
-    let percent = ((currentPrice - previousPrice) / currentPrice) * 100;
-    percentEl.textContent = percent.toFixed(0) + "%";
-
-  } else {
-
-    // إخفاء البوكس إذا لم يوجد خصم
-    promoBox.style.display = "none";
-    percentEl.textContent = "0%";
-
-  }
-}
-
 // 3. وظيفة إضافة بطاقة (إنشاء الـ DOM)
 function addCard(data = null) {
-
   const card = document.createElement("div");
   card.className = "card";
 
@@ -257,13 +201,6 @@ function addCard(data = null) {
                     stroke-linejoin="round"/>
           </svg>
         </div>
-        <div class="promo-box">
-          <div class="promo-title">Promotion</div>
-          <div class="promo-content">
-              <div class="porcent">${data ? data.porcent : ""}</div>
-              <div class="old-price">${data ? data.oldPrice : ""}</div>
-         </div>
-        </div>
         <div class="price">
             <span class="amount" contenteditable="true">${displayAmount}</span>
             <span class="unit"> Dh</span>
@@ -277,11 +214,11 @@ function addCard(data = null) {
         </div>
         <div class="date">${data ? data.date : getFormattedDate()}</div>
     `;
-  updatePromotion(card)
+
   // --- أحداث الحفظ التلقائي ---
+
   // عند الكتابة في أي مكان داخل الكارد
   card.addEventListener("input", () => {
-    updatePromotion(card)
     saveToLocal();
   });
 
@@ -289,7 +226,6 @@ function addCard(data = null) {
   const amountSpan = card.querySelector(".amount");
   amountSpan.addEventListener("blur", () => {
     amountSpan.innerHTML = formatPrice(amountSpan.innerText);
-    updatePromotion(card)
     saveToLocal();
   });
 
@@ -433,16 +369,13 @@ function fetchPriceDynamic(card, input) {
     .then(res => res.json())
     .then(data => {
       if (data) {
-
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");
         card.querySelector(".sku").textContent = data.anpf;
-        card.querySelector(".old-price").textContent = data.prixPro;
         // هنا التعديل الجوهري
         card.querySelector(".amount").innerHTML =
           formatPrice(data.prix);
         saveToLocal();
-        updatePromotion(card);
       }
     });
 }
@@ -482,7 +415,7 @@ document.getElementById("clearStorage").onclick = () => {
 
 
 window.onload = function () {
-  loadFromLocal(), scaner.addEventListener("click", showReader), updatePromotion
+  loadFromLocal(), scaner.addEventListener("click", showReader)
 };
 
 const menuToggle = document.querySelector('.menu-toggle');

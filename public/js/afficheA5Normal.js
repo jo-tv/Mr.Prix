@@ -144,44 +144,26 @@ btnFermer.addEventListener("click", stopReader);
 const container = document.getElementById("cardsContainer");
 // 1. وظيفة حفظ البيانات في LocalStorage
 function saveToLocal() {
-
   const cardsData = [];
-
   document.querySelectorAll(".card").forEach(card => {
-
-    const amountEl = card.querySelector(".amount");
-    const oldPriceEl = card.querySelector(".old-price");
-
-    let rawPrice = amountEl.textContent.replace(",", ".").trim();
-    let oldPrice = oldPriceEl.textContent.replace(",", ".").trim();
-
-    let currentPrice = parseFloat(rawPrice) || 0;
-    let previousPrice = parseFloat(oldPrice) || 0;
-
-    // قلب القيم إذا كان هناك خصم
-    if (previousPrice > currentPrice && previousPrice > 0) {
-      [currentPrice, previousPrice] = [previousPrice, currentPrice];
-    }
+    // نأخذ innerText لتجاهل الـ <span> والحصول على الرقم فقط (مثل 139,90)
+    let rawPrice = card.querySelector(".amount").innerText;
 
     cardsData.push({
       title: card.querySelector(".title").textContent,
-      amount: currentPrice,
+      amount: rawPrice.replace(",", ".").trim(), // نحول الفاصلة لنقطة للتخزين البرمجي
       ref: card.querySelector(".Ref").value,
       sku: card.querySelector(".sku").textContent,
-      date: card.querySelector(".date").textContent,
-      oldPrice: previousPrice,
-      porcent: card.querySelector(".porcent").textContent
+      date: card.querySelector(".date").textContent
     });
-
   });
-
-  localStorage.setItem("saved_cardsA4", JSON.stringify(cardsData));
+  localStorage.setItem("saved_cardsA5", JSON.stringify(cardsData));
 }
 
 // 2. وظيفة استعادة البيانات
 function loadFromLocal() {
   const data = JSON.parse(
-    localStorage.getItem("saved_cardsA4") || "[]"
+    localStorage.getItem("saved_cardsA5") || "[]"
   );
   if (data.length === 0) {
     addCard(); // إضافة بطاقة فارغة إذا كانت الذاكرة فارغة
@@ -190,47 +172,8 @@ function loadFromLocal() {
   }
 }
 
-function updatePromotion(card) {
-
-  const amountEl = card.querySelector(".amount");
-  const oldPriceEl = card.querySelector(".old-price");
-  const percentEl = card.querySelector(".porcent");
-  const promoBox = card.querySelector(".promo-box");
-  const prixTest = card.querySelector(".price");
-
-  let rawPrice = amountEl.textContent.replace(",", ".").trim();
-  let oldPrice = oldPriceEl.textContent.replace(",", ".").trim();
-
-  let currentPrice = parseFloat(rawPrice) || 0;
-  let previousPrice = parseFloat(oldPrice) || 0;
-
-  if (previousPrice > 0) {
-
-    promoBox.style.display = "block";
-
-    // قلب القيم
-    [currentPrice, previousPrice] = [previousPrice, currentPrice];
-
-    // تحديث الواجهة
-    amountEl.innerHTML = formatPrice(currentPrice);
-    oldPriceEl.innerHTML = formatPrice(previousPrice);
-
-    // حساب نسبة الخصم
-    let percent = ((previousPrice - currentPrice) / previousPrice) * 100;
-    percentEl.textContent = "-" + percent.toFixed(0) + "%";
-
-  } else {
-
-    // إخفاء البوكس إذا لم يوجد خصم
-    promoBox.style.display = "none";
-    percentEl.textContent = "0%";
-    prixTest.style.top = "110mm";
-  }
-}
-
 // 3. وظيفة إضافة بطاقة (إنشاء الـ DOM)
 function addCard(data = null) {
-
   const card = document.createElement("div");
   card.className = "card";
 
@@ -242,28 +185,21 @@ function addCard(data = null) {
         <div class="title" contenteditable="true">${data ? data.title : ""
     }</div>
         <div class="arc">
-          <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
-               style="width:100%; height:100%;">
-          
-              <!-- الشكل الأبيض -->
-              <path d="M0,260 C250,-160 750,-160 1000,260 L1000,400 L0,400 Z"
-                    fill="transparent"/>
-          
-              <!-- القوس الأحمر -->
-              <path d="M0,260 C250,50 750,50 1000,260"
-                    stroke="#a82d29"
-                    stroke-width="60"
-                    fill="none"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="promo-box">
-          <div class="promo-title">Promotion</div>
-          <div class="promo-content">
-              <div class="porcent">${data ? data.porcent : ""}</div>
-              <div class="old-price">${data ? data.oldPrice : ""}</div>
-         </div>
+<svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
+     style="width:100%; height:100%;">
+
+    <!-- الشكل الأبيض -->
+    <path d="M0,260 C250,-160 750,-160 1000,260 L1000,400 L0,400 Z"
+          fill="#ffffff"/>
+
+    <!-- القوس الأحمر -->
+    <path d="M0,260 C250,50 750,50 1000,260"
+          stroke="#a82d29"
+          stroke-width="60"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+</svg>
         </div>
         <div class="price">
             <span class="amount" contenteditable="true">${displayAmount}</span>
@@ -278,11 +214,11 @@ function addCard(data = null) {
         </div>
         <div class="date">${data ? data.date : getFormattedDate()}</div>
     `;
-  updatePromotion(card)
+
   // --- أحداث الحفظ التلقائي ---
+
   // عند الكتابة في أي مكان داخل الكارد
   card.addEventListener("input", () => {
-    updatePromotion(card)
     saveToLocal();
   });
 
@@ -291,7 +227,6 @@ function addCard(data = null) {
   amountSpan.addEventListener("blur", () => {
     amountSpan.innerHTML = formatPrice(amountSpan.innerText);
     saveToLocal();
-    fetchPriceDynamic(card, input);
   });
 
   card.querySelector(".remove-btn").onclick = () => {
@@ -347,33 +282,36 @@ document
     const { jsPDF } = window.jspdf;
     const cards = document.querySelectorAll(".card");
 
-    // إنشاء PDF بمقاس A4 عمودي
+    // إنشاء PDF بمقاس A4
     const pdf = new jsPDF("p", "mm", "a4");
 
-    // أبعاد A4 بالمليمتر
-    const cardWidth = 210;
-    const cardHeight = 297;
+    // مقاسات البطاقة بالمليمتر (A7)
+    const cardWidth = 148;
+    const cardHeight = 210;
 
     for (let i = 0; i < cards.length; i++) {
+      // إنشاء نسخة للرندر
       const clone = cards[i].cloneNode(true);
 
+      // تنظيف النسخة من زر الحذف
       const removeBtn = clone.querySelector(".remove-btn");
-      clone.querySelector(".arc")?.style && (clone.querySelector(".arc").style.display = "block");
+      clone.querySelector(".arc").style.display = "none";
       if (removeBtn) removeBtn.remove();
 
       Object.assign(clone.style, {
         position: "fixed",
         left: "-10000px",
         top: "0",
-        width: "210mm",
-        height: "297mm",
+        width: "148mm",
+        height: "210mm",
         display: "block"
       });
-
       document.body.appendChild(clone);
 
+      // معالجة الـ SVG (تأكد أن هذه الدالة موجودة في كودك)
       await prepareSvg(clone);
 
+      // التقاط الصورة بدقة عالية
       const canvas = await html2canvas(clone, {
         scale: 3,
         useCORS: true,
@@ -382,8 +320,17 @@ document
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
-      pdf.addImage(imgData, "JPEG", 0, 0, cardWidth, cardHeight);
+      // نضع الإحداثيات 0 و 0 لوضعها في الزاوية اليسرى العليا تماماً
+      pdf.addImage(
+        imgData,
+        "JPEG",
+        0, // الإحداثي الأفقي (اليسار)
+        0, // الإحداثي الرأسي (الأعلى)
+        cardWidth,
+        cardHeight
+      );
 
+      // إضافة صفحة جديدة لكل بطاقة (باستثناء الأخيرة)
       if (i < cards.length - 1) {
         pdf.addPage("a4", "p");
       }
@@ -391,7 +338,7 @@ document
       document.body.removeChild(clone);
     }
 
-    pdf.save("AfficheA4.pdf"); // تم تصحيح الاسم
+    pdf.save("AfficheA5.pdf");
   });
 // دوال مساعدة
 function getFormattedDate() {
@@ -434,16 +381,13 @@ function fetchPriceDynamic(card, input) {
     .then(res => res.json())
     .then(data => {
       if (data) {
-
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");
         card.querySelector(".sku").textContent = data.anpf;
-        card.querySelector(".old-price").textContent = data.prixPro;
         // هنا التعديل الجوهري
         card.querySelector(".amount").innerHTML =
           formatPrice(data.prix);
         saveToLocal();
-        updatePromotion(card);
       }
     });
 }
@@ -483,7 +427,7 @@ document.getElementById("clearStorage").onclick = () => {
 
 
 window.onload = function () {
-  loadFromLocal(), scaner.addEventListener("click", showReader), updatePromotion
+  loadFromLocal(), scaner.addEventListener("click", showReader)
 };
 
 const menuToggle = document.querySelector('.menu-toggle');

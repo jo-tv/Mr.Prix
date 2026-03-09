@@ -188,7 +188,7 @@ function addCard(data = null) {
 
   // نستخدم الدالة لتنسيق المبلغ سواء كان قادماً من الـ API أو الـ LocalStorage
   const displayAmount = data ? formatPrice(data.amount) : "0";
-  
+
 
   card.innerHTML = `
         <div class="remove-btn">X</div>
@@ -236,6 +236,7 @@ function addCard(data = null) {
   amountSpan.addEventListener("blur", () => {
     amountSpan.innerHTML = formatPrice(amountSpan.innerText);
     saveToLocal();
+    fetchPriceDynamic(card, input)
   });
 
   card.querySelector(".remove-btn").onclick = () => {

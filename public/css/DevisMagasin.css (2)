@@ -9,9 +9,10 @@ body {
 }
 
 .table {
-    width: 100%;
+    width: 97%;
     margin: 15px auto;
     border-collapse: collapse;
+    
 }
 
 .full {
@@ -37,7 +38,7 @@ th {
 
 .titelDevis {
     text-align: center;
-    font-size: 65%;
+    font-size: 16px;
     font-weight: 800;
     background: #d8d8f5;
     border: none;
@@ -46,28 +47,28 @@ th {
 .ExClient {
     text-align: center;
     background: #d8d8f5;
-    font-size: 65%;
+    font-size: 12px;
     font-weight: 500;
     border: none;
 }
 
 .label {
-    font-size: 65%;
+    font-size: 11px;
     font-weight: 600;
 }
 .td-info {
-    font-size: 65%;
+    font-size: 10px;
     font-weight: 400;
 }
 
 .grid th {
-    font-size: 65%;
+    font-size: 11px;
     font-weight: 700;
     text-align: center;
     padding: 3px auto;
 }
 .grid td {
-    font-size: 65%;
+    font-size: 10px;
     font-weight: 500;
     text-align: center;
     padding: 4px auto;
@@ -89,7 +90,7 @@ th {
 .totals td {
     border: none;
     font-weight: 600;
-    font-size: 65%;
+    font-size: 11px;
     text-align: left;
 }
 

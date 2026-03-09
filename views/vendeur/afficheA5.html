@@ -98,10 +98,45 @@
                 z-index: 1;
                 display: block;
             }
+            .promo-box {
+                width: 100%;
+                height: 100px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+                left: 0;
+                right: 0;
+                top: 68mm;
+                z-index: 1;
+                display: none;
+            }
+
+            .promo-title {
+                font-size: 30px;
+                font-weight: bold;
+                margin-bottom: 25px;
+                text-align: center;
+            }
+
+            .promo-content {
+                width: 100%;
+                display: flex;
+                justify-content: space-around;
+                font-size: 36px;
+                font-weight: bold;
+            }
+
+            .old-price {
+                text-decoration: line-through;
+                font-size: 38px;
+            }
+            
             .price {
                 position: relative;
                 right: 25px;
-                top: 80mm;
+                top: 68mm;
                 text-align: center;
                 font-weight: 600;
                 letter-spacing: 3px;
@@ -347,7 +382,7 @@
                         >
                     </div>
                 </div>
-                            <div class="btn-app" data-label="affiche A7">
+                <div class="btn-app" data-label="affiche A7">
                     <a href="afficheA7"></a>
                     <div class="fa">
                         <a href="afficheA7"
