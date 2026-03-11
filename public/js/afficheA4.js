@@ -169,6 +169,8 @@ function saveToLocal() {
       ref: card.querySelector(".Ref").value,
       sku: card.querySelector(".sku").textContent,
       date: card.querySelector(".date").textContent,
+      dateDebut: card.querySelector(".debut").textContent,
+      dateFin: card.querySelector(".fin").textContent,
       oldPrice: previousPrice,
       porcent: card.querySelector(".porcent").textContent
     });
@@ -197,6 +199,7 @@ function updatePromotion(card) {
   const percentEl = card.querySelector(".porcent");
   const promoBox = card.querySelector(".promo-box");
   const prixTest = card.querySelector(".price");
+  const dateValable = card.querySelector(".dateValable");
 
   let rawPrice = amountEl.textContent.replace(",", ".").trim();
   let oldPrice = oldPriceEl.textContent.replace(",", ".").trim();
@@ -207,6 +210,7 @@ function updatePromotion(card) {
   if (previousPrice > 0) {
 
     promoBox.style.display = "block";
+    dateValable.style.display = "block";
 
     // قلب القيم
     [currentPrice, previousPrice] = [previousPrice, currentPrice];
@@ -223,6 +227,7 @@ function updatePromotion(card) {
 
     // إخفاء البوكس إذا لم يوجد خصم
     promoBox.style.display = "none";
+    dateValable.style.display = "none";
     percentEl.textContent = "0%";
     prixTest.style.top = "110mm";
   }
@@ -236,7 +241,6 @@ function addCard(data = null) {
 
   // نستخدم الدالة لتنسيق المبلغ سواء كان قادماً من الـ API أو الـ LocalStorage
   const displayAmount = data ? formatPrice(data.amount) : "0";
-
   card.innerHTML = `
         <div class="remove-btn">X</div>
         <div class="title">${data ? data.title : ""
@@ -271,13 +275,21 @@ function addCard(data = null) {
         </div>
         <div class="small-box"></div>
         <div class="meta">
-            <div>Réf : <input type="number" class="Ref"  value="${data ? data.ref : ""
-    }" placeholder="GenCode.."></div>
-            <div style="margin-top:10px">SKU : <span class="sku">${data ? data.sku : ""
-    }</span></div>
+          <div class ="dateValable">
+           <div>
+             Valable : Du <span class="debut"> ${data ? data.dateDebut : ""}</span >
+            </div>
+           <div>
+            Au <span class="fin">  ${data ? data.dateFin : ""}</span>
+            </div >
+            </div >
+            <div>Réf : <input type="number" class="Ref"  value="${data ? data.ref : ""}" placeholder="GenCode..">
         </div>
-        <div class="date">${data ? data.date : getFormattedDate()}</div>
-    `;
+        <div style="margin-top:10px">SKU : <span class="sku">${data ? data.sku : ""}</span></div>
+        </div >
+    <div class="date">${data ? data.date : getFormattedDate()}</div>
+  `;
+
   updatePromotion(card)
   // --- أحداث الحفظ التلقائي ---
   // عند الكتابة في أي مكان داخل الكارد
@@ -421,7 +433,7 @@ function formatPrice(priceValue) {
   if (centsPart === "00") {
     return mainPart;
   } else {
-    return `${mainPart}<span id="cente">,${centsPart}</span>`;
+    return `${mainPart} <span id="cente">,${centsPart}</span>`;
   }
 }
 
@@ -433,17 +445,23 @@ function fetchPriceDynamic(card, input) {
   fetch(`/api/produit/${code}`)
     .then(res => res.json())
     .then(data => {
+      if (data.message != undefined) {
+        alert(data.message)
+      }
       if (data) {
-
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");
         card.querySelector(".sku").textContent = data.anpf;
         card.querySelector(".old-price").textContent = data.prixPro;
+        card.querySelector(".debut").textContent = data.dateDebut;
+        card.querySelector(".fin").textContent = data.dateFin;
         // هنا التعديل الجوهري
         card.querySelector(".amount").innerHTML =
           formatPrice(data.prix);
         saveToLocal();
         updatePromotion(card);
+      } else {
+        alert("no good")
       }
     });
 }

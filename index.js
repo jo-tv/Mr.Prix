@@ -376,14 +376,27 @@ app.get("/api/Produit/:code", isAuthenticated, async (req, res) => {
       $or: [{ GENCOD_P: code }, { ANPF: code }]
     });
 
+
     if (!produit)
       return res.status(404).json({ message: "Produit non trouvé" });
+
+    function formatDate(date) {
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    }
 
     res.json({
       prix: produit.PV_TTC,
       libelle: produit.LIBELLE,
       prixPro: produit.PRIXVT,
-      anpf: produit.ANPF
+      anpf: produit.ANPF,
+      genCode: produit.GENCOD_P,
+      dateDebut: formatDate(produit.DATEDEBUT),
+      dateFin: formatDate(produit.DATEFIN)
     });
   } catch (err) {
     console.error(err);

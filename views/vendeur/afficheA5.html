@@ -140,7 +140,7 @@
             .price {
                 position: relative;
                 right: 25px;
-                top: 68mm;
+                top: 69mm;
                 text-align: center;
                 font-weight: 600;
                 letter-spacing: 3px;
@@ -148,7 +148,7 @@
                 z-index: 2;
             }
             .price .amount {
-                font-size: 12rem;
+                font-size: 10rem;
             }
             .price .unit {
                 position: absolute;
@@ -173,18 +173,36 @@
                 height: 50mm;
                 border: 1px solid #000;
             }
+            .dateValable {
+                position: absolute;
+                right: 10mm;
+                bottom: 25mm;
+                font-size: 12pt;
+                font-weight: 900;
+                width: 320px;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                display: none;
+                letter-spacing: 1px;
+            }
+            .dateValable span,
+            .dateValable div {
+                margin-top: 20px;
+                text-align: right;
+            }
             .meta {
                 position: absolute;
-                right: 6mm;
+                right: 4mm;
                 bottom: 12mm;
                 font-size: 13pt;
                 font-weight: 800;
-                width: 250px;
                 padding: 10px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: start;
+                letter-spacing: 1px;
             }
             .meta input {
                 border: none;
@@ -193,6 +211,7 @@
                 font-size: 12pt;
                 font-weight: 900;
                 outline: none;
+                letter-spacing: 1px;
             }
             .date {
                 position: absolute;

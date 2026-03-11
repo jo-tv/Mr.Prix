@@ -372,6 +372,9 @@ function fetchPriceDynamic(card, input) {
   fetch(`/api/produit/${code}`)
     .then(res => res.json())
     .then(data => {
+      if (data.message != undefined) {
+        alert(data.message)
+      }
       if (data) {
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");
