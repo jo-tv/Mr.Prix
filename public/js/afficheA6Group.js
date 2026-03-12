@@ -210,7 +210,7 @@ function updatePromotion(card) {
   if (previousPrice > 0) {
     promoBox.style.display = "block";
     dateValable.style.display = "block";
-    prixTest.style.top = "62mm";
+    prixTest.style.top = "65mm";
     // قلب القيم
     [currentPrice, previousPrice] = [previousPrice, currentPrice];
 
@@ -273,18 +273,19 @@ function addCard(data = null) {
             <span class="unit"> Dh</span>
         </div>
         <div class="small-box"></div>
-        <div class="meta">
-          <div class ="dateValable">
+         <div class="meta">
+            <div>Réf : <input type="number" class="Ref"  value="${data ? data.ref : ""}" placeholder="GenCode..">
+        </div>
+        <div style="margin-top:10px">SKU : <span class="sku">${data ? data.sku : ""}</span>
+        </div>
+           <div class ="dateValable">
            <div>
              Valable : Du <span class="debut"> ${data ? data.dateDebut : ""}</span >
             </div>
-           <div>
+            <div>
             Au <span class="fin">  ${data ? data.dateFin : ""}</span>
             </div >
             </div >
-            <div>Réf : <input type="number" class="Ref"  value="${data ? data.ref : ""}" placeholder="GenCode..">
-        </div>
-        <div style="margin-top:10px">SKU : <span class="sku">${data ? data.sku : ""}</span></div>
         </div >
     <div class="date">${data ? data.date : getFormattedDate()}</div>
   `;

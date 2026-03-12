@@ -224,12 +224,11 @@ function updatePromotion(card) {
     percentEl.textContent = "-" + percent.toFixed(0) + "%";
 
   } else {
-
     // إخفاء البوكس إذا لم يوجد خصم
     promoBox.style.display = "none";
     dateValable.style.display = "none";
     percentEl.textContent = "0%";
-    prixTest.style.top = "110mm";
+    prixTest.style.top = "120mm";
   }
 }
 
@@ -275,17 +274,18 @@ function addCard(data = null) {
         </div>
         <div class="small-box"></div>
         <div class="meta">
-          <div class ="dateValable">
+            <div>Réf : <input type="number" class="Ref"  value="${data ? data.ref : ""}" placeholder="GenCode..">
+        </div>
+        <div style="margin-top:10px">SKU : <span class="sku">${data ? data.sku : ""}</span>
+        </div>
+           <div class ="dateValable">
            <div>
              Valable : Du <span class="debut"> ${data ? data.dateDebut : ""}</span >
             </div>
-           <div>
+            <div>
             Au <span class="fin">  ${data ? data.dateFin : ""}</span>
             </div >
             </div >
-            <div>Réf : <input type="number" class="Ref"  value="${data ? data.ref : ""}" placeholder="GenCode..">
-        </div>
-        <div style="margin-top:10px">SKU : <span class="sku">${data ? data.sku : ""}</span></div>
         </div >
     <div class="date">${data ? data.date : getFormattedDate()}</div>
   `;
@@ -370,7 +370,7 @@ document
       const clone = cards[i].cloneNode(true);
 
       const removeBtn = clone.querySelector(".remove-btn");
-      clone.querySelector(".arc")?.style && (clone.querySelector(".arc").style.display = "block");
+      clone.querySelector(".arc")?.style && (clone.querySelector(".arc").style.display = "none");
       if (removeBtn) removeBtn.remove();
 
       Object.assign(clone.style, {
