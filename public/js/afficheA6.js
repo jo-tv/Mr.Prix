@@ -356,7 +356,7 @@ async function prepareSvg(cardElement) {
 }
 
 // 5. تحميل الـ PDF
-document
+/* document
   .getElementById("downloadAll")
   .addEventListener("click", async () => {
     const { jsPDF } = window.jspdf;
@@ -395,11 +395,11 @@ document
       document.body.removeChild(clone);
     }
     pdf.save("AfficheA6.pdf");
-  });
+  }); */
 
 
 // 5. تحميل الـ PDF
-/* document
+ document
   .getElementById("downloadAll")
   .addEventListener("click", async () => {
     const { jsPDF } = window.jspdf;
@@ -462,7 +462,7 @@ document
     }
 
     pdf.save("AfficheA6.pdf");
-  }); */
+  }); 
 // دوال مساعدة
 function getFormattedDate() {
   return new Date().toLocaleDateString("fr-FR");
