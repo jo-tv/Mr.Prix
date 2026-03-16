@@ -362,13 +362,10 @@ document
     const { jsPDF } = window.jspdf;
     const cards = document.querySelectorAll(".card");
     const pdf = new jsPDF("p", "mm", "a4");
-
     for (let i = 0; i < cards.length; i++) {
       const clone = cards[i].cloneNode(true);
       // إخفاء زر الحذف في النسخة
       clone.querySelector(".remove-btn").remove();
-
-
       Object.assign(clone.style, {
         position: "fixed",
         left: "-10000px",
@@ -399,6 +396,8 @@ document
     }
     pdf.save("AfficheA6.pdf");
   });
+
+
 // 5. تحميل الـ PDF
 /* document
   .getElementById("downloadAll")
@@ -507,6 +506,7 @@ function fetchPriceDynamic(card, input) {
       if (data.message != undefined) {
         alert(data.message)
       }
+      
       if (data) {
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");

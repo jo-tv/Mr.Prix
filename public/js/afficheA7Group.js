@@ -375,13 +375,25 @@ function fetchPriceDynamic(card, input) {
       if (data.message != undefined) {
         alert(data.message)
       }
+
+      let rawPrice = data.prix.replace(",", ".").trim();
+      let oldPrice = data.prixPro.replace(",", ".").trim();
+
+      let currentPrice = parseFloat(rawPrice) || 0;
+      let previousPrice = parseFloat(oldPrice) || 0;
+
       if (data) {
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");
         card.querySelector(".sku").textContent = data.anpf;
         // هنا التعديل الجوهري
-        card.querySelector(".amount").innerHTML =
-          formatPrice(data.prix);
+        if (previousPrice > 0) {
+          card.querySelector(".amount").innerHTML =
+            formatPrice(previousPrice);
+        } else {
+          card.querySelector(".amount").innerHTML =
+            formatPrice(currentPrice);
+        }
         saveToLocal();
       }
     });

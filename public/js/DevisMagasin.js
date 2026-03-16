@@ -6,6 +6,7 @@
 let produitActuel = null;
 let panier = JSON.parse(localStorage.getItem("panier")) || [];
 const TAUX_TVA = 20;
+
 /* ===================================== */
 /*  INIT                                 */
 /* ===================================== */
@@ -13,8 +14,9 @@ const TAUX_TVA = 20;
 document.addEventListener("DOMContentLoaded", function () {
   const btnRecherche = document.getElementById("btnRecherche");
   const btnAjouter = document.querySelector(
-    ".article-form .add-btn:last-of-type"
-  );
+    ".article-form .add-btn:last-of-type");
+  document.querySelector(".name-client").textContent = localStorage.getItem("nameDevies") || "NAME CLIENT";
+
 
   if (btnRecherche) {
     btnRecherche.addEventListener("click", getProduit);
@@ -138,6 +140,7 @@ function afficherPanier() {
   });
 
   calculerTotaux();
+
 }
 
 /* ===================================== */
@@ -211,8 +214,8 @@ document.getElementById("date").innerHTML = getFormattedDate()
 
 function sauvegarder() {
   localStorage.setItem("panier", JSON.stringify(panier));
+  localStorage.setItem("nameDevies", document.querySelector(".name-client").textContent.trim());
 }
-
 
 /* ===================================== */
 /* ACTION BUTTONS                        */
@@ -243,6 +246,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+/* ===================================== */
+/*  downloadPDF                      */
+/* ===================================== */
 
 async function downloadPDF() {
   // 1️⃣ إخفاء جميع أزرار الحذف في الجدول
@@ -298,17 +304,23 @@ async function downloadPDF() {
   // 4️⃣ إعادة ظهور أزرار الحذف بعد التحويل
   deleteButtons.forEach(btn => (btn.style.display = "inline-block"));
 }
-
+/* ===================================== */
+/*  viderPanier                      */
+/* ===================================== */
 function viderPanier() {
 
   if (!confirm("Voulez-vous vraiment vider le panier ?")) return;
 
   localStorage.removeItem("panier");
+  localStorage.removeItem("nameDevies");
   panier = [];
   afficherPanier();
 }
 
-// code scripte scanner code-bare---------->
+/* ===================================== */
+/*  code scripte scanner code-bare     */
+/* ===================================== */
+
 
 const scaner = document.getElementById("scan-btn");
 const readerDiv = document.getElementById("reader");
@@ -447,8 +459,9 @@ function hideReader() {
 
 btnFermer.addEventListener("click", stopReader);
 
-
-// code script menu toggel-------------->
+/* ===================================== */
+/*  code script menu toggel     */
+/* ===================================== */
 
 const menuToggle = document.querySelector('.menu-toggle');
 const menuRound = document.querySelector('.menu-round');
