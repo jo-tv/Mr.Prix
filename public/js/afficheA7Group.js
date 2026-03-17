@@ -386,6 +386,7 @@ function fetchPriceDynamic(card, input) {
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");
         card.querySelector(".sku").textContent = data.anpf;
+        card.querySelector(".Ref").value = data.genCode;
         // هنا التعديل الجوهري
         if (previousPrice > 0) {
           card.querySelector(".amount").innerHTML =
@@ -410,7 +411,7 @@ document
 function scrollToLastCard() {
   const cards = document.querySelectorAll(".card");
   const lastCard = cards[cards.length - 1];
-
+  lastCard.querySelector(".Ref").focus()
   lastCard.scrollIntoView({
     behavior: "smooth"
   });

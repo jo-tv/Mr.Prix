@@ -448,10 +448,12 @@ function fetchPriceDynamic(card, input) {
       if (data.message != undefined) {
         alert(data.message)
       }
+      console.log(data)
       if (data) {
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");
         card.querySelector(".sku").textContent = data.anpf;
+        card.querySelector(".Ref").value = data.genCode;
         card.querySelector(".old-price").textContent = data.prixPro;
         card.querySelector(".debut").textContent = data.dateDebut;
         card.querySelector(".fin").textContent = data.dateFin;
@@ -467,6 +469,7 @@ function fetchPriceDynamic(card, input) {
 }
 
 /*  document.getElementById("addCardBtn").onclick = () => addCard();*/
+// زر الإضافة
 document
   .getElementById("addCardBtn")
   .addEventListener("click", () => {
@@ -474,10 +477,25 @@ document
     scrollToLastCard();
   });
 
+// الإضافة عن طريق زر المسافة
+document.addEventListener("keydown", (event) => {
+  const active = document.activeElement;
+
+  if (
+    event.code === "Space" &&
+    active.tagName !== "INPUT" &&
+    active.tagName !== "TEXTAREA"
+  ) {
+    event.preventDefault();
+    addCard();
+    scrollToLastCard();
+  }
+});
+
 function scrollToLastCard() {
   const cards = document.querySelectorAll(".card");
   const lastCard = cards[cards.length - 1];
-
+  lastCard.querySelector(".Ref").focus()
   lastCard.scrollIntoView({
     behavior: "smooth"
   });

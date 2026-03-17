@@ -510,6 +510,7 @@ function fetchPriceDynamic(card, input) {
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");
         card.querySelector(".sku").textContent = data.anpf;
+        card.querySelector(".Ref").value = data.genCode;
         card.querySelector(".old-price").textContent = data.prixPro;
         card.querySelector(".debut").textContent = data.dateDebut;
         card.querySelector(".fin").textContent = data.dateFin;
@@ -533,7 +534,7 @@ document
 function scrollToLastCard() {
   const cards = document.querySelectorAll(".card");
   const lastCard = cards[cards.length - 1];
-
+  lastCard.querySelector(".Ref").focus()
   lastCard.scrollIntoView({
     behavior: "smooth"
   });
