@@ -332,34 +332,34 @@
 /* 2. شاشات اللابتوب والأجهزة المتوسطة (أقل من 1200px) */
 @media (max-width: 1200px) {
     .containeer {
-        scale: 1.9 !important;
+        scale: 2.2 !important;
     }
 }
 
 /* 3. شاشات التابلت الصغيرة واللابتوب الصغير (أقل من 992px) */
-@media (max-width: 992px) {
+@media (min-width: 992px) {
     .containeer {
-        scale: 1.9 !important;
+        scale: 1.5 !important;
     }
 }
 
 /* 4. شاشات التابلت العمودي (أقل من 768px) */
 @media (max-width: 768px) {
     .containeer {
-        scale: 1.9 !important;
+        scale: 1.5 !important;
     }
 }
 
 /* 5. شاشات الموبايل (أقل من 576px) */
-@media (min-width: 576px) {
+@media (max-width: 576px) {
     .containeer {
-        scale: 1.9 !important;
+        scale: 1.3 !important;
     }
 }
 
 /* 6. شاشات الموبايل الصغير جداً (أقل من 400px) - اختياري */
 @media (max-width: 400px) {
     .containeer {
-        scale: 1 !important;
+        scale: 1.4 !important;
     }
 }
