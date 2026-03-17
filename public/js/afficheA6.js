@@ -455,7 +455,7 @@ document
 
       // إضافة صفحة جديدة لكل بطاقة (باستثناء الأخيرة)
       if (i < cards.length - 1) {
-        pdf.addPage("a4", "p");
+        pdf.addPage("a6", "p");
       }
 
       document.body.removeChild(clone);
