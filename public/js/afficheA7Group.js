@@ -192,7 +192,7 @@ function addCard(data = null) {
 
   card.innerHTML = `
         <div class="remove-btn">X</div>
-        <div class="title" >${data ? data.title : ""
+        <div contenteditable="true" class="title" >${data ? data.title : ""
     }</div>
         <div class="arc">
             <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
