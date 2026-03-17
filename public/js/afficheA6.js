@@ -399,14 +399,14 @@ async function prepareSvg(cardElement) {
 
 
 // 5. تحميل الـ PDF
- document
+document
   .getElementById("downloadAll")
   .addEventListener("click", async () => {
     const { jsPDF } = window.jspdf;
     const cards = document.querySelectorAll(".card");
 
     // إنشاء PDF بمقاس A4
-    const pdf = new jsPDF("p", "mm", "a4");
+    const pdf = new jsPDF("p", "mm", "a6");
 
     // مقاسات البطاقة بالمليمتر (A7)
     const cardWidth = 105;
@@ -462,7 +462,7 @@ async function prepareSvg(cardElement) {
     }
 
     pdf.save("AfficheA6.pdf");
-  }); 
+  });
 // دوال مساعدة
 function getFormattedDate() {
   return new Date().toLocaleDateString("fr-FR");
@@ -506,7 +506,7 @@ function fetchPriceDynamic(card, input) {
       if (data.message != undefined) {
         alert(data.message)
       }
-      
+
       if (data) {
         card.querySelector(".title").textContent =
           data.libelle.replace(/\[.*?\]/g, "");

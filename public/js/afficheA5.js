@@ -358,7 +358,7 @@ document
     const cards = document.querySelectorAll(".card");
 
     // إنشاء PDF بمقاس A4
-    const pdf = new jsPDF("p", "mm", "a4");
+    const pdf = new jsPDF("p", "mm", "a5");
 
     // مقاسات البطاقة بالمليمتر (A7)
     const cardWidth = 148;
@@ -407,7 +407,7 @@ document
 
       // إضافة صفحة جديدة لكل بطاقة (باستثناء الأخيرة)
       if (i < cards.length - 1) {
-        pdf.addPage("a4", "p");
+        pdf.addPage("a5", "p");
       }
 
       document.body.removeChild(clone);
