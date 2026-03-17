@@ -246,8 +246,7 @@ function addCard(data = null) {
   const displayAmount = data ? formatPrice(data.amount) : "0";
   card.innerHTML = `
         <div class="remove-btn">X</div>
-        <div contenteditable="true" class="title">${data ? data.title : ""
-    }</div>
+        <div contenteditable="true" class="title">${data ? data.title : ""}</div>
         <div class="arc">
           <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
                style="width:100%; height:100%;">
@@ -276,7 +275,7 @@ function addCard(data = null) {
             <span class="amount" >${displayAmount}</span>
             <span class="unit"> Dh</span>
         </div>
-        <div class="small-box"></div>
+         <div class="small-box"></div>
          <div class="meta">
             <div>Réf : <input type="number" class="Ref"  value="${data ? data.ref : ""}" placeholder="GenCode..">
         </div>
