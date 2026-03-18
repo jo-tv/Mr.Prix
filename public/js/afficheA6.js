@@ -519,6 +519,7 @@ function fetchPriceDynamic(card, input) {
           formatPrice(data.prix);
         saveToLocal();
         updatePromotion(card);
+        newCards()
       }
     });
 }
@@ -530,6 +531,13 @@ document
     addCard();
     scrollToLastCard();
   });
+
+function newCards() {
+  setTimeout(() => {
+    addCard();
+    scrollToLastCard();
+  }, 2000)
+}
 
 function scrollToLastCard() {
   const cards = document.querySelectorAll(".card");

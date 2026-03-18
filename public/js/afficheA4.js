@@ -368,10 +368,11 @@ document
 
     for (let i = 0; i < cards.length; i++) {
       const clone = cards[i].cloneNode(true);
-
+      
       const removeBtn = clone.querySelector(".remove-btn");
       clone.querySelector(".arc")?.style && (clone.querySelector(".arc").style.display = "none");
       if (removeBtn) removeBtn.remove();
+
 
       Object.assign(clone.style, {
         position: "fixed",
@@ -462,8 +463,7 @@ function fetchPriceDynamic(card, input) {
           formatPrice(data.prix);
         saveToLocal();
         updatePromotion(card);
-      } else {
-        alert("no good")
+        newCards()
       }
     });
 }
@@ -477,20 +477,12 @@ document
     scrollToLastCard();
   });
 
-// الإضافة عن طريق زر المسافة
-document.addEventListener("keydown", (event) => {
-  const active = document.activeElement;
-
-  if (
-    event.code === "Space" &&
-    active.tagName !== "INPUT" &&
-    active.tagName !== "TEXTAREA"
-  ) {
-    event.preventDefault();
+function newCards() {
+  setTimeout(() => {
     addCard();
     scrollToLastCard();
-  }
-});
+  }, 2000)
+}
 
 function scrollToLastCard() {
   const cards = document.querySelectorAll(".card");

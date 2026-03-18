@@ -396,6 +396,7 @@ function fetchPriceDynamic(card, input) {
             formatPrice(currentPrice);
         }
         saveToLocal();
+        newCards()
       }
     });
 }
@@ -407,6 +408,13 @@ document
     addCard();
     scrollToLastCard();
   });
+  
+  function newCards() {
+  setTimeout(() => {
+    addCard();
+    scrollToLastCard();
+  }, 2000)
+}
 
 function scrollToLastCard() {
   const cards = document.querySelectorAll(".card");
