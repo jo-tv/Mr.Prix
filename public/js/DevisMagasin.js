@@ -7,6 +7,8 @@ let produitActuel = null;
 let panier = JSON.parse(localStorage.getItem("panier")) || [];
 const TAUX_TVA = 20;
 
+let formInfo = document.querySelector(".form-info")
+
 /* ===================================== */
 /*  INIT                                 */
 /* ===================================== */
@@ -67,6 +69,7 @@ function remplirForm(data) {
   document.getElementById("qte").value = 1;
   document.getElementById("prix").value = PrixTotal || 0;
   document.getElementById("taxe").value = data.taxe || 0;
+  formInfo.style.display = "block"
 }
 
 /* ===================================== */
@@ -106,7 +109,7 @@ function ajouterAuTableau() {
 
     });
   }
-
+  formInfo.style.display = "none";
   sauvegarder();
   afficherPanier();
   resetForm();
