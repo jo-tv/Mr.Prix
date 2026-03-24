@@ -186,7 +186,7 @@
         window.history.back();
       });
 
-      const menuToggle = document.querySelector('.menu-toggle');
+const menuToggle = document.querySelector('.menu-toggle');
 const menuRound = document.querySelector('.menu-round');
 const menuLines = document.querySelectorAll('.menu-line');
 

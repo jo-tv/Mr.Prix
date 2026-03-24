@@ -1376,7 +1376,7 @@ app.get("/api/searchee", isAuthenticated, async (req, res) => {
     const bricoURL = `https://mrbricolage.ma/wp-content/plugins/ajax-search-for-woocommerce-premium/includes/Engines/TNTSearchMySQL/Endpoints/search.php?s=${encodeURIComponent(
       q
     )}`;
-
+    
     const glovoURL = `https://api.glovoapp.com/v3/stores/453329/addresses/714876/search?query=${encodeURIComponent(
       q
     )}&searchId=04a29a7d-418b-4c1a-bd39-fcb5393248e6`;
@@ -1391,7 +1391,9 @@ app.get("/api/searchee", isAuthenticated, async (req, res) => {
         }
       })
     ]);
-
+    
+    console.log(bricoRes)
+    
     const bricoText = await bricoRes.text();
     const bricoData = JSON.parse(bricoText);
 
