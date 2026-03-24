@@ -1,223 +1,190 @@
 <!doctype html>
-<html
-  lang="ar"
-  dir="rtl"
->
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-    <title>فاتورة حساب المساحة</title>
-    <link
-      rel="stylesheet"
-      href="css/calc.css"
-      type="text/css"
-      media="all"
-    />
-    <link
-      rel="stylesheet"
-      href="css/navb.css"
-      type="text/css"
-      media="all"
-    />
-    <!-- مكتبات PDF و PNG -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <!-- ===== Boxicons CSS ===== -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script
-      src="https://kit.fontawesome.com/fb67a05d46.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-      <!-- مكان الرسائل -->   
-    <div
-      id="toast"
-      class="toast"
-    ></div>
-    <div class="a4-wrapper">
-      <div
-        class="container"
-        dir="ltr"
-      >
-        <h2>Calcul de la surface et du coût</h2>
-
-        <label for="seller"><i class="fas fa-user"></i> Nom du vendeur :</label>
-        <input
-          type="text"
-          id="seller"
-          placeholder="Entrez votre nom (obligatoire)"
+<html lang="ar" dir="rtl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>فاتورة حساب المساحة</title>
+        <link
+            rel="stylesheet"
+            href="css/calc.css"
+            type="text/css"
+            media="all"
         />
-
-        <label for="code"><i class="fas fa-barcode"></i> Code produit :</label>
-        <input
-          type="number"
-          id="code"
-          placeholder="Entrez le code du produit"
-          step="0.01"
+        <link
+            rel="stylesheet"
+            href="css/navb.css"
+            type="text/css"
+            media="all"
         />
-
-        <label for="length"><i class="fas fa-ruler-horizontal"></i> Longueur (en mètres) :</label>
-        <input
-          type="number"
-          id="length"
-          placeholder="Entrez la longueur"
-          step="0.01"
+        <!-- مكتبات PDF و PNG -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
+        <!-- ===== Boxicons CSS ===== -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script
+            src="https://kit.fontawesome.com/fb67a05d46.js"
+            crossorigin="anonymous"
+        ></script>
+    </head>
+    <body>
+        <!-- مكان الرسائل -->
+        <div id="toast" class="toast"></div>
+        <div class="a4-wrapper">
+            <div class="container" dir="ltr">
+                <h2>Calcul de la surface et du coût</h2>
 
-        <label for="width"><i class="fas fa-ruler-vertical"></i> Largeur (en mètres) :</label>
-        <input
-          type="number"
-          id="width"
-          placeholder="Entrez la largeur"
-          step="0.01"
-        />
+                <label for="seller"
+                    ><i class="fas fa-user"></i> Nom du vendeur :</label
+                >
+                <input
+                    type="text"
+                    id="seller"
+                    placeholder="Entrez votre nom (obligatoire)"
+                />
 
-        <label for="price"><i class="fas fa-tag"></i> Prix par mètre carré :</label>
-        <input
-          type="number"
-          id="price"
-          placeholder="Entrez le prix en dirhams"
-          step="0.01"
-        />
+                <label for="code"
+                    ><i class="fas fa-barcode"></i> Code produit :</label
+                >
+                <input
+                    type="number"
+                    id="code"
+                    placeholder="Entrez le code du produit"
+                    step="0.01"
+                />
 
-        <button
-          onclick="calculate()"
-          class="calc"
-        >
-          <i class="fas fa-calculator"></i> Calculer
-        </button>
-        <button onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Télécharger PDF</button>
+                <label for="length"
+                    ><i class="fas fa-ruler-horizontal"></i> Longueur (en
+                    mètres) :</label
+                >
+                <input
+                    type="number"
+                    id="length"
+                    placeholder="Entrez la longueur"
+                    step="0.01"
+                />
 
-        <div
-          id="invoice"
-          class="invoice"
-          style="display: none"
-        >
-          <!-- Logo -->
-          <div style="text-align: center">
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlxROjU-Kg9pPtIr05RTUHw4-mBcShDfo_qw&amp;s"
-              crossorigin="anonymous"
-              class="logo"
-              alt="Logo"
-            />
-          </div>
+                <label for="width"
+                    ><i class="fas fa-ruler-vertical"></i> Largeur (en mètres)
+                    :</label
+                >
+                <input
+                    type="number"
+                    id="width"
+                    placeholder="Entrez la largeur"
+                    step="0.01"
+                />
 
-          <!-- Date -->
-          <div
-            class="datetime"
-            id="invoice-datetime"
-          ></div>
+                <label for="price"
+                    ><i class="fas fa-tag"></i> Prix par mètre carré :</label
+                >
+                <input
+                    type="number"
+                    id="price"
+                    placeholder="Entrez le prix en dirhams"
+                    step="0.01"
+                />
 
-          <h3>📄 Facture de calcul de coût</h3>
+                <button onclick="calculate()" class="calc">
+                    <i class="fas fa-calculator"></i> Calculer
+                </button>
+                <button onclick="downloadPDF()">
+                    <i class="fas fa-file-pdf"></i> Télécharger PDF
+                </button>
 
-          <!-- جدول المعلومات -->
-          <table
-            class="info-table"
-            dir="ltr"
-          >
-            <tr>
-              <th>Vendeur</th>
-              <td id="inv-seller"></td>
-            </tr>
-            <tr>
-              <th>Code produit</th>
-              <td id="inv-code"></td>
-            </tr>
-            <tr>
-              <th>Longueur</th>
-              <td><span id="inv-length"></span> m²</td>
-            </tr>
-            <tr>
-              <th>Largeur</th>
-              <td><span id="inv-width"></span> m²</td>
-            </tr>
-            <tr>
-              <th>Surface</th>
-              <td><span id="inv-area"></span> m²</td>
-            </tr>
-            <tr>
-              <th>Prix au mètre carré</th>
-              <td><span id="inv-price"></span> DH</td>
-            </tr>
-            <tr class="total-row">
-              <th>Total</th>
-              <td id="inv-total"></td>
-            </tr>
-          </table>
+                <div id="invoice" class="invoice" style="display: none">
+                    <!-- Logo -->
+                    <div style="text-align: center">
+                        <img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlxROjU-Kg9pPtIr05RTUHw4-mBcShDfo_qw&amp;s"
+                            crossorigin="anonymous"
+                            class="logo"
+                            alt="Logo"
+                        />
+                    </div>
 
-          <!-- توقيعات -->
-          <table class="signature-table">
-            <thead>
-              <tr>
-                <th>Signature</th>
-                <th>Le Nom</th>
-                <th>Nom de la personne</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="input-line"></div>
-                </td>
-                <td><div class="signature-line"></div></td>
-                <td>Vendeur</td>
-              </tr>
-              <tr>
-                <td><div class="input-line"></div></td>
-                <td><div class="signature-line"></div></td>
-                <td>Client</td>
-              </tr>
-              <tr>
-                <td><div class="input-line"></div></td>
-                <td><div class="signature-line"></div></td>
-                <td>Responsable</td>
-              </tr>
-            </tbody>
-          </table>
+                    <!-- Date -->
+                    <div class="datetime" id="invoice-datetime"></div>
+
+                    <h3>📄 Facture de calcul de coût</h3>
+
+                    <!-- جدول المعلومات -->
+                    <table class="info-table" dir="ltr">
+                        <tr>
+                            <th>Vendeur</th>
+                            <td id="inv-seller"></td>
+                        </tr>
+                        <tr>
+                            <th>Code produit</th>
+                            <td id="inv-code"></td>
+                        </tr>
+                        <tr>
+                            <th>Longueur</th>
+                            <td><span id="inv-length"></span> m²</td>
+                        </tr>
+                        <tr>
+                            <th>Largeur</th>
+                            <td><span id="inv-width"></span> m²</td>
+                        </tr>
+                        <tr>
+                            <th>Surface</th>
+                            <td><span id="inv-area"></span> m²</td>
+                        </tr>
+                        <tr>
+                            <th>Prix au mètre carré</th>
+                            <td><span id="inv-price"></span> DH</td>
+                        </tr>
+                        <tr class="total-row">
+                            <th>Total</th>
+                            <td id="inv-total"></td>
+                        </tr>
+                    </table>
+
+                    <!-- توقيعات -->
+                    <table class="signature-table">
+                        <thead>
+                            <tr>
+                                <th>Signature</th>
+                                <th>Le Nom</th>
+                                <th>Nom de la personne</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="input-line"></div>
+                                </td>
+                                <td><div class="signature-line"></div></td>
+                                <td>Vendeur</td>
+                            </tr>
+                            <tr>
+                                <td><div class="input-line"></div></td>
+                                <td><div class="signature-line"></div></td>
+                                <td>Client</td>
+                            </tr>
+                            <tr>
+                                <td><div class="input-line"></div></td>
+                                <td><div class="signature-line"></div></td>
+                                <td>Responsable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <!--nav FAB Button -->
+        <!--nav FAB Button -->
         <div class="containeer">
             <div class="menu-toggle">
                 <span class="fa fa-plus"></span>
             </div>
             <div class="menu-round">
-                <div class="btn-app" data-label="">
-                    <a href="devisMagazin"></a>
+                <div class="btn-app" data-label="Retour 🔄">
+                    <a href="/prixVen"></a>
                     <div class="fa">
-                        <a href="devisMagazin"
-                            ><i
-                                class="fas fa-file-invoice"
-                                style="color: white"
-                            ></i
-                        ></a>
-                    </div>
-                </div>
-                <div class="btn-app" data-label="Album Photo 🖼️">
-                    <a href="Album"></a>
-                    <div class="fa">
-                        <a href="Album"
-                            ><i
-                                class="fas fa-file-image"
-                                style="color: white"
-                            ></i
-                        ></a>
-                    </div>
-                </div>
-                <div class="btn-app" data-label="Déconnexion 🚪">
-                    <a href="logout"></a>
-                    <div class="fa">
-                        <a href="logout"
+                        <a href="/prixVen"
                             ><i
                                 class="fas fa-sign-out-alt"
                                 style="color: white"
@@ -228,67 +195,7 @@
             </div>
 
             <div class="menu-line">
-                <div
-                    class="btn-app"
-                    data-label=" Trouver un produit avec photo 🔎"
-                >
-                    <a href="searchee"></a>
-                    <div class="fa">
-                        <a href="searchee"
-                            ><i
-                                class="fa-brands fa-google"
-                                style="color: white"
-                            ></i
-                        ></a>
-                    </div>
-                </div>
-                <div class="btn-app" data-label="Recherche Codes 🔎">
-                    <a href="table"></a>
-                    <div class="fa">
-                        <a href="table"
-                            ><i class="fas fa-search" style="color: white"></i
-                        ></a>
-                    </div>
-                </div>
-                <!--         <div
-          class="btn-app"
-          data-label="Inventaire Fournisseurs"
-        > <a href="inventaire"></a>
-          <div class="fa">
-            <a href="inventaire"
-              ><i
-                class="far fa-file-excel"
-                style="color: white"
-              ></i
-            ></a>
-          </div>
-        </div> -->
-                <div
-                    class="btn-app"
-                    data-label="Recherche visuelle du produit 🔎"
-                >
-                    <a href="serchCode"></a>
-                    <div class="fa">
-                        <a href="serchCode"
-                            ><i
-                                class="fas fa-question-circle"
-                                style="color: white"
-                            ></i
-                        ></a>
-                    </div>
-                </div>
-                <div class="btn-app" data-label="Gestion Stock 📊">
-                    <a href="InvSmartManager"></a>
-                    <div class="fa">
-                        <a href="InvSmartManager"
-                            ><i
-                                class="far fa-file-excel"
-                                style="color: white"
-                            ></i
-                        ></a>
-                    </div>
-                </div>
-                <div class="btn-app" data-label="Devis & facturation 📃">
+                <div class="btn-app" data-label="Devis du magasin 📃">
                     <a href="devisMagazin"></a>
                     <div class="fa">
                         <a href="devisMagazin"
@@ -299,26 +206,23 @@
                         ></a>
                     </div>
                 </div>
-                <div
-                    class="btn-app"
-                    data-label="Affichage & impression des prix 🖨️"
-                >
-                    <a href="afficheA6"></a>
+                <div class="btn-app" data-label="Devis parquet & sol 📃">
+                    <a href="calc"></a>
                     <div class="fa">
-                        <a href="afficheA6"
+                        <a href="calc"
                             ><i
-                                class="fa-solid fa-print"
+                                class="fas fa-file-invoice"
                                 style="color: white"
                             ></i
                         ></a>
                     </div>
                 </div>
-                <div class="btn-app" data-label="Lecteur Prix → 💲 ">
-                    <a href="prixVen"></a>
+                <div class="btn-app" data-label="Devis Ger flex 📃">
+                    <a href="devis"></a>
                     <div class="fa">
-                        <a href="prixVen"
+                        <a href="devis"
                             ><i
-                                class="fas fa-cash-register"
+                                class="fas fa-file-invoice"
                                 style="color: white"
                             ></i
                         ></a>
@@ -326,11 +230,11 @@
                 </div>
             </div>
         </div>
-    <!--fin FAB Button -->
-    <script
-      src="js/calc.js"
-      type="text/javascript"
-      charset="utf-8"
-    ></script>
-  </body>
+        <!--fin FAB Button -->
+        <script
+            src="js/calc.js"
+            type="text/javascript"
+            charset="utf-8"
+        ></script>
+    </body>
 </html>
