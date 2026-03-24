@@ -368,7 +368,7 @@ document
 
     for (let i = 0; i < cards.length; i++) {
       const clone = cards[i].cloneNode(true);
-      
+
       const removeBtn = clone.querySelector(".remove-btn");
       clone.querySelector(".arc")?.style && (clone.querySelector(".arc").style.display = "none");
       if (removeBtn) removeBtn.remove();
@@ -517,9 +517,15 @@ window.onload = function () {
 const menuToggle = document.querySelector('.menu-toggle');
 const menuRound = document.querySelector('.menu-round');
 const menuLines = document.querySelectorAll('.menu-line');
+const btnApp = document.querySelectorAll(".btn-app");
 
 menuToggle.addEventListener('click', () => {
   menuToggle.classList.toggle('open');
   menuRound.classList.toggle('open');
-  menuLines.forEach(line => line.classList.toggle('open'));
+  menuLines.forEach(line => line.classList.toggle('open')
+  );
+  
+  btnApp.forEach(e => {
+    e.classList.toggle("active");
+  });
 });

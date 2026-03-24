@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Lilita+One&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
+
 .containeer {
     position: fixed;
     bottom: 2em;
@@ -28,8 +30,11 @@
     vertical-align: middle;
     transition: 0.4s;
 }
-.menu-toggle.open .fa {
+.menu-toggle.open .fa,
+.menu-toggle.open {
     transform: rotate(135deg);
+    background: blue;
+    border-radius: 50%;
 }
 
 .btn-app {
@@ -41,9 +46,9 @@
     color: #fff;
     text-align: center;
     cursor: pointer;
-}
-.btn-app .fa {
-    line-height: 2.1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .open .btn-app {
@@ -89,7 +94,7 @@
     transition-delay: 0.5s;
 }
 .menu-line.open .btn-app:nth-of-type(1) {
-    bottom: 4em;
+    bottom: 5em;
 }
 .menu-line.open .btn-app:nth-of-type(1) {
     bottom: 7em;
@@ -112,37 +117,45 @@
 .menu-line.open .btn-app:nth-of-type(7) {
     bottom: 25em;
 }
-.menu-line.open .btn-app:nth-of-type(8) {
-    bottom: 28em;
-}
 
 /* النص عند المرور */
 .btn-app::after {
-    content: attr(data-label);
+    content: attr(data-label) "👈";
     position: absolute;
-    right: 110%; /* النص يظهر بجانب الأيقونة */
+    right: 150%; /* النص يظهر بجانب الأيقونة */
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    font-size: 0.8rem;
+    background: rgba(116, 116, 116, 0.768);
+    color: #210b0b;
+    font-size: 0.56rem;
+    font-family: "Merriweather", serif;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     padding: 5px 8px;
     border-radius: 6px;
     opacity: 0;
     white-space: nowrap;
     pointer-events: none;
+    text-shadow: 4px 4px 6px rgba(233, 234, 240, 1);
+    box-shadow:
+        rgba(0, 0, 0, 0.3) 0px 19px 38px,
+        rgba(0, 0, 0, 0.22) 0px 15px 12px;
     transition:
         opacity 0.3s,
         right 0.3s;
-    z-index: 999999999;
 }
 
 /* عند الـ hover */
-.btn-app:hover::after {
-    opacity: 1;
+.btn-app::after {
+    opacity: 0;
     right: 130%;
 }
-
+.btn-app.active::after {
+    opacity: 1;
+    right: 140%;
+}
 /* تصميم نافذة منبثقة */
 .toast {
     position: fixed;
