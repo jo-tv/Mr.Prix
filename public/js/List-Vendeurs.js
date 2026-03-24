@@ -554,7 +554,6 @@ async function confirmDeleteAll() {
 const menuToggle = document.querySelector(".menu-toggle");
 const menuRound = document.querySelector(".menu-round");
 const menuLines = document.querySelectorAll(".menu-line");
-
 const btnApp = document.querySelectorAll(".btn-app");
 menuToggle.addEventListener('click', () => {
   menuToggle.classList.toggle('open');
