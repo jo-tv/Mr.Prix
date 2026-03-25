@@ -205,7 +205,7 @@ function addCard(data = null) {
               <!-- القوس الأحمر -->
               <path d="M0,260 C250,100 750,100 1000,260"
                     stroke="#a82d29"
-                    stroke-width="40"
+                    stroke-width="45"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"/>
@@ -216,9 +216,9 @@ function addCard(data = null) {
             <span class="unit"> Dh</span>
         </div>
         <div class="meta">
-            <div>Réf : <input type="number" class="Ref"  value="${data ? data.ref : ""
+            <div>code : <input type="number" class="Ref"  value="${data ? data.ref : ""
     }" placeholder="GenCode.."></div>
-            <div style="margin-top:10px">SKU : <span class="sku">${data ? data.sku : ""
+            <div style="margin-top:10px;display:none">SKU : <span class="sku">${data ? data.sku : ""
     }</span></div>
         </div>
         <div class="date">${data ? data.date : getFormattedDate()}</div>
@@ -293,6 +293,28 @@ document
     const cards = document.querySelectorAll(".card");
     const pdf = new jsPDF("p", "mm", "a4");
 
+    const pageWidth = 210;
+    const pageHeight = 297;
+
+    const cols = 2;
+    const rows = 4;
+
+    const gap = 8; // المسافة بين الكروت
+
+    // 🔽 نصغّرو الكارد شوية
+    const cardWidth = 96;
+    const cardHeight = 65;
+
+    const padding = 2;
+
+    // 🔽 نحسبو الحجم الكامل ديال grid
+    const gridWidth = cols * cardWidth + (cols - 1) * gap;
+    const gridHeight = rows * cardHeight + (rows - 1) * gap;
+
+    // 🔽 نوسّطو grid كامل
+    const startX = (pageWidth - gridWidth) / 2;
+    const startY = (pageHeight - gridHeight) / 2;
+
     for (let i = 0; i < cards.length; i++) {
       const clone = cards[i].cloneNode(true);
 
@@ -302,8 +324,9 @@ document
         position: "fixed",
         left: "-10000px",
         top: "0",
-        width: "105mm",
-        height: "74mm"
+        width: cardWidth + "mm",
+        height: cardHeight + "mm",
+        background: "white"
       });
 
       document.body.appendChild(clone);
@@ -317,15 +340,79 @@ document
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
-      // 2 أعمدة × 4 صفوف = 8 كروت
-      const x = (i % 2) * 105;
-      const y = (Math.floor(i / 2) % 4) * 74;
+      // 🔽 position داخل grid
+      const col = i % cols;
+      const row = Math.floor(i / cols) % rows;
 
-      pdf.addImage(imgData, "JPEG", x, y, 105, 74);
+      const x = startX + col * (cardWidth + gap);
+      const y = startY + row * (cardHeight + gap);
 
-      // صفحة جديدة بعد 8 كروت
-      if ((i + 1) % 8 === 0 && i + 1 < cards.length)
+      // الكارد
+      pdf.addImage(imgData, "JPEG", x, y, cardWidth, cardHeight);
+
+      // border منقط للقص
+      pdf.setDrawColor(0);
+      pdf.setLineWidth(0.2);
+      pdf.setLineDash([2, 2]);
+
+      pdf.rect(
+        x - padding,
+        y - padding,
+        cardWidth + padding * 2,
+        cardHeight + padding * 2
+      );
+
+      pdf.setLineDash([]);
+
+      // crop marks
+      const mark = 3;
+
+      pdf.line(x - padding, y - padding, x - padding + mark, y - padding);
+      pdf.line(x - padding, y - padding, x - padding, y - padding + mark);
+
+      pdf.line(
+        x + cardWidth + padding,
+        y - padding,
+        x + cardWidth + padding - mark,
+        y - padding
+      );
+      pdf.line(
+        x + cardWidth + padding,
+        y - padding,
+        x + cardWidth + padding,
+        y - padding + mark
+      );
+
+      pdf.line(
+        x - padding,
+        y + cardHeight + padding,
+        x - padding + mark,
+        y + cardHeight + padding
+      );
+      pdf.line(
+        x - padding,
+        y + cardHeight + padding,
+        x - padding,
+        y + cardHeight + padding - mark
+      );
+
+      pdf.line(
+        x + cardWidth + padding,
+        y + cardHeight + padding,
+        x + cardWidth + padding - mark,
+        y + cardHeight + padding
+      );
+      pdf.line(
+        x + cardWidth + padding,
+        y + cardHeight + padding,
+        x + cardWidth + padding,
+        y + cardHeight + padding - mark
+      );
+
+      // صفحة جديدة بعد 8
+      if ((i + 1) % 8 === 0 && i + 1 < cards.length) {
         pdf.addPage();
+      }
 
       document.body.removeChild(clone);
     }
@@ -408,8 +495,8 @@ document
     addCard();
     scrollToLastCard();
   });
-  
-  function newCards() {
+
+function newCards() {
   setTimeout(() => {
     addCard();
     scrollToLastCard();

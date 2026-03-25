@@ -26,7 +26,7 @@
             @import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
             /* التنسيقات (بقيت كما هي مع تعديلات طفيفة للطباعة) */
             @page {
-                size: 105mm 74mm;
+                size: 96mm 65mm;
                 margin: 0;
             }
             * {
@@ -76,8 +76,8 @@
                 font-weight: 900;
             }
             .card {
-                width: 105mm;
-                height: 74mm;
+                width: 96mm;
+                height: 65mm;
                 background: #fff;
                 position: relative;
                 overflow: hidden;
@@ -92,7 +92,7 @@
                 left: 6mm;
                 right: 6mm;
                 font-weight: 800;
-                font-size: 14pt;
+                font-size: 13pt;
                 color: #000;
                 height: 30px;
                 line-height: 1.5rem;
@@ -104,14 +104,14 @@
                 position: relative;
                 left: 0;
                 right: 0;
-                top: -15mm;
+                top: -13mm;
                 z-index: 1;
                 display: block;
             }
             .price {
                 position: relative;
                 right: 25px;
-                top: -39mm;
+                top: -35mm;
                 text-align: center;
                 font-weight: 800;
                 letter-spacing: 3px;
@@ -139,16 +139,22 @@
                 position: absolute;
                 right: -3mm;
                 bottom: 3mm;
-                font-size: 8pt;
+                font-size: 10pt;
                 font-weight: 800;
+            }
+            .meta > div {
+                display: flex;
+                justify-content: cente;
+                align-items: cente;
             }
             .meta input {
                 border: none;
                 padding: 2px;
                 width: 120px;
                 font-size: 8pt;
-                font-weight: 800;
                 outline: none;
+                font-weight: 800;
+                z-index: 99999;
             }
             .date {
                 position: absolute;
