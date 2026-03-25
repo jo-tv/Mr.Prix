@@ -11,7 +11,7 @@ function ipCheck(req, res, next) {
 
   // ✅ البادئات المسموح بها
   const allowedIPs = [
-    "127.0.0.1",
+//     "127.0.0.1",
     "79.127.139.245",
     "10.50.223.",
     "154.144.255.22"
@@ -20,7 +20,7 @@ function ipCheck(req, res, next) {
   function isIPAllowed(userIP) {
     if (userIP === "::1") userIP = "127.0.0.1";
     userIP = userIP.replace("::ffff:", "");
-
+    console.log(userIP)
     return allowedIPs.some(item => {
       // ✅ IP دقيق
       if (!item.endsWith(".")) {
