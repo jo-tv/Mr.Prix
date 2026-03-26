@@ -33,7 +33,7 @@ const PORT = process.env.PORT || 5000;
 // وضع الـ Middleware قبل أي Route تريد حمايته
 // ===============================================
 app.set("trust proxy", true);
- app.use(ipCheck); // قبل الراوتات
+//app.use(ipCheck); // قبل الراوتات
 // ===============================================
 // إعداد EJS كـ view engine
 app.set("view engine", "ejs");
