@@ -1,38 +1,46 @@
 function ipCheck(req, res, next) {
 
-  // ✅ مهم جدًا (يجب وضعه مرة واحدة في app.js)
-  // app.set("trust proxy", true);
-
   function getClientIP(req) {
-    let ip = req.ip || req.headers["x-forwarded-for"];
+    let ip = null;
 
-    if (ip && ip.includes(",")) {
-      ip = ip.split(",")[0].trim();
+    // ✅ الأفضل دائمًا: x-forwarded-for
+    const forwarded = req.headers["x-forwarded-for"];
+
+    if (forwarded) {
+      ip = forwarded.split(",")[0].trim(); // 🔥 أول IP هو الحقيقي
+    } else if (req.socket?.remoteAddress) {
+      ip = req.socket.remoteAddress;
     }
 
+    // تنظيف IP
+    if (!ip) return null;
     if (ip === "::1") ip = "127.0.0.1";
-    if (ip) ip = ip.replace("::ffff:", "");
+    ip = ip.replace("::ffff:", "");
 
     return ip;
   }
 
   const userIP = getClientIP(req);
-  console.log("Client IP:", userIP);
 
-  // ✅ IPs المسموحة
+  console.log("🌍 Client IP:", userIP);
+  console.log("📡 x-forwarded-for:", req.headers["x-forwarded-for"]);
+
+  // ✅ قائمة IPs المسموحة
   const allowedIPs = [
     "127.0.0.1",
     "79.127.139.245",
-    "10.50.223.",
-    "154.144.255.22"
+    "154.144.255.22",
+    "10.50.223." // شبكة
   ];
 
   function isIPAllowed(ip) {
+    if (!ip) return false;
+
     return allowedIPs.some(item => {
-      if (!item.endsWith(".")) {
-        return ip === item; // IP دقيق
+      if (item.endsWith(".")) {
+        return ip.startsWith(item); // prefix
       }
-      return ip.startsWith(item); // شبكة
+      return ip === item; // exact match
     });
   }
 
@@ -47,38 +55,37 @@ function ipCheck(req, res, next) {
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-family: Arial, sans-serif;
     background: linear-gradient(135deg,#ff4e50,#f9d423);
     height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
   }
-  .container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
+  .box {
+    background:#fff;
+    padding:30px;
+    border-radius:10px;
     text-align:center;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width:90%;
+    max-width:400px;
   }
-  h1 { color:#e63946; margin-bottom:10px; }
-  p { margin-bottom:20px; color:#555; }
+  h1 { color:#e63946; }
+  p { margin:15px 0; }
   a {
     display:inline-block;
     padding:10px 20px;
-    border-radius:6px;
     background:#457b9d;
     color:#fff;
+    border-radius:5px;
     text-decoration:none;
   }
 </style>
 </head>
 <body>
-  <div class="container">
+  <div class="box">
     <h1>🚫 Accès refusé</h1>
-    <p>Votre adresse IP n'est pas autorisée à accéder à cette application.</p>
+    <p>IP non autorisée.</p>
     <a href="/">Retour</a>
   </div>
 </body>
