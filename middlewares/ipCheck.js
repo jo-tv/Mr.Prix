@@ -1,15 +1,25 @@
 function ipCheck(req, res, next) {
-  let userIP =
-    req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-    req.socket.remoteAddress;
 
-  // ✅ تحويل localhost
-  if (userIP === "::1") userIP = "127.0.0.1";
+  // ✅ مهم جدًا (يجب وضعه مرة واحدة في app.js)
+  // app.set("trust proxy", true);
 
-  // ✅ إزالة ::ffff: في حال وجودها (مهم جدًا في الاستضافات)
-  userIP = userIP.replace("::ffff:", "");
+  function getClientIP(req) {
+    let ip = req.ip || req.headers["x-forwarded-for"];
 
-  // ✅ البادئات المسموح بها
+    if (ip && ip.includes(",")) {
+      ip = ip.split(",")[0].trim();
+    }
+
+    if (ip === "::1") ip = "127.0.0.1";
+    if (ip) ip = ip.replace("::ffff:", "");
+
+    return ip;
+  }
+
+  const userIP = getClientIP(req);
+  console.log("Client IP:", userIP);
+
+  // ✅ IPs المسموحة
   const allowedIPs = [
     "127.0.0.1",
     "79.127.139.245",
@@ -17,17 +27,12 @@ function ipCheck(req, res, next) {
     "154.144.255.22"
   ];
 
-  function isIPAllowed(userIP) {
-    if (userIP === "::1") userIP = "127.0.0.1";
-    userIP = userIP.replace("::ffff:", "");
-    console.log(userIP)
+  function isIPAllowed(ip) {
     return allowedIPs.some(item => {
-      // ✅ IP دقيق
       if (!item.endsWith(".")) {
-        return userIP === item;
+        return ip === item; // IP دقيق
       }
-      // ✅ شبكة (prefix)
-      return userIP.startsWith(item);
+      return ip.startsWith(item); // شبكة
     });
   }
 
@@ -42,7 +47,7 @@ function ipCheck(req, res, next) {
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
     background: linear-gradient(135deg,#ff4e50,#f9d423);
     height:100vh;
     display:flex;
@@ -50,31 +55,30 @@ function ipCheck(req, res, next) {
     align-items:center;
   }
   .container {
-    background: rgba(255,255,255,0.95);
-    padding: 40px 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    max-width: 500px;
-    text-align: center;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    text-align:center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   }
-  img { max-width:120px; margin-bottom:20px; }
-  h1 { color:#e63946; margin-bottom:15px; }
-  p { margin-bottom:20px; }
+  h1 { color:#e63946; margin-bottom:10px; }
+  p { margin-bottom:20px; color:#555; }
   a {
     display:inline-block;
-    padding:12px 25px;
-    border-radius:8px;
+    padding:10px 20px;
+    border-radius:6px;
     background:#457b9d;
-    color:white;
+    color:#fff;
     text-decoration:none;
   }
 </style>
 </head>
 <body>
   <div class="container">
-    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
-    <h1>Accès refusé</h1>
-    <p>🚫 L'accès à cette application est restreint.</p>
+    <h1>🚫 Accès refusé</h1>
+    <p>Votre adresse IP n'est pas autorisée à accéder à cette application.</p>
     <a href="/">Retour</a>
   </div>
 </body>
