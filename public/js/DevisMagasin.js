@@ -37,22 +37,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function getProduit() {
   const code = document.getElementById("code").value.trim();
-  if (!code) return alert("Entrer un code");
+  if (!code) return alert("Veuillez entrer un code");
 
   try {
     const response = await fetch(`/api/produit/${code}`);
-
-    if (!response.ok) throw new Error("Produit non trouvé");
-
     const data = await response.json();
 
+    // التأكد من أن هناك رسالة موجودة في الـ JSON
+    const message = data.message || "Une erreur est survenue";
+
+    if (!response.ok) {
+      // وضع الرسالة في عنصر .message
+      const messageElem = document.querySelector(".message");
+      if (messageElem) {
+        messageElem.textContent = message;
+        document.querySelector(".card").style.display = "block";
+      } else {
+        alert(message); // احتياطي إذا العنصر غير موجود
+      }
+      return; // منع استكمال العملية
+    }
+
+    // حفظ المنتج الحالي وملء النموذج
     produitActuel = data;
-
-
     remplirForm(data);
-  } catch (err) {
-    alert(err.message);
 
+  } catch (err) {
+    alert("Erreur: " + err.message);
   }
 }
 

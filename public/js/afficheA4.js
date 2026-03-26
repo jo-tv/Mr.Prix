@@ -442,12 +442,13 @@ function formatPrice(priceValue) {
 function fetchPriceDynamic(card, input) {
   const code = input.value.trim();
   if (!code) return;
-
+const messageElem = document.querySelector(".message");
   fetch(`/api/produit/${code}`)
     .then(res => res.json())
     .then(data => {
       if (data.message != undefined) {
-        alert(data.message)
+        messageElem.textContent = data.message;
+        document.querySelector(".cardss").style.display = "block";
       }
       console.log(data)
       if (data) {
