@@ -2,8 +2,8 @@
 <html lang="fr">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=0.45" />
-        <title>Price Tag A4 - Optimized</title>
+        <meta name="viewport" content="width=device-width,initial-scale=0.56" />
+        <title>Price Tag A5 - Optimized</title>
         <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
@@ -21,13 +21,14 @@
             @import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
             /* التنسيقات (بقيت كما هي مع تعديلات طفيفة للطباعة) */
             @page {
-                size: 210mm 297mm;
+                size: 210mm 148mm;
+                margin: 0;
             }
             body {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                background: #f3f1f1fa;
+                background: #fff;
                 padding: 20px;
                 font-family: "Ubuntu", sans-serif;
                 margin: 0;
@@ -35,7 +36,7 @@
             .actions {
                 background: #333;
                 width: 100%;
-                height: 90px;
+                height: 70px;
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
@@ -52,7 +53,7 @@
                 font-weight: bold;
                 border-radius: 5px;
                 cursor: pointer;
-                font-size: 19px !important  ;
+                font-size: 15px !important  ;
                 width: 100%;
                 height: 50px;
                 overflow: hidden;
@@ -61,55 +62,96 @@
                 align-items: center;
             }
             .actions .btn-action i {
-                font-size: 21px;
+                font-size: 17px;
                 font-weight: 900;
             }
             .card {
-                width: 210mm;
-                height: 297mm;
+                width: 148mm;
+                height: 210mm;
                 background: #fff;
                 position: relative;
                 overflow: hidden;
-                margin-top: 200px;
-                margin-bottom: 200px;
-                border: 1px solid #ddd;
+                margin-top: 100px;
+                border: 1px solid #59545474;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
                 flex-shrink: 0;
                 z-index: 99;
             }
             .title {
                 position: absolute;
-                top: 6mm;
+                top: 23mm;
                 left: 6mm;
                 right: 6mm;
                 font-weight: 800;
-                font-size: 35pt;
+                font-size: 21pt;
                 color: #000;
-                height: 40px;
-                line-height: 4.7rem;
+                height: 150px;
+                overflow: hidden;
+                line-height: 3.5rem;
                 letter-spacing: 1px;
-                width: 80%;
+                width: 90%;
+                cursor: pointer;
             }
             .arc {
                 position: absolute;
                 left: 0;
                 right: 0;
                 top: 8mm;
-                z-index: 1;
+                z-index: -1;
                 display: block;
+            }
+            .promo-box {
+                width: 80%;
+                height: 100px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+                left: 0;
+                right: 0;
+                top: 72mm;
+                z-index: 1;
+                margin: 0 auto;
+                display: none;
+            }
+
+            .promo-title {
+                font-size: 2rem;
+                font-weight: bold;
+                margin-bottom: 25px;
+                text-align: center;
+            }
+
+            .promo-content {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                font-size: 2rem;
+                font-weight: bold;
+            }
+
+            .old-price {
+                text-decoration: line-through;
+                font-size: 3rem;
+            }
+            .porcent {
+                width: 150px;
+                text-align: right;
+                color: #a82d29;
             }
             .price {
                 position: relative;
                 right: 25px;
-                top: 130mm;
+                top: 72mm;
                 text-align: center;
-                font-weight: 700;
+                font-weight: 600;
                 letter-spacing: 3px;
                 color: #a82d29;
                 z-index: 2;
             }
             .price .amount {
-                font-size: 14.5rem;
+                font-size: 10rem;
             }
             .price .unit {
                 position: absolute;
@@ -130,15 +172,33 @@
                 position: absolute;
                 left: 6mm;
                 bottom: 12mm;
-                width: 100mm;
-                height: 80mm;
+                width: 50mm;
+                height: 45mm;
                 border: 1px solid #000;
+            }
+            .dateValable {
+                position: relative;
+                right: 35mm;
+                bottom: 0;
+                font-size: 12pt;
+                font-weight: 900;
+                width: 320px;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                display: none;
+                letter-spacing: 2px;
+            }
+            .dateValable span,
+            .dateValable div {
+                margin-top: 20px;
+                text-align: right;
             }
             .meta {
                 position: absolute;
-                right: -13mm;
+                right: -25mm;
                 bottom: 10mm;
-                font-size: 20pt;
+                font-size: 13pt;
                 font-weight: 900;
                 width: 320px;
                 padding: 20px;
@@ -146,22 +206,23 @@
                 flex-direction: column;
                 justify-content: center;
                 align-items: start;
+                letter-spacing: 1px;
             }
             .meta input {
                 border: none;
                 padding: 2px;
-                width: 200px;
-                font-size: 17pt;
+                width: 180px;
+                font-size: 12pt;
                 font-weight: 900;
                 outline: none;
+                letter-spacing: 1px;
             }
             .date {
                 position: absolute;
                 bottom: 5mm;
                 left: 6mm;
-                font-size: 13pt;
+                font-size: 10pt;
                 color: #000;
-                margin-top: 5px;
             }
             .remove-btn {
                 position: absolute;
@@ -170,13 +231,13 @@
                 background: red;
                 color: white;
                 border-radius: 50%;
-                width: 55px;
-                height: 55px;
+                width: 45px;
+                height: 45px;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 2.5rem;
+                font-size: 1.5rem;
                 font-weight: 700;
                 z-index: 10;
             }
@@ -186,7 +247,6 @@
                 z-index: -9999999;
                 position: fixed;
                 top: 40%;
-
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -223,7 +283,7 @@
             /* === HEADING STYLE #1 === */
             .one {
                 position: relative;
-                top: 180px;
+                top: 100px;
                 margin-bottom: 50px;
                 border: 1px solid #000;
                 padding: 50px;
@@ -258,6 +318,82 @@
                 left: 50%;
                 margin-left: -50px;
                 background-color: #b80000;
+            }
+            /* From Uiverse.io by Yaya12085 */
+            .cardss {
+                width: 320px;
+                border-width: 1px;
+                border-color: rgba(219, 234, 254, 1);
+                border-radius: 1rem;
+                background-color: rgba(255, 255, 255, 1);
+                padding: 1rem;
+                box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                display: none;
+                z-index: 99999999;
+            }
+
+            .header {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                grid-gap: 1rem;
+                gap: 1rem;
+            }
+
+            .icon {
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 9999px;
+                background-color: rgba(96, 165, 250, 1);
+                padding: 0.5rem;
+                color: rgba(255, 255, 255, 1);
+            }
+
+            .icon svg {
+                height: 1rem;
+                width: 1rem;
+            }
+
+            .alert {
+                font-weight: 600;
+                color: rgba(107, 114, 128, 1);
+            }
+
+            .message {
+                margin-top: 1rem;
+                color: rgba(107, 114, 128, 1);
+                text-align: center;
+            }
+
+            .action {
+                margin-top: 1.5rem;
+            }
+
+            .action a {
+                text-decoration: none;
+            }
+
+            .read {
+                display: inline-block;
+                border-radius: 0.5rem;
+                width: 90%;
+                padding: 0.75rem 1.25rem;
+                margin: 10px auto;
+                text-align: center;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                font-weight: 600;
+            }
+
+            .read {
+                background-color: rgba(59, 130, 246, 1);
+                color: rgba(255, 255, 255, 1);
             }
 
             @media print {
@@ -300,33 +436,39 @@
             <div id="reader"></div>
         </div>
         <div class="one">
-            <h1>Page affiche A4</h1>
+            <h1>Page affiche A5</h1>
+        </div>
+        <!-- From Uiverse.io by Yaya12085 -->
+        <div class="cardss">
+            <div class="header">
+                <span class="icon">
+                    <svg
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            clip-rule="evenodd"
+                            d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z"
+                            fill-rule="evenodd"
+                        ></path>
+                    </svg>
+                </span>
+                <p class="alert">New message!</p>
+            </div>
+
+            <p class="message">🛍️ لم يتم العثور على المنتج</p>
+
+            <div class="action">
+                <a class="read" href=""> حسنا </a>
+            </div>
         </div>
         <div id="cardsContainer"></div>
-        <div class="containeer" style="scale: 1.5">
+        <div class="containeer">
             <div class="menu-toggle">
                 <span class="fa fa-plus"></span>
             </div>
             <div class="menu-round">
-                <div class="btn-app" data-label="affiche A5">
-                    <div class="fa">
-                        <a href="afficheA5"
-                            ><i class="fa-solid fa-a" style="color: white"
-                                ><span style="font-size: 12px">5</span></i
-                            ></a
-                        >
-                    </div>
-                </div>
-                <div class="btn-app" data-label="affiche A4">
-                    <a href="afficheA4"></a>
-                    <div class="fa">
-                        <a href="afficheA4"
-                            ><i class="fa-solid fa-a" style="color: white"
-                                ><span style="font-size: 12px">4</span></i
-                            ></a
-                        >
-                    </div>
-                </div>
                 <div class="btn-app" data-label="Lecteur Prix">
                     <div class="fa">
                         <a href="/prixVen"
@@ -339,6 +481,25 @@
                 </div>
             </div>
             <div class="menu-line">
+                <div class="btn-app" data-label="affiche A4">
+                    <a href="afficheA4"></a>
+                    <div class="fa">
+                        <a href="afficheA4"
+                            ><i class="fa-solid fa-a" style="color: white"
+                                ><span style="font-size: 12px">4</span></i
+                            ></a
+                        >
+                    </div>
+                </div>
+                <div class="btn-app" data-label="affiche A5">
+                    <div class="fa">
+                        <a href="afficheA5"
+                            ><i class="fa-solid fa-a" style="color: white"
+                                ><span style="font-size: 12px">5</span></i
+                            ></a
+                        >
+                    </div>
+                </div>
                 <div class="btn-app" data-label="affiche A6">
                     <a href="afficheA6"></a>
                     <div class="fa">
@@ -362,6 +523,6 @@
             </div>
         </div>
         <script src="js/codebar.min.js"></script>
-        <script src="js/afficheA4.js"></script>
+        <script src="js/afficheA5.js"></script>
     </body>
 </html>
