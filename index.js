@@ -166,7 +166,7 @@ cloudinary.config({
 // ===============================================
 // دالة إدخال دفعات
 // ===============================================
-async function insertInBatches(data, batchSize = 20000) {
+async function insertInBatches(data, batchSize = 40000) {
   for (let i = 0; i < data.length; i += batchSize) {
     const batch = data.slice(i, i + batchSize);
     await Product.insertMany(batch);
