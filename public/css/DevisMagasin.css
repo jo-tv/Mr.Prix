@@ -8,6 +8,18 @@ body {
     margin: auto;
 }
 
+.logo {
+    width: 100%;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    margin: 5px 0;
+}
+.logo img {
+    padding: 10px;
+    width: 200px;
+}
+
 .table {
     width: 97%;
     margin: 15px auto;
@@ -99,6 +111,21 @@ th {
 
 .comment {
     height: 40px;
+}
+.footer {
+    position: fixed; /* يجعل العنصر ثابتاً */
+    bottom: 0; /* يثبته في أسفل الصفحة */
+    width: 90%; /* يملأ عرض الصفحة */
+    color: #000; /* لون النص */
+    text-align: center; /* توسيط النص */
+    padding: 5px; /* مسافة داخلية */
+    font-weight: 600;
+    z-index: -100000 !important;
+}
+.footer p {
+    text-align: center;
+    font-size: 12px;
+    margin: 5px auto !important;
 }
 
 /* =============================== */
@@ -403,7 +430,6 @@ th {
 @media print {
     @page {
         size: A4;
-        margin: 10mm;
     }
 
     body {
@@ -423,9 +449,36 @@ th {
     }
 
     .page {
-        width: 90%;
-        margin: auto;
+        width: 100% !important;
+        margin: auto !important;
         box-shadow: none !important;
         border: none !important;
+    }
+    .grid th {
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+        padding: 12px auto !important;
+    }
+    .grid td {
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        text-align: center !important;
+        padding: 12px auto !important;
+    }
+    .footer {
+        position: fixed; /* يجعل العنصر ثابتاً */
+        bottom: 0; /* يثبته في أسفل الصفحة */
+        width: 90%; /* يملأ عرض الصفحة */
+        color: #000; /* لون النص */
+        text-align: center; /* توسيط النص */
+        padding: 5px; /* مسافة داخلية */
+        font-weight: 600;
+        z-index: -100000 !important;
+    }
+    .footer p {
+        text-align: center;
+        font-size: 12px;
+        margin: 5px auto !important;
     }
 }

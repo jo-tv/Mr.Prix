@@ -149,14 +149,6 @@
             </section>
             <!-- HEADER -->
             <div id="devisContent">
-                <div class="logo">
-                    <img
-                        class="logo"
-                        src="https://i.postimg.cc/PxycCz7d/Photoroom-20250826-153121.png"
-                        alt="Logo devis"
-                        crossorigin="anonymous"
-                    />
-                </div>
                 <table class="table full">
                     <tr>
                         <td class="titelDevis">DEVIS</td>
@@ -265,17 +257,6 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="footer">
-                    <p>
-                        Magasin Mr. Bricolage Lot 15-16-17.Parc D’activité
-                        Marjane .Av Abdelkrim Khattabi.Marrakech.-TEL:
-                    </p>
-                    <p>0525-060-240/241-Fax: 05-24-29-18-87</p>
-                    <p>
-                        PATENTE: 47924641/ RC: 129 997/ IF: 220 2961/CNSS:
-                        6728458/ICE: 001525045000091
-                    </p>
-                </div>
             </div>
         </div>
 

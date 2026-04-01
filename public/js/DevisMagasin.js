@@ -265,14 +265,18 @@ document.addEventListener("DOMContentLoaded", function () {
 /* ===================================== */
 
 async function downloadPDF() {
-  // 1️⃣ إخفاء جميع أزرار الحذف في الجدول
-  const deleteButtons = document.querySelectorAll("#sup"); // ضع كل أزرار الحذف class="delete-btn"
+  // 1️⃣ إخفاء أزرار الحذف
+  const deleteButtons = document.querySelectorAll("#sup");
   deleteButtons.forEach(btn => (btn.style.display = "none"));
 
-  // 2️⃣ تحميل PDF
+  // 2️⃣ جلب المحتوى
   const devis = document.getElementById("devisContent");
-  if (!devis) return alert("Contenu Devis introuvable");
+  if (!devis) {
+    alert("Contenu Devis introuvable");
+    return;
+  }
 
+  // 3️⃣ تحويل إلى Canvas
   const canvas = await html2canvas(devis, {
     scale: 2,
     useCORS: true,
@@ -281,6 +285,7 @@ async function downloadPDF() {
   });
 
   const imgData = canvas.toDataURL("image/png");
+
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("p", "mm", "a4");
 
@@ -288,19 +293,40 @@ async function downloadPDF() {
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 15;
 
-  const imgProps = { width: canvas.width, height: canvas.height };
-  const ratio = (pageWidth - 2 * margin) / imgProps.width;
-  const imgWidth = imgProps.width * ratio;
-  const imgHeight = imgProps.height * ratio;
+  const imgWidth = pageWidth - margin * 2;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
   let heightLeft = imgHeight;
   let position = margin;
 
-  pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight - 2 * margin;
+  // 🟢 Footer النص الحقيقي
+  const addFooter = () => {
+    pdf.setFontSize(8);
 
+    const footerLines = [
+      "Magasin Mr. Bricolage Lot 15-16-17. Parc D’activité Marjane .Av Abdelkrim Khattabi. Marrakech.-TEL:",
+      "0525-060-240/241 - Fax: 05-24-29-18-87",
+      "PATENTE: 47924641 / RC: 129997 / IF: 2202961 / CNSS: 6728458 / ICE: 001525045000091"
+    ];
+
+    let y = pageHeight - 15;
+
+    footerLines.forEach(line => {
+      pdf.text(line, pageWidth / 2, y, { align: "center" });
+      y += 4;
+    });
+  };
+
+  // 4️⃣ الصفحة الأولى
+  pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+  addFooter();
+
+  heightLeft -= (pageHeight - margin * 2);
+
+  // 5️⃣ الصفحات الأخرى
   while (heightLeft > 0) {
     pdf.addPage();
+
     pdf.addImage(
       imgData,
       "PNG",
@@ -309,13 +335,16 @@ async function downloadPDF() {
       imgWidth,
       imgHeight
     );
-    heightLeft -= pageHeight - 2 * margin;
+
+    addFooter();
+
+    heightLeft -= (pageHeight - margin * 2);
   }
 
-  // 3️⃣ تحميل PDF
+  // 6️⃣ حفظ PDF
   pdf.save("devis.pdf");
 
-  // 4️⃣ إعادة ظهور أزرار الحذف بعد التحويل
+  // 7️⃣ إعادة الأزرار
   deleteButtons.forEach(btn => (btn.style.display = "inline-block"));
 }
 /* ===================================== */
