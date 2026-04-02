@@ -113,7 +113,7 @@ th {
     height: 40px;
 }
 .footer {
-    position: fixed; /* يجعل العنصر ثابتاً */
+    position: relative; /* يجعل العنصر ثابتاً */
     bottom: 0; /* يثبته في أسفل الصفحة */
     width: 90%; /* يملأ عرض الصفحة */
     color: #000; /* لون النص */
@@ -467,7 +467,7 @@ th {
         padding: 12px auto !important;
     }
     .footer {
-        position: fixed; /* يجعل العنصر ثابتاً */
+        position: relative; /* يجعل العنصر ثابتاً */
         bottom: 0; /* يثبته في أسفل الصفحة */
         width: 90%; /* يملأ عرض الصفحة */
         color: #000; /* لون النص */
