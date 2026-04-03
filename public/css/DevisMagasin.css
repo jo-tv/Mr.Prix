@@ -112,15 +112,13 @@ th {
 .comment {
     height: 40px;
 }
+
 .footer {
-    position: relative; /* يجعل العنصر ثابتاً */
-    bottom: 0; /* يثبته في أسفل الصفحة */
-    width: 90%; /* يملأ عرض الصفحة */
-    color: #000; /* لون النص */
-    text-align: center; /* توسيط النص */
-    padding: 5px; /* مسافة داخلية */
+    width: 100%;
+    text-align: center;
     font-weight: 600;
-    z-index: -100000 !important;
+    margin-top: 50px;
+    margin-bottom: 10px;
 }
 .footer p {
     text-align: center;
@@ -465,20 +463,5 @@ th {
         font-weight: 500 !important;
         text-align: center !important;
         padding: 12px auto !important;
-    }
-    .footer {
-        position: relative; /* يجعل العنصر ثابتاً */
-        bottom: 0; /* يثبته في أسفل الصفحة */
-        width: 90%; /* يملأ عرض الصفحة */
-        color: #000; /* لون النص */
-        text-align: center; /* توسيط النص */
-        padding: 5px; /* مسافة داخلية */
-        font-weight: 600;
-        z-index: -100000 !important;
-    }
-    .footer p {
-        text-align: center;
-        font-size: 12px;
-        margin: 5px auto !important;
     }
 }

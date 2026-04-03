@@ -269,14 +269,18 @@ async function downloadPDF() {
   const deleteButtons = document.querySelectorAll("#sup");
   deleteButtons.forEach(btn => (btn.style.display = "none"));
 
-  // 2️⃣ جلب المحتوى
+  // 2️⃣ إخفاء footer من الصفحة
+  const htmlFooter = document.querySelector(".footer");
+  if (htmlFooter) htmlFooter.style.display = "none";
+
+  // 3️⃣ جلب المحتوى
   const devis = document.getElementById("devisContent");
   if (!devis) {
     alert("Contenu Devis introuvable");
     return;
   }
 
-  // 3️⃣ تحويل إلى Canvas
+  // 4️⃣ تحويل إلى Canvas
   const canvas = await html2canvas(devis, {
     scale: 2,
     useCORS: true,
@@ -291,15 +295,19 @@ async function downloadPDF() {
 
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
+
   const margin = 15;
+  const footerHeight = 20; // 🟢 مساحة مخصصة للـ footer
 
   const imgWidth = pageWidth - margin * 2;
+  const usableHeight = pageHeight - margin * 2 - footerHeight; // 🟢 نترك بلاصة للـ footer
+
   const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
   let heightLeft = imgHeight;
   let position = margin;
 
-  // 🟢 Footer النص الحقيقي
+  // 🟢 دالة إضافة footer
   const addFooter = () => {
     pdf.setFontSize(8);
 
@@ -317,13 +325,11 @@ async function downloadPDF() {
     });
   };
 
-  // 4️⃣ الصفحة الأولى
+  // 5️⃣ الصفحة الأولى
   pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-  addFooter();
+  heightLeft -= usableHeight;
 
-  heightLeft -= (pageHeight - margin * 2);
-
-  // 5️⃣ الصفحات الأخرى
+  // 6️⃣ باقي الصفحات
   while (heightLeft > 0) {
     pdf.addPage();
 
@@ -336,16 +342,18 @@ async function downloadPDF() {
       imgHeight
     );
 
-    addFooter();
-
-    heightLeft -= (pageHeight - margin * 2);
+    heightLeft -= usableHeight;
   }
 
-  // 6️⃣ حفظ PDF
+  // 7️⃣ إضافة footer فقط في آخر صفحة
+  addFooter();
+
+  // 8️⃣ حفظ PDF
   pdf.save("devis.pdf");
 
-  // 7️⃣ إعادة الأزرار
+  // 9️⃣ إعادة العناصر
   deleteButtons.forEach(btn => (btn.style.display = "inline-block"));
+  if (htmlFooter) htmlFooter.style.display = "block";
 }
 /* ===================================== */
 /*  viderPanier                      */
