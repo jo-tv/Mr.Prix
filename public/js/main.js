@@ -143,59 +143,82 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
         throw new Error("لم يتم العثور على المنتج");
       }
       const product = products[0];
-
       const ticketDiv = document.querySelector(".ticket");
       ticketDiv.innerHTML = `
        <div class="imgPromo">
+
+    </div>
+       <div class="imgFinSirie">
       <img
-        src="https://cdn.pixabay.com/photo/2022/09/23/09/13/promotion-7474039_1280.png"
+        src="../img/finSerie.png"
         alt="promo"
       />
     </div>
-    <h4><span>LIBELLE :</span> ${product.LIBELLE}</h4>
-    <div class="date">Dernière mise à jour le :<span>${formatDate(
-        product.createdAt
-      )}</span></div>
+    <div class="libelle">
+    <span class="i1">LIBELLE : </span> <span class="i3 lib">${product.LIBELLE}</span>
+    </div>
     <div class="items">
-      <div><span class="i1">GenCode</span><span class="i2"><i class="fa-solid fa-barcode"></i></span><span class="i3">${product.GENCOD_P
+      <div><span class="i1">GenCode</span><span class="i2"><i class="fa-solid fa-barcode"></i></span><span class="i3">${product.GENCOD_P || "❌"
         }</span></div>
       <div><span class="i1">ANPF</span><span class="i2"><i class="fa-solid fa-qrcode"></i></span><span class="i3">${product.ANPF
+        || "❌"}</span></div>
+      <div><span class="i1">Fourni</span><span class="i2"><i class="fa-solid fa-user-tie"></i></span><span class="i3">${product.FOURNISSEUR_P || "❌"
         }</span></div>
-      <div><span class="i1">Fourni</span><span class="i2"><i class="fa-solid fa-user-tie"></i></span><span class="i3">${product.FOURNISSEUR_P
-        }</span></div>
-      <div><span class="i1">ReF-Four</span><span class="i2"><i class="fa-solid fa-users-gear"></i></span><span class="i3">${product.REFFOUR_P
+      <div><span class="i1">ReF-Four</span><span class="i2"><i class="fa-solid fa-users-gear"></i></span><span class="i3">${product.REFFOUR_P || "❌"
         }</span></div>
       <div><span class="i1">Stock</span><span class="i2"><i class="fa-solid
-      fa-boxes-stacked"></i></span><span id="stk" class="i3">${product.STOCK
+      fa-boxes-stacked"></i></span><span id="stk" class="i3">${product.STOCK || "-"
         }</span></div>
-      <div><span class="i1">SOUS SOLUTION</span><span class="i2"><i class="fa-solid fa-map-pin"></i></span><span id="stk" class="i3" style="color:#8147ed;font-weight: 900;background: #dfd59d;">${product.SOUS_SOLUTION
+      <div><span class="i1">SOUS SOLUTION</span><span class="i2"><i class="fa-solid fa-map-pin"></i></span><span id="stk" class="i3" style="color:#8147ed;font-weight: 900;background: #dfd59d;">${product.SOUS_SOLUTION || "❌"
         }</span></div>
-      <div><span class="i1">Status</span><span class="i2"><i class="fas fa-exclamation-triangle"></i></span><span class="i3" id="etatProduit" ></span></div>
     </div>
     <div class="total">
-      <span class="i1">prix</span><span class="i3 i4"id="prixTotal">${product.PV_TTC
+      <span class="i1">prix</span><span class="i3 i4"id="prixTotal">${product.PV_TTC || 0
         } DH</span>
     </div>
     <div class="PrixPromo">
-      <span class="i3 i4" id="promo">${product.PRIXVT
-        } DH<i class="fa-solid fa-tag"></i></span>
+      <span  id="promo"> ${product.PRIXVT || 0
+        } DH</span>
     </div>
     <div class="footer">Dernière mise à jour il y a <span> ${timeSince(
-          product.createdAt
-        )}</span></div>
+          product.createdAt || ""
+        )}</span>${formatDate(
+          product.createdAt || ""
+        )}</div>
 `;
+
       let divPromo = document.querySelector(".PrixPromo");
       let prixPromo = document.querySelector("#promo");
       let prixTotal = document.querySelector("#prixTotal");
-      let imgPromo = document.querySelector(".imgPromo");
+      let imgFinSirie = document.querySelector(".imgFinSirie");
+      let footer = document.querySelector(".footer");
 
-      if (parseInt(prixPromo.textContent) === 0) {
-        imgPromo.style.display = "none";
-        divPromo.style.display = "none";
-      } else {
-        divPromo.style.display = "block";
-        imgPromo.style.display = "block";
+      function formatDate2(date) {
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+
+        return `${day}/${month}/${year}`;
+      }
+
+      if (parseInt(prixPromo.textContent) !== 0) {
+        divPromo.style.setProperty(
+          "display",
+          "block",
+          "important"
+        );
+        prixTotal.style.setProperty(
+          "font-size",
+          "30px",
+          "important"
+        )
         prixTotal.classList.add("activePromo");
+        footer.innerHTML = `
+        Valable : Du  <span> ${formatDate2(product.DATEDEBUT
+        )}</span>  Au <span>${formatDate2(product.DATEFIN
+        )}</span>
+        `
       }
       function timeSince(dateString) {
         const now = new Date();
@@ -232,15 +255,14 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
         return `${day}/${month}/${year} ${hours}:${minutes}`;
       }
 
-      const etatElement = document.getElementById("etatProduit");
+      const etatElement = document.querySelector(".lib");
       const libelle = product?.LIBELLE?.trim();
 
       if (etatElement && libelle) {
         if (/\[\s*GA\s*\]$/.test(libelle)) {
-          etatElement.textContent = "Produit Désactivé";
           etatElement.style.setProperty(
             "background-color",
-            "orange",
+            "red",
             "important"
           );
           etatElement.style.setProperty(
@@ -248,11 +270,11 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
             "16px",
             "important"
           );
-          etatElement.style.setProperty("color", "red", "important");
+          etatElement.style.setProperty("color", "#fff", "important");
+          imgFinSirie.style.display = "block"
         } else if (/\[\s*A\s*\]$/.test(libelle)) {
-          etatElement.textContent = "Produit Active";
           etatElement.style.setProperty(
-            "background-color",
+            "color",
             "#fff",
             "important"
           );
@@ -262,10 +284,11 @@ document.querySelector(".Subscribe-btn").addEventListener("click", function () {
             "important"
           );
           etatElement.style.setProperty(
-            "color",
+            "background-color",
             "green",
             "important"
           );
+          imgFinSirie.style.display = "none"
         }
       }
 
