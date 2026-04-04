@@ -391,11 +391,11 @@ app.get("/api/Produit/:code", isAuthenticated, async (req, res) => {
     }
 
     res.json({
-      prix: produit.PV_TTC,
-      libelle: produit.LIBELLE,
-      prixPro: produit.PRIXVT,
-      anpf: produit.ANPF,
-      genCode: produit.GENCOD_P,
+      prix: produit.PV_TTC || 0,
+      libelle: produit.LIBELLE || "",
+      prixPro: produit.PRIXVT || 0,
+      anpf: produit.ANPF || "",
+      genCode: produit.GENCOD_P || "",
       dateDebut: formatDate(produit.DATEDEBUT),
       dateFin: formatDate(produit.DATEFIN)
     });

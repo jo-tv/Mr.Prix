@@ -30,7 +30,7 @@ function updateTotals() {
     const tvaValue = net - htValue;
 
     // عرض النتائج
-    document.getElementById('net').textContent = net.toFixed(2) ;
+    document.getElementById('net').textContent = net.toFixed(2);
 
     document.getElementById('ht').textContent = htValue.toFixed(2);
 
@@ -101,7 +101,8 @@ async function fetchPrice(input) {
     }
 
     const data = await response.json();
-    prixInput.value = data.prix;
+    data.prixPro > 0 ? prixInput.value = data.prixPro : prixInput.value = data.prix
+    
     updateTotals();
   } catch (err) {
     console.error(err);

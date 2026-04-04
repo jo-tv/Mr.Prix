@@ -29,6 +29,10 @@ router.get("/cmd", isAuthenticated, isResponsable, (req, res) => {
   res.sendFile(path.join(__dirname, "../views/responsable/search.html"));
 });
 
+router.get("/devisRS", isAuthenticated, isResponsable, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/responsable/DevisMagasin.html"));
+});
+
 router.get("/CHERCHER", isAuthenticated, isResponsable, (req, res) => {
   res.sendFile(path.join(__dirname, "../views/responsable/CHERCHER.html"));
 });
