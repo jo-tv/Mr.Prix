@@ -540,43 +540,51 @@ body {
     transform: scale(0.9);
 }
 
-#reader {
-    position: absolute;
-    top: 0;
+.container-scan {
     width: 100%;
-    max-width: 400px;
-    display: none;
-    margin: auto;
-    box-shadow:
-        rgba(0, 0, 0, 0.3) 0px 19px 38px,
-        rgba(0, 0, 0, 0.22) 0px 15px 12px;
-    border: dashed solid #4285f4;
-    z-index: 999;
+    height: 300px;
+    position: fixed;
+    top: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000 !important;
 }
-
-.fermer {
-    background: red;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    outline: none;
-    border: none;
-    font-size: 25px;
-    color: #fff;
-    font-weight: 900;
-    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
-    position: absolute;
-    top: 25%;
-    right: 12%;
+#reader {
+    width: 90vw;
+    max-width: 300px;
+    margin-top: 10px;
+    background: black;
+    border-radius: 16px;
+    overflow: hidden;
     display: none;
-    z-index: 1000;
+    box-shadow:
+        rgba(0, 0, 0, 0.4) 0px 30px 60px,
+        rgba(0, 0, 0, 0.3) 0px 15px 30px;
+}
+/* زر الإغلاق */
+.fermer {
+    position: fixed;
+    top: 15%;
+    right: 10%;
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    font-size: 38px;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
 img {
     width: 70%;
     height: 50%;
     position: absolute;
-    opacity: 0.5;
+    opacity: 0.3;
     z-index: -10;
 }
 
@@ -586,7 +594,7 @@ img {
 .modal-message {
     display: none; /* مخفي افتراضياً */
     position: fixed;
-    z-index: 9999;
+    z-index: 9999999 !important;
     left: 0;
     top: 0;
     width: 100%;

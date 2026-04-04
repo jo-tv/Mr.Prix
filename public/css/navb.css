@@ -154,7 +154,7 @@
 }
 .btn-app.active::after {
     opacity: 1;
-    right: 140%;
+    right: 110%;
 }
 /* تصميم نافذة منبثقة */
 .toast {

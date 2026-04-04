@@ -40,7 +40,7 @@ function showReader() {
 
       const config = {
         fps: 10,
-        qrbox: { width: 250, height: 250 },
+        qrbox: { width: 350, height: 350 },
         aspectRatio: 1.7778, // 16:9 مثالي للآيفون
         facingMode: { exact: "environment" }
       };
