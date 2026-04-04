@@ -14,7 +14,7 @@ body {
 /* style ticket css  */
 
 .ticket {
-    width: 85%;
+    width: 90%;
     background-color: rgba(255, 255, 255, 0.367);
     -webkit-box-shadow: 0px 2px 1px rgba(50, 50, 50, 0.22);
     -moz-box-shadow: 0px 2px 1px rgba(50, 50, 50, 0.22);
@@ -29,7 +29,7 @@ body {
     z-index: 10;
     margin: 200px auto;
     display: none;
-    zoom: 0.8;
+    zoom: 0.7;
 
     -webkit-animation: bounce-in-top 1.1s both;
     animation: bounce-in-top 1.1s both;
@@ -266,7 +266,7 @@ body {
     background-image: url("../img/prixPromo.png");
     background-size: cover;
     background-repeat: no-repeat;
-    width: 430px !important;
+    width: 400px !important;
     height: 200px;
     text-align: center;
     margin: 0 auto;
