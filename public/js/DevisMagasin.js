@@ -110,7 +110,7 @@ function ajouterAuTableau() {
   if (exist) {
     exist.qte += qte;
   } else {
-    panier.push({
+    panier.unshift({
       code,
       anpf,
       libelle,
@@ -529,3 +529,4 @@ menuToggle.addEventListener('click', () => {
     e.classList.toggle("active");
   });
 });
+
