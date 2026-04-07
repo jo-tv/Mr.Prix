@@ -85,7 +85,7 @@ function ipCheck(req, res, next) {
 <body>
   <div class="box">
     <h1>🚫 Accès refusé</h1>
-    <p>IP non autorisée.</p>
+    <p>Désolé, l’accès à l’application n’est pas disponible depuis votre emplacement actuel. Veuillez contacter le support pour obtenir de l’aide. ⚠️</p>
     <a href="/">Retour</a>
   </div>
 </body>
