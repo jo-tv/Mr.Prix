@@ -22,8 +22,8 @@ function ipCheck(req, res, next) {
 
   const userIP = getClientIP(req);
 
-  console.log("🌍 Client IP:", userIP);
-  console.log("📡 x-forwarded-for:", req.headers["x-forwarded-for"]);
+  // console.log("🌍 Client IP:", userIP);
+//   console.log("📡 x-forwarded-for:", req.headers["x-forwarded-for"]);
 
   // ✅ قائمة IPs المسموحة
   const allowedIPs = [

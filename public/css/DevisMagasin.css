@@ -26,7 +26,8 @@ body {
     border-collapse: collapse;
 }
 
-.full {
+.full,
+#devisContent {
     width: 100%;
 }
 .half {
@@ -428,6 +429,11 @@ th {
 @media print {
     @page {
         size: A4;
+    }
+    #devisContent {
+        width: 210mm !important; /* عرض A4 */
+        min-height: 297mm;
+        margin: 0 auto !important;
     }
 
     body {
