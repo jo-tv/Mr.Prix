@@ -122,14 +122,27 @@ th {
     height: 40px;
 }
 
-.footer {
+/* .footer {
     width: 100%;
     text-align: center;
     font-weight: 600;
     margin-top: 50px;
     margin-bottom: 10px;
     letter-spacing: 1px;
-    line-height: 25px;
+    line-height: 23px;
+} */
+
+.footer {
+    width: 90%;
+    margin: auto;
+    text-align: center;
+    font-weight: 600;
+    position: absolute;
+    bottom: 0;
+    letter-spacing: 1px;
+    line-height: 23px;
+    break-inside: avoid !important;
+    opacity: 0;
 }
 .footer p {
     text-align: center;
@@ -476,9 +489,8 @@ th {
         size: A4;
     }
     #devisContent {
-    transform: none !important;
-    zoom: 1 !important;
-}
+        margin: 0 auto !important;
+    }
 
     body {
         margin: 0;
@@ -497,7 +509,7 @@ th {
     }
 
     .page {
-        width: 90% !important;
+        width: 100% !important;
         margin: auto !important;
         box-shadow: none !important;
         border: none !important;
@@ -513,6 +525,17 @@ th {
         font-weight: 500 !important;
         text-align: center !important;
         padding: 12px auto !important;
+    }
+    .lible {
+        text-align: left !important;
+        padding-left: 7px !important;
+    }
+    .footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        break-inside: avoid !important;
+        opacity: 1 !important;
     }
 }
 @media only screen and (min-width: 1020px) {

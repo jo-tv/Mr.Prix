@@ -347,14 +347,7 @@ async function downloadPDF() {
 
         pdf.addPage();
 
-        pdf.addImage(
-            imgData,
-            "JPEG",
-            margin,
-            position,
-            imgWidth,
-            imgHeight
-        );
+        pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
 
         addFooter();
 
@@ -540,3 +533,5 @@ menuToggle.addEventListener("click", () => {
         e.classList.toggle("active");
     });
 });
+
+
