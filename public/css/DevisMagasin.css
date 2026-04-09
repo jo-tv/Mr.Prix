@@ -26,10 +26,13 @@ body {
     border-collapse: collapse;
 }
 
-.full,
-#devisContent {
+.full {
     width: 100%;
     margin: 20px auto;
+}
+#devisContent {
+    max-width: 800px;
+    margin: auto;
 }
 .half {
     width: 48%;

@@ -260,26 +260,30 @@ document.addEventListener("DOMContentLoaded", function () {
 /* ===================================== */
 
 async function downloadPDF() {
-    // 1️⃣ إخفاء أزرار الحذف
     const deleteButtons = document.querySelectorAll("#sup");
     deleteButtons.forEach(btn => (btn.style.display = "none"));
 
-    // 2️⃣ إخفاء footer من الصفحة
     const htmlFooter = document.querySelector(".footer");
     if (htmlFooter) htmlFooter.style.display = "none";
 
-    // 3️⃣ جلب المحتوى
     const devis = document.getElementById("devisContent");
     if (!devis) {
         alert("Contenu Devis introuvable");
         return;
     }
 
-    // 4️⃣ تحويل إلى Canvas
+    // 🟢 نحفظ الستايل الأصلي
+    const originalWidth = devis.style.width;
+
+    // 🟢 نفرض عرض ثابت (A4 تقريباً بالـ px)
+    devis.style.width = "800px";
+
+    // 🟢 scale حسب الشاشة
+    const scale = window.devicePixelRatio || 2;
+
     const canvas = await html2canvas(devis, {
-        scale: 2,
+        scale: scale,
         useCORS: true,
-        allowTaint: true,
         scrollY: -window.scrollY
     });
 
@@ -292,24 +296,23 @@ async function downloadPDF() {
     const pageHeight = pdf.internal.pageSize.getHeight();
 
     const margin = 15;
-    const footerHeight = 20; // 🟢 مساحة مخصصة للـ footer
+    const footerHeight = 20;
 
     const imgWidth = pageWidth - margin * 2;
-    const usableHeight = pageHeight - margin * 2 - footerHeight; // 🟢 نترك بلاصة للـ footer
+    const usableHeight = pageHeight - margin * 2 - footerHeight;
 
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
     let heightLeft = imgHeight;
     let position = margin;
 
-    // 🟢 دالة إضافة footer
     const addFooter = () => {
         pdf.setFontSize(8);
 
         const footerLines = [
-            "Magasin Mr. Bricolage Lot 15-16-17. Parc D’activité Marjane .Av Abdelkrim Khattabi. Marrakech.-TEL:",
-            "0525-060-240/241 - Fax: 05-24-29-18-87",
-            "PATENTE: 47924641 / RC: 129997 / IF: 2202961 / CNSS: 6728458 / ICE: 001525045000091"
+            "Magasin Mr. Bricolage Lot 15-16-17.Parc D’activité Marjane.Av Abdelkrim Khattabi.Marrakech.-TEL:",
+            "0525-060-240/241-Fax: 05-24-29-18-87",
+            "PATENTE: 47924641/ RC: 129 997/ IF: 220 2961/CNSS:6728458/ICE: 001525045000091"
         ];
 
         let y = pageHeight - 15;
@@ -320,11 +323,11 @@ async function downloadPDF() {
         });
     };
 
-    // 5️⃣ الصفحة الأولى
+    // الصفحة الأولى
     pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
     heightLeft -= usableHeight;
 
-    // 6️⃣ باقي الصفحات
+    // باقي الصفحات
     while (heightLeft > 0) {
         pdf.addPage();
 
@@ -340,13 +343,13 @@ async function downloadPDF() {
         heightLeft -= usableHeight;
     }
 
-    // 7️⃣ إضافة footer فقط في آخر صفحة
     addFooter();
 
-    // 8️⃣ حفظ PDF
     pdf.save("devis.pdf");
 
-    // 9️⃣ إعادة العناصر
+    // 🟢 نرجعو الستايل
+    devis.style.width = originalWidth;
+
     deleteButtons.forEach(btn => (btn.style.display = "inline-block"));
     if (htmlFooter) htmlFooter.style.display = "block";
 }
