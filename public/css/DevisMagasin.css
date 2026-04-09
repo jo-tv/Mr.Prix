@@ -476,10 +476,9 @@ th {
         size: A4;
     }
     #devisContent {
-        width: 210mm !important; /* عرض A4 */
-        min-height: 297mm;
-        margin: 0 auto !important;
-    }
+    transform: none !important;
+    zoom: 1 !important;
+}
 
     body {
         margin: 0;
@@ -498,7 +497,7 @@ th {
     }
 
     .page {
-        width: 100% !important;
+        width: 90% !important;
         margin: auto !important;
         box-shadow: none !important;
         border: none !important;

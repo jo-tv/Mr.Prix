@@ -260,6 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
 /* ===================================== */
 
 async function downloadPDF() {
+    // 1️⃣ إخفاء الأزرار
     const deleteButtons = document.querySelectorAll("#sup");
     deleteButtons.forEach(btn => (btn.style.display = "none"));
 
@@ -272,31 +273,41 @@ async function downloadPDF() {
         return;
     }
 
-    // 🟢 نحفظ الستايل الأصلي
+    // 🟢 حفظ الحالة الأصلية
     const originalWidth = devis.style.width;
+    const originalTransform = devis.style.transform;
 
-    // 🟢 نفرض عرض ثابت (A4 تقريباً بالـ px)
-    devis.style.width = "800px";
+    // 🟢 توحيد العرض (مهم للجودة)
+    devis.style.width = "1000px";
+    devis.style.transform = "scale(1)";
 
-    // 🟢 scale حسب الشاشة
-    const scale = window.devicePixelRatio || 2;
-
+    // 🟢 إعدادات عالية الجودة
     const canvas = await html2canvas(devis, {
-        scale: scale,
+        scale: 3, // 🔥 جودة عالية
         useCORS: true,
-        scrollY: -window.scrollY
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        scrollY: -window.scrollY,
+        windowWidth: 1200
     });
 
-    const imgData = canvas.toDataURL("image/png");
+    // 🟢 تحويل الصورة (أفضل من PNG)
+    const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+        compress: true
+    });
 
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    const margin = 15;
-    const footerHeight = 20;
+    const margin = 10;
+    const footerHeight = 15;
 
     const imgWidth = pageWidth - margin * 2;
     const usableHeight = pageHeight - margin * 2 - footerHeight;
@@ -306,16 +317,17 @@ async function downloadPDF() {
     let heightLeft = imgHeight;
     let position = margin;
 
+    // 🟢 Footer لكل صفحة
     const addFooter = () => {
         pdf.setFontSize(8);
 
         const footerLines = [
-            "Magasin Mr. Bricolage Lot 15-16-17.Parc D’activité Marjane.Av Abdelkrim Khattabi.Marrakech.-TEL:",
-            "0525-060-240/241-Fax: 05-24-29-18-87",
-            "PATENTE: 47924641/ RC: 129 997/ IF: 220 2961/CNSS:6728458/ICE: 001525045000091"
+            "Magasin Mr. Bricolage Lot 15-16-17. Parc D’activité Marjane. Av Abdelkrim Khattabi. Marrakech",
+            "TEL: 0525-060-240/241 - Fax: 05-24-29-18-87",
+            "PATENTE: 47924641 / RC: 129997 / IF: 2202961 / CNSS: 6728458 / ICE: 001525045000091"
         ];
 
-        let y = pageHeight - 15;
+        let y = pageHeight - 12;
 
         footerLines.forEach(line => {
             pdf.text(line, pageWidth / 2, y, { align: "center" });
@@ -323,32 +335,38 @@ async function downloadPDF() {
         });
     };
 
-    // الصفحة الأولى
-    pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+    // 2️⃣ الصفحة الأولى
+    pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
+    addFooter();
+
     heightLeft -= usableHeight;
 
-    // باقي الصفحات
+    // 3️⃣ الصفحات الأخرى
     while (heightLeft > 0) {
+        position = margin - (imgHeight - heightLeft);
+
         pdf.addPage();
 
         pdf.addImage(
             imgData,
-            "PNG",
+            "JPEG",
             margin,
-            position - (imgHeight - heightLeft),
+            position,
             imgWidth,
             imgHeight
         );
 
+        addFooter();
+
         heightLeft -= usableHeight;
     }
 
-    addFooter();
-
+    // 4️⃣ حفظ الملف
     pdf.save("devis.pdf");
 
-    // 🟢 نرجعو الستايل
+    // 🟢 استرجاع الحالة
     devis.style.width = originalWidth;
+    devis.style.transform = originalTransform;
 
     deleteButtons.forEach(btn => (btn.style.display = "inline-block"));
     if (htmlFooter) htmlFooter.style.display = "block";
