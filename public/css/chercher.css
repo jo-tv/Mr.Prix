@@ -271,9 +271,8 @@ thead input {
     .containeer {
         zoom: 1.2 !important;
     }
-    table {
-        zoom: 0.5;
-        font-weight: 800 !important;
+    .content {
+        zoom: 0.7;
     }
     .dt-buttons .btn {
         font-size: 9px !important;
@@ -285,16 +284,13 @@ thead input {
     .containeer {
         zoom: 1.1 !important;
     }
-    table {
-        zoom: 0.8;
+    .content {
+        zoom: 0.9;
     }
 }
 @media only screen and (min-width: 1020px) {
     .containeer {
         zoom: 1 !important;
-    }
-    table {
-        zoom: 0.9;
     }
     .dt-buttons .btn {
         font-size: 15px !important;
