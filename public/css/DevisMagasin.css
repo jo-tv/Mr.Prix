@@ -29,7 +29,7 @@ body {
 .full,
 #devisContent {
     width: 100%;
-    margin: 0 auto;
+    margin: 20px auto;
 }
 .half {
     width: 48%;
@@ -86,6 +86,10 @@ th {
     text-align: center;
     padding: 4px auto;
 }
+.lible {
+    text-align: left !important;
+    padding-left: 7px !important;
+}
 
 .name-client {
     max-width: 200px;
@@ -116,11 +120,13 @@ th {
 }
 
 .footer {
-    width: 90%;
+    width: 100%;
     text-align: center;
     font-weight: 600;
     margin-top: 50px;
     margin-bottom: 10px;
+    letter-spacing: 1px;
+    line-height: 25px;
 }
 .footer p {
     text-align: center;
@@ -505,5 +511,27 @@ th {
         font-weight: 500 !important;
         text-align: center !important;
         padding: 12px auto !important;
+    }
+}
+@media only screen and (min-width: 1020px) {
+    .grid th {
+        font-size: 14px !important;
+        font-weight: 700;
+        text-align: center;
+        padding: 3px auto;
+    }
+    .grid td {
+        font-size: 13px !important;
+        font-weight: 500;
+        text-align: center;
+        padding: 4px auto;
+    }
+    .label {
+        font-size: 14px !important;
+        font-weight: 600;
+    }
+    .td-info {
+        font-size: 13px !important;
+        font-weight: 400;
     }
 }
