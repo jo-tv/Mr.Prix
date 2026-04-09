@@ -29,6 +29,7 @@ body {
 .full,
 #devisContent {
     width: 100%;
+    margin: 0 auto;
 }
 .half {
     width: 48%;
@@ -115,7 +116,7 @@ th {
 }
 
 .footer {
-    width: 100%;
+    width: 90%;
     text-align: center;
     font-weight: 600;
     margin-top: 50px;
@@ -398,26 +399,61 @@ th {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media only screen and (min-width: 358px) and (max-width: 599px) {
+    .containeer {
+        zoom: 1.3 !important;
+    }
     .actions-container {
-        flex-direction: column;
+        flex-direction: row;
     }
     .article-form {
         display: flex !important;
         flex-direction: column;
     }
-
     .action-btn {
-        width: 100%;
+        width: 20%;
+        display: flex;
+        flex-direction: column;
         justify-content: center;
+        font-size: 10px !important;
     }
-
+    .action-btn i {
+        justify-content: center;
+        font-size: 10px !important;
+    }
     .button-group {
         align-self: stretch;
     }
-
     .add-btn {
         width: 100%;
+    }
+}
+@media only screen and (min-width: 599px) and (max-width: 840px) {
+    .containeer {
+        zoom: 1.2 !important;
+    }
+    .actions-container {
+        flex-direction: row;
+    }
+    .article-form {
+        display: flex !important;
+        flex-direction: column;
+    }
+    .action-btn {
+        width: 20%;
+        justify-content: center;
+        font-size: 13px !important;
+    }
+    .button-group {
+        align-self: stretch;
+    }
+    .add-btn {
+        width: 100%;
+    }
+}
+@media only screen and (min-width: 1020px) {
+    .containeer {
+        zoom: 1.1 !important;
     }
 }
 

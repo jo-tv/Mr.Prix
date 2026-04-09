@@ -29,8 +29,6 @@ body {
     z-index: 10;
     margin: 200px auto;
     display: none;
-    zoom: 0.7;
-
     -webkit-animation: bounce-in-top 1.1s both;
     animation: bounce-in-top 1.1s both;
 }
@@ -828,5 +826,35 @@ img {
 
     100% {
         clip-path: inset(0 0 0 100%);
+    }
+}
+@media only screen and (min-width: 358px) and (max-width: 599px) {
+    .ticket {
+        zoom: 0.6;
+    }
+    .containeer {
+        zoom: 1.1 !important;
+    }
+}
+@media only screen and (min-width: 599px) and (max-width: 840px) {
+    .ticket {
+        zoom: 0.7;
+    }
+    .containeer {
+        zoom: 1.1 !important;
+    }
+    input {
+        zoom: 1.2 !important;
+    }
+}
+@media only screen and (min-width: 1020px) {
+    .ticket {
+        zoom: 0.8 !important;
+    }
+    .containeer {
+        zoom: 1 !important;
+    }
+    input {
+        zoom: 1.3 !important;
     }
 }

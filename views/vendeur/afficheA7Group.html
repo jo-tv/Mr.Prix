@@ -365,6 +365,58 @@
                     display: none;
                 }
             }
+            @media only screen and (min-width: 358px) and (max-width: 599px) {
+                .card {
+                    zoom: 0.8;
+                }
+                .containeer {
+                    zoom: 1 !important;
+                }
+                .one {
+                    zoom: 0.7;
+                }
+                .actions .btn-action {
+                    font-size: 10px !important;
+                    display: flex;
+                }
+            }
+            @media only screen and (min-width: 599px) and (max-width: 840px) {
+                .card {
+                    zoom: 1;
+                    margin-top: 80px;
+                }
+                .containeer {
+                    zoom: 1.1 !important;
+                }
+                .one {
+                    zoom: 0.7;
+                }
+                .actions .btn-action {
+                    font-size: 14px !important;
+                }
+            }
+            @media only screen and (min-width: 1020px) {
+                #cardsContainer {
+                    width: 100vw;
+                    display: grid !important;
+                    grid-template-columns: repeat(2, minmax(150px, auto));
+                    gap: 20px;
+                    margin-top: 60px;
+                }
+                .card {
+                    zoom: 1;
+                    margin: 0 auto !important;
+                }
+                .containeer {
+                    zoom: 1.1 !important;
+                }
+                .one {
+                    zoom: 1;
+                }
+                .actions .btn-action {
+                    font-size: 23px !important;
+                }
+            }
         </style>
     </head>
 
@@ -401,7 +453,7 @@
         <div class="one">
             <h1>Page affiche A7</h1>
         </div>
-                <!-- From Uiverse.io by Yaya12085 -->
+        <!-- From Uiverse.io by Yaya12085 -->
         <div class="cardss">
             <div class="header">
                 <span class="icon">
