@@ -31,7 +31,7 @@ body {
     margin: 20px auto;
 }
 #devisContent {
-    max-width: 800px;
+    width: 90%;
     margin: auto;
 }
 .half {
