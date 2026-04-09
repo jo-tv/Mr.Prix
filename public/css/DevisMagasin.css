@@ -143,6 +143,7 @@ th {
     line-height: 23px;
     break-inside: avoid !important;
     opacity: 0;
+    z-index: -1000;
 }
 .footer p {
     text-align: center;
