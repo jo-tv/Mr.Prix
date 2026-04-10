@@ -314,6 +314,7 @@ document.getElementById("downloadAll").addEventListener("click", async () => {
         const clone = cards[i].cloneNode(true);
 
         clone.querySelector(".remove-btn")?.remove();
+        clone.style.zoom = "1";
 
         Object.assign(clone.style, {
             position: "fixed",

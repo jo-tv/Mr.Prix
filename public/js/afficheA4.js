@@ -372,6 +372,7 @@ document
       const removeBtn = clone.querySelector(".remove-btn");
       clone.querySelector(".arc")?.style && (clone.querySelector(".arc").style.display = "none");
       if (removeBtn) removeBtn.remove();
+      clone.style.zoom = "1";
 
 
       Object.assign(clone.style, {
