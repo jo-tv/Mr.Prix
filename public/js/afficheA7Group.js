@@ -7,193 +7,188 @@ let html5QrCode = null;
 let isScanning = false;
 
 function showReader() {
+    const readerDiv = document.getElementById("reader");
+    const btnFermer = document.querySelector(".fermer");
+    const beepSound = new Audio("/sounds/beep.mp3");
 
-  const readerDiv = document.getElementById("reader");
-  const btnFermer = document.querySelector(".fermer");
-  const beepSound = new Audio("/sounds/beep.mp3");
+    readerDiv.style.display = "block";
+    btnFermer.style.display = "block";
+    containerScan.style.zIndex = "9999999";
 
-  readerDiv.style.display = "block";
-  btnFermer.style.display = "block";
-  containerScan.style.zIndex = "9999999";
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader", {
+            verbose: false
+        });
+    }
 
-  if (!html5QrCode) {
-    html5QrCode = new Html5Qrcode("reader", {
-      verbose: false
-    });
-  }
+    if (isScanning) return;
+    isScanning = true;
 
-  if (isScanning) return;
-  isScanning = true;
-
-  Html5Qrcode.getCameras()
-    .then(devices => {
-      if (!devices || devices.length === 0) {
-        alert(
-          "🚫 لا توجد كاميرات متاحة. تأكد من منح الإذن!"
-        );
-        isScanning = false;
-        hideReader();
-        return;
-      }
-
-      const backCamera =
-        devices.find(device =>
-          device.label.toLowerCase().includes("back")
-        ) || devices[0];
-
-      const config = {
-        fps: 30,
-        qrbox: { width: 350, height: 350 },
-        aspectRatio: 1.7778, // 16:9 مثالي للآيفون
-        facingMode: { exact: "environment" }
-      };
-
-      html5QrCode.start(
-        { deviceId: { exact: backCamera.id } },
-        config,
-        (decodedText) => {
-          beepSound.play();
-
-          html5QrCode.stop().then(() => {
-            html5QrCode.clear();
-
-            // 🧠 نأخذ آخر بطاقة
-            const cards = document.querySelectorAll(".card");
-            const lastCard = cards[cards.length - 1];
-
-            if (!lastCard) {
-              alert("⚠️ لا توجد بطاقة لإدخال الرمز");
-              isScanning = false;
-              hideReader();
-              return;
+    Html5Qrcode.getCameras()
+        .then(devices => {
+            if (!devices || devices.length === 0) {
+                alert("🚫 لا توجد كاميرات متاحة. تأكد من منح الإذن!");
+                isScanning = false;
+                hideReader();
+                return;
             }
 
-            const refInput = lastCard.querySelector(".Ref");
+            const backCamera =
+                devices.find(device =>
+                    device.label.toLowerCase().includes("back")
+                ) || devices[0];
 
-            // ✨ نضع الكود في آخر كارت
-            refInput.value = decodedText;
+            const config = {
+                fps: 30,
+                qrbox: { width: 350, height: 350 },
+                aspectRatio: 1.7778, // 16:9 مثالي للآيفون
+                facingMode: { exact: "environment" }
+            };
 
-            // 🔥 نشغل نفس سلوك الإدخال اليدوي
-            refInput.focus();
+            html5QrCode
+                .start(
+                    { deviceId: { exact: backCamera.id } },
+                    config,
+                    decodedText => {
+                        beepSound.play();
 
-            // محاكاة الضغط على زر Enter
-            refInput.dispatchEvent(
-              new KeyboardEvent("keydown", {
-                key: "Enter",
-                code: "Enter",
-                which: 13,
-                keyCode: 13,
-                bubbles: true
-              })
+                        html5QrCode.stop().then(() => {
+                            html5QrCode.clear();
+
+                            // 🧠 نأخذ آخر بطاقة
+                            const cards = document.querySelectorAll(".card");
+                            const lastCard = cards[cards.length - 1];
+
+                            if (!lastCard) {
+                                alert("⚠️ لا توجد بطاقة لإدخال الرمز");
+                                isScanning = false;
+                                hideReader();
+                                return;
+                            }
+
+                            const refInput = lastCard.querySelector(".Ref");
+
+                            // ✨ نضع الكود في آخر كارت
+                            refInput.value = decodedText;
+
+                            // 🔥 نشغل نفس سلوك الإدخال اليدوي
+                            refInput.focus();
+
+                            // محاكاة الضغط على زر Enter
+                            refInput.dispatchEvent(
+                                new KeyboardEvent("keydown", {
+                                    key: "Enter",
+                                    code: "Enter",
+                                    which: 13,
+                                    keyCode: 13,
+                                    bubbles: true
+                                })
+                            );
+
+                            // كذلك نطلق change كضمان إضافي
+                            refInput.dispatchEvent(new Event("change"));
+
+                            isScanning = false;
+                            hideReader();
+                        });
+                    },
+                    errorMessage => {
+                        // يمكن تجاهل أخطاء القراءة المؤقتة
+                    }
+                )
+                .catch(err => {
+                    console.error("📷 فشل بدء الكاميرا:", err);
+                    alert(
+                        "📵 تعذر فتح الكاميرا. تأكد من منح الصلاحيات أو استخدام متصفح يدعم الكاميرا."
+                    );
+                    isScanning = false;
+                    hideReader();
+                });
+        })
+        .catch(err => {
+            console.error("⚠️ خطأ في الحصول على الكاميرات:", err);
+            alert(
+                "⚠️ تعذر الوصول إلى الكاميرات. قد تحتاج إلى تغيير المتصفح أو السماح بالوصول."
             );
-
-            // كذلك نطلق change كضمان إضافي
-            refInput.dispatchEvent(new Event("change"));
-
             isScanning = false;
             hideReader();
-          });
-        },
-        errorMessage => {
-          // يمكن تجاهل أخطاء القراءة المؤقتة
-        }
-      )
-        .catch(err => {
-          console.error("📷 فشل بدء الكاميرا:", err);
-          alert(
-            "📵 تعذر فتح الكاميرا. تأكد من منح الصلاحيات أو استخدام متصفح يدعم الكاميرا."
-          );
-          isScanning = false;
-          hideReader();
         });
-    })
-    .catch(err => {
-      console.error("⚠️ خطأ في الحصول على الكاميرات:", err);
-      alert(
-        "⚠️ تعذر الوصول إلى الكاميرات. قد تحتاج إلى تغيير المتصفح أو السماح بالوصول."
-      );
-      isScanning = false;
-      hideReader();
-    });
 }
 
 function stopReader() {
-  const instance = window._qrCodeInstance;
-  if (instance && instance._isScanning) {
-    instance.stop().then(() => {
-      instance.clear();
-      delete window._qrCodeInstance;
-      hideReader();
-    });
-  } else {
-    hideReader();
-  }
+    const instance = window._qrCodeInstance;
+    if (instance && instance._isScanning) {
+        instance.stop().then(() => {
+            instance.clear();
+            delete window._qrCodeInstance;
+            hideReader();
+        });
+    } else {
+        hideReader();
+    }
 }
 
 function hideReader() {
-  readerDiv.style.display = "none";
-  btnFermer.style.display = "none";
-  containerScan.style.zIndex = "-9999999";
+    readerDiv.style.display = "none";
+    btnFermer.style.display = "none";
+    containerScan.style.zIndex = "-9999999";
 }
 
 btnFermer.addEventListener("click", stopReader);
-
 
 // ------------===========================
 
 const container = document.getElementById("cardsContainer");
 // 1. وظيفة حفظ البيانات في LocalStorage
 function saveToLocal() {
-  const cards = document.querySelectorAll(".card");
+    const cards = document.querySelectorAll(".card");
 
-  // إذا لم يبقَ أي كارد، امسح التخزين
-  if (cards.length === 0) {
-    localStorage.removeItem("saved_cardsA7");
-    return;
-  }
+    // إذا لم يبقَ أي كارد، امسح التخزين
+    if (cards.length === 0) {
+        localStorage.removeItem("saved_cardsA7");
+        return;
+    }
 
-  const cardsData = [];
+    const cardsData = [];
 
-  cards.forEach(card => {
-    let rawPrice = card.querySelector(".amount").innerText;
+    cards.forEach(card => {
+        let rawPrice = card.querySelector(".amount").innerText;
 
-    cardsData.push({
-      title: card.querySelector(".title").textContent,
-      amount: rawPrice.replace(",", ".").trim(),
-      ref: card.querySelector(".Ref").value,
-      sku: card.querySelector(".sku").textContent,
-      date: card.querySelector(".date").textContent
+        cardsData.push({
+            title: card.querySelector(".title").textContent,
+            amount: rawPrice.replace(",", ".").trim(),
+            ref: card.querySelector(".Ref").value,
+            sku: card.querySelector(".sku").textContent,
+            date: card.querySelector(".date").textContent
+        });
     });
-  });
 
-  localStorage.setItem("saved_cardsA7", JSON.stringify(cardsData));
+    localStorage.setItem("saved_cardsA7", JSON.stringify(cardsData));
 }
 
 // 2. وظيفة استعادة البيانات
 function loadFromLocal() {
-  const data = JSON.parse(
-    localStorage.getItem("saved_cardsA7") || "[]"
-  );
-  if (data.length === 0) {
-    addCard(); // إضافة بطاقة فارغة إذا كانت الذاكرة فارغة
-  } else {
-    data.forEach(item => addCard(item));
-  }
+    const data = JSON.parse(localStorage.getItem("saved_cardsA7") || "[]");
+    if (data.length === 0) {
+        addCard(); // إضافة بطاقة فارغة إذا كانت الذاكرة فارغة
+    } else {
+        data.forEach(item => addCard(item));
+    }
 }
 
 // 3. وظيفة إضافة بطاقة (إنشاء الـ DOM)
 function addCard(data = null) {
-  const card = document.createElement("div");
-  card.className = "card";
+    const card = document.createElement("div");
+    card.className = "card";
 
-  // نستخدم الدالة لتنسيق المبلغ سواء كان قادماً من الـ API أو الـ LocalStorage
-  const displayAmount = data ? formatPrice(data.amount) : "0";
+    // نستخدم الدالة لتنسيق المبلغ سواء كان قادماً من الـ API أو الـ LocalStorage
+    const displayAmount = data ? formatPrice(data.amount) : "0";
 
-
-  card.innerHTML = `
+    card.innerHTML = `
         <div class="remove-btn">X</div>
-        <div contenteditable="true" class="title" >${data ? data.title : ""
-    }</div>
+        <div contenteditable="true" class="title" >${
+            data ? data.title : ""
+        }</div>
         <div class="arc">
             <svg viewBox="0 -220 1000 620" preserveAspectRatio="none"
                style="width:100%; height:100%;">
@@ -216,79 +211,79 @@ function addCard(data = null) {
             <span class="unit"> Dh</span>
         </div>
         <div class="meta">
-            <div>code : <input type="number" class="Ref"  value="${data ? data.ref : ""
-    }" placeholder="GenCode.."></div>
-            <div style="margin-top:10px;display:none">SKU : <span class="sku">${data ? data.sku : ""
-    }</span></div>
+            <div> <span>code :</span> <input type="number" class="Ref"  value="${
+                data ? data.ref : ""
+            }" placeholder="GenCode.."></div>
+            <div style="margin-top:10px;display:none">SKU : <span class="sku">${
+                data ? data.sku : ""
+            }</span></div>
         </div>
         <div class="date">${data ? data.date : getFormattedDate()}</div>
     `;
 
-  // --- أحداث الحفظ التلقائي ---
+    // --- أحداث الحفظ التلقائي ---
 
-  // عند الكتابة في أي مكان داخل الكارد
-  card.addEventListener("input", () => {
-    saveToLocal();
-  });
+    // عند الكتابة في أي مكان داخل الكارد
+    card.addEventListener("input", () => {
+        saveToLocal();
+    });
 
-  // عند خروج المؤشر من حقل السعر (blur)، نعيد تنسيقه فوراً لضمان الشكل الصحيح
-  const amountSpan = card.querySelector(".amount");
-  amountSpan.addEventListener("blur", () => {
-    amountSpan.innerHTML = formatPrice(amountSpan.innerText);
-    saveToLocal();
-    fetchPriceDynamic(card, input)
-  });
+    // عند خروج المؤشر من حقل السعر (blur)، نعيد تنسيقه فوراً لضمان الشكل الصحيح
+    const amountSpan = card.querySelector(".amount");
+    amountSpan.addEventListener("blur", () => {
+        amountSpan.innerHTML = formatPrice(amountSpan.innerText);
+        saveToLocal();
+        fetchPriceDynamic(card, input);
+    });
 
-  card.querySelector(".remove-btn").onclick = () => {
-    card.remove();
-    saveToLocal();
-  };
+    card.querySelector(".remove-btn").onclick = () => {
+        card.remove();
+        saveToLocal();
+    };
 
-  const refInput = card.querySelector(".Ref");
-  refInput.addEventListener("change", () =>
-    fetchPriceDynamic(card, refInput)
-  );
+    const refInput = card.querySelector(".Ref");
+    refInput.addEventListener("change", () =>
+        fetchPriceDynamic(card, refInput)
+    );
 
-  container.appendChild(card);
+    container.appendChild(card);
 }
 
 // 4. معالجة الـ SVG المعقدة (التحويل لـ Image يضمن ظهورها في الـ PDF)
 async function prepareSvg(cardElement) {
-  const svg = cardElement.querySelector("svg");
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-  const svgData = new XMLSerializer().serializeToString(svg);
-  const img = new Image();
+    const svg = cardElement.querySelector("svg");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const img = new Image();
 
-  // ضبط أبعاد الكانفس بناءً على أبعاد الـ SVG في الصفحة
-  canvas.width = svg.clientWidth * 2;
-  canvas.height = svg.clientHeight * 2;
+    // ضبط أبعاد الكانفس بناءً على أبعاد الـ SVG في الصفحة
+    canvas.width = svg.clientWidth * 2;
+    canvas.height = svg.clientHeight * 2;
 
-  const svgBlob = new Blob([svgData], {
-    type: "image/svg+xml;charset=utf-8"
-  });
-  const url = URL.createObjectURL(svgBlob);
+    const svgBlob = new Blob([svgData], {
+        type: "image/svg+xml;charset=utf-8"
+    });
+    const url = URL.createObjectURL(svgBlob);
 
-  await new Promise(resolve => {
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const pngUrl = canvas.toDataURL("image/png");
-      const newImg = document.createElement("img");
-      newImg.src = pngUrl;
-      newImg.style.width = "100%";
-      newImg.style.height = "100%";
-      svg.replaceWith(newImg);
-      URL.revokeObjectURL(url);
-      resolve();
-    };
-    img.src = url;
-  });
+    await new Promise(resolve => {
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const pngUrl = canvas.toDataURL("image/png");
+            const newImg = document.createElement("img");
+            newImg.src = pngUrl;
+            newImg.style.width = "100%";
+            newImg.style.height = "100%";
+            svg.replaceWith(newImg);
+            URL.revokeObjectURL(url);
+            resolve();
+        };
+        img.src = url;
+    });
 }
 
 // 5. تحميل الـ PDF
-document
-  .getElementById("downloadAll")
-  .addEventListener("click", async () => {
+document.getElementById("downloadAll").addEventListener("click", async () => {
     const { jsPDF } = window.jspdf;
     const cards = document.querySelectorAll(".card");
     const pdf = new jsPDF("p", "mm", "a4");
@@ -316,236 +311,228 @@ document
     const startY = (pageHeight - gridHeight) / 2;
 
     for (let i = 0; i < cards.length; i++) {
-      const clone = cards[i].cloneNode(true);
+        const clone = cards[i].cloneNode(true);
 
-      clone.querySelector(".remove-btn")?.remove();
+        clone.querySelector(".remove-btn")?.remove();
 
-      Object.assign(clone.style, {
-        position: "fixed",
-        left: "-10000px",
-        top: "0",
-        width: cardWidth + "mm",
-        height: cardHeight + "mm",
-        background: "white"
-      });
+        Object.assign(clone.style, {
+            position: "fixed",
+            left: "-10000px",
+            top: "0",
+            width: cardWidth + "mm",
+            height: cardHeight + "mm",
+            background: "white"
+        });
 
-      document.body.appendChild(clone);
+        document.body.appendChild(clone);
 
-      await prepareSvg(clone);
+        await prepareSvg(clone);
 
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        useCORS: true
-      });
+        const canvas = await html2canvas(clone, {
+            scale: 2,
+            useCORS: true
+        });
 
-      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+        const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
-      // 🔽 position داخل grid
-      const col = i % cols;
-      const row = Math.floor(i / cols) % rows;
+        // 🔽 position داخل grid
+        const col = i % cols;
+        const row = Math.floor(i / cols) % rows;
 
-      const x = startX + col * (cardWidth + gap);
-      const y = startY + row * (cardHeight + gap);
+        const x = startX + col * (cardWidth + gap);
+        const y = startY + row * (cardHeight + gap);
 
-      // الكارد
-      pdf.addImage(imgData, "JPEG", x, y, cardWidth, cardHeight);
+        // الكارد
+        pdf.addImage(imgData, "JPEG", x, y, cardWidth, cardHeight);
 
-      // border منقط للقص
-      pdf.setDrawColor(0);
-      pdf.setLineWidth(0.2);
-      pdf.setLineDash([2, 2]);
+        // border منقط للقص
+        pdf.setDrawColor(0);
+        pdf.setLineWidth(0.2);
+        pdf.setLineDash([2, 2]);
 
-      pdf.rect(
-        x - padding,
-        y - padding,
-        cardWidth + padding * 2,
-        cardHeight + padding * 2
-      );
+        pdf.rect(
+            x - padding,
+            y - padding,
+            cardWidth + padding * 2,
+            cardHeight + padding * 2
+        );
 
-      pdf.setLineDash([]);
+        pdf.setLineDash([]);
 
-      // crop marks
-      const mark = 3;
+        // crop marks
+        const mark = 3;
 
-      pdf.line(x - padding, y - padding, x - padding + mark, y - padding);
-      pdf.line(x - padding, y - padding, x - padding, y - padding + mark);
+        pdf.line(x - padding, y - padding, x - padding + mark, y - padding);
+        pdf.line(x - padding, y - padding, x - padding, y - padding + mark);
 
-      pdf.line(
-        x + cardWidth + padding,
-        y - padding,
-        x + cardWidth + padding - mark,
-        y - padding
-      );
-      pdf.line(
-        x + cardWidth + padding,
-        y - padding,
-        x + cardWidth + padding,
-        y - padding + mark
-      );
+        pdf.line(
+            x + cardWidth + padding,
+            y - padding,
+            x + cardWidth + padding - mark,
+            y - padding
+        );
+        pdf.line(
+            x + cardWidth + padding,
+            y - padding,
+            x + cardWidth + padding,
+            y - padding + mark
+        );
 
-      pdf.line(
-        x - padding,
-        y + cardHeight + padding,
-        x - padding + mark,
-        y + cardHeight + padding
-      );
-      pdf.line(
-        x - padding,
-        y + cardHeight + padding,
-        x - padding,
-        y + cardHeight + padding - mark
-      );
+        pdf.line(
+            x - padding,
+            y + cardHeight + padding,
+            x - padding + mark,
+            y + cardHeight + padding
+        );
+        pdf.line(
+            x - padding,
+            y + cardHeight + padding,
+            x - padding,
+            y + cardHeight + padding - mark
+        );
 
-      pdf.line(
-        x + cardWidth + padding,
-        y + cardHeight + padding,
-        x + cardWidth + padding - mark,
-        y + cardHeight + padding
-      );
-      pdf.line(
-        x + cardWidth + padding,
-        y + cardHeight + padding,
-        x + cardWidth + padding,
-        y + cardHeight + padding - mark
-      );
+        pdf.line(
+            x + cardWidth + padding,
+            y + cardHeight + padding,
+            x + cardWidth + padding - mark,
+            y + cardHeight + padding
+        );
+        pdf.line(
+            x + cardWidth + padding,
+            y + cardHeight + padding,
+            x + cardWidth + padding,
+            y + cardHeight + padding - mark
+        );
 
-      // صفحة جديدة بعد 8
-      if ((i + 1) % 8 === 0 && i + 1 < cards.length) {
-        pdf.addPage();
-      }
+        // صفحة جديدة بعد 8
+        if ((i + 1) % 8 === 0 && i + 1 < cards.length) {
+            pdf.addPage();
+        }
 
-      document.body.removeChild(clone);
+        document.body.removeChild(clone);
     }
 
     pdf.save("AfficheA7.pdf");
-  });
+});
 // دوال مساعدة
 function getFormattedDate() {
-  return new Date().toLocaleDateString("fr-FR");
+    return new Date().toLocaleDateString("fr-FR");
 }
 
 /*--- دالة التنسيق الذكي ---*/
 function formatPrice(priceValue) {
-  if (
-    priceValue === undefined ||
-    priceValue === null ||
-    priceValue === ""
-  )
-    return "0";
+    if (priceValue === undefined || priceValue === null || priceValue === "")
+        return "0";
 
-  // تنظيف القيمة من أي رموز غير رقمية باستثناء النقطة والفاصلة
-  let cleanValue = String(priceValue)
-    .replace(/[^\d.,]/g, "")
-    .replace(",", ".");
-  let parts = cleanValue.split(".");
+    // تنظيف القيمة من أي رموز غير رقمية باستثناء النقطة والفاصلة
+    let cleanValue = String(priceValue)
+        .replace(/[^\d.,]/g, "")
+        .replace(",", ".");
+    let parts = cleanValue.split(".");
 
-  let mainPart = parts[0] || "0";
-  let centsPart = parts[1]
-    ? parts[1].padEnd(2, "0").substring(0, 2)
-    : "00";
+    let mainPart = parts[0] || "0";
+    let centsPart = parts[1] ? parts[1].padEnd(2, "0").substring(0, 2) : "00";
 
-  if (centsPart === "00") {
-    return mainPart;
-  } else {
-    return `${mainPart}<span id="cente">,${centsPart}</span>`;
-  }
+    if (centsPart === "00") {
+        return mainPart;
+    } else {
+        return `${mainPart}<span id="cente">,${centsPart}</span>`;
+    }
 }
 
 /*--- تحديث دالة جلب البيانات ---*/
 function fetchPriceDynamic(card, input) {
-  const code = input.value.trim();
-  if (!code) return;
-const messageElem = document.querySelector(".message");
-  fetch(`/api/produit/${code}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.message != undefined) {
-        messageElem.textContent = data.message;
-        document.querySelector(".cardss").style.display = "block";
-      }
+    const code = input.value.trim();
+    if (!code) return;
+    const messageElem = document.querySelector(".message");
+    fetch(`/api/produit/${code}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.message != undefined) {
+                messageElem.textContent = data.message;
+                document.querySelector(".cardss").style.display = "block";
+            }
 
-      let rawPrice = data.prix.replace(",", ".").trim();
-      let oldPrice = data.prixPro.replace(",", ".").trim();
+            let rawPrice = data.prix.replace(",", ".").trim();
+            let oldPrice = data.prixPro.replace(",", ".").trim();
 
-      let currentPrice = parseFloat(rawPrice) || 0;
-      let previousPrice = parseFloat(oldPrice) || 0;
+            let currentPrice = parseFloat(rawPrice) || 0;
+            let previousPrice = parseFloat(oldPrice) || 0;
 
-      if (data) {
-        card.querySelector(".title").textContent =
-          data.libelle.replace(/\[.*?\]/g, "");
-        card.querySelector(".sku").textContent = data.anpf;
-        card.querySelector(".Ref").value = data.genCode;
-        // هنا التعديل الجوهري
-        if (previousPrice > 0) {
-          card.querySelector(".amount").innerHTML =
-            formatPrice(previousPrice);
-        } else {
-          card.querySelector(".amount").innerHTML =
-            formatPrice(currentPrice);
-        }
-        saveToLocal();
-        newCards()
-      }
-    });
+            if (data) {
+                card.querySelector(".title").textContent = data.libelle.replace(
+                    /\[.*?\]/g,
+                    ""
+                );
+                card.querySelector(".sku").textContent = data.anpf;
+                card.querySelector(".Ref").value = data.genCode;
+                // هنا التعديل الجوهري
+                if (previousPrice > 0) {
+                    card.querySelector(".amount").innerHTML =
+                        formatPrice(previousPrice);
+                } else {
+                    card.querySelector(".amount").innerHTML =
+                        formatPrice(currentPrice);
+                }
+                saveToLocal();
+                newCards();
+            }
+        });
 }
 
 /*  document.getElementById("addCardBtn").onclick = () => addCard();*/
-document
-  .getElementById("addCardBtn")
-  .addEventListener("click", () => {
+document.getElementById("addCardBtn").addEventListener("click", () => {
     addCard();
     scrollToLastCard();
-  });
+});
 
 function newCards() {
-  setTimeout(() => {
-    addCard();
-    scrollToLastCard();
-  }, 2000)
+    setTimeout(() => {
+        addCard();
+        scrollToLastCard();
+    }, 2000);
 }
 
 function scrollToLastCard() {
-  const cards = document.querySelectorAll(".card");
-  const lastCard = cards[cards.length - 1];
-  lastCard.querySelector(".Ref").focus()
-  lastCard.scrollIntoView({
-    behavior: "smooth"
-  });
+    const cards = document.querySelectorAll(".card");
+    const lastCard = cards[cards.length - 1];
+    lastCard.querySelector(".Ref").focus();
+    lastCard.scrollIntoView({
+        behavior: "smooth"
+    });
 }
 
 document.getElementById("clearStorage").onclick = () => {
-  // عبارة تأكيد احترافية بالفرنسية (أو العربية)
-  const confirmation = confirm(
-    "Êtes-vous sûr de vouloir supprimer toutes les étiquettes ? Cette action est irréversible."
-  );
+    // عبارة تأكيد احترافية بالفرنسية (أو العربية)
+    const confirmation = confirm(
+        "Êtes-vous sûr de vouloir supprimer toutes les étiquettes ? Cette action est irréversible."
+    );
 
-  // إذا ضغط المستخدم على "OK" يتم المسح
-  if (confirmation) {
-    localStorage.clear();
-    location.reload();
-  }
-  // إذا ضغط على "Annuler" لا يحدث شيء
+    // إذا ضغط المستخدم على "OK" يتم المسح
+    if (confirmation) {
+        localStorage.clear();
+        location.reload();
+    }
+    // إذا ضغط على "Annuler" لا يحدث شيء
 };
 
 // عند فتح الصفحة
 
-
 window.onload = function () {
-  loadFromLocal(), scaner.addEventListener("click", showReader)
+    (loadFromLocal(), scaner.addEventListener("click", showReader));
 };
 
-const menuToggle = document.querySelector('.menu-toggle');
-const menuRound = document.querySelector('.menu-round');
-const menuLines = document.querySelectorAll('.menu-line');
+const menuToggle = document.querySelector(".menu-toggle");
+const menuRound = document.querySelector(".menu-round");
+const menuLines = document.querySelectorAll(".menu-line");
 
 const btnApp = document.querySelectorAll(".btn-app");
-menuToggle.addEventListener('click', () => {
-  menuToggle.classList.toggle('open');
-  menuRound.classList.toggle('open');
-  menuLines.forEach(line => line.classList.toggle('open')
-  );
+menuToggle.addEventListener("click", () => {
+    menuToggle.classList.toggle("open");
+    menuRound.classList.toggle("open");
+    menuLines.forEach(line => line.classList.toggle("open"));
 
-  btnApp.forEach(e => {
-    e.classList.toggle("active");
-  });
+    btnApp.forEach(e => {
+        e.classList.toggle("active");
+    });
 });
