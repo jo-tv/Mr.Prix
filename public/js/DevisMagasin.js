@@ -262,6 +262,10 @@ document.addEventListener("DOMContentLoaded", function () {
 async function downloadPDF() {
     // 1️⃣ إخفاء الأزرار
     const deleteButtons = document.querySelectorAll("#sup");
+    const th = document.querySelectorAll("th");
+    const td = document.querySelectorAll("td");
+    th.forEach(btn => (btn.style.fontSize = "14px"));
+    td.forEach(btn => (btn.style.fontSize = "14px"));
     deleteButtons.forEach(btn => (btn.style.display = "none"));
 
     const htmlFooter = document.querySelector(".footer");
@@ -286,7 +290,7 @@ async function downloadPDF() {
         scale: 3, // 🔥 جودة عالية
         useCORS: true,
         allowTaint: true,
-        backgroundColor: "#ffffff",
+        backgroundColor: "#fff",
         scrollY: -window.scrollY,
         windowWidth: 1200
     });
@@ -533,5 +537,3 @@ menuToggle.addEventListener("click", () => {
         e.classList.toggle("active");
     });
 });
-
-
