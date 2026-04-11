@@ -153,9 +153,16 @@
     right: 130%;
 }
 .btn-app.active::after {
+    /* القيم التي تريد الوصول إليها بعد ثانية */
     opacity: 1;
-    right: 110%;
+    right: 110%; /* تأكد من مراجعة هذه القيمة حسب التصميم */
+
+    /* إعدادات الحركة */
+    transition-property: opacity;
+    transition-duration: 0.5s; /* مدة اختفاء/ظهور التأثير نفسه */
+    transition-delay: 1s; /* الانتظار لمدة ثانية قبل البدء */
 }
+
 /* تصميم نافذة منبثقة */
 .toast {
     position: fixed;
@@ -182,7 +189,6 @@
     transition: all 0.4s ease;
     z-index: 9999;
 }
-
 /* أنواع الرسائل */
 .toast.success {
     background-color: #4caf50;
@@ -339,40 +345,18 @@
     width: 100%;
     height: 100%;
 }
-
-/* 1. الإعداد الافتراضي للشاشات الكبيرة جداً (أكبر من 1200px) */
-
-/* 2. شاشات اللابتوب والأجهزة المتوسطة (أقل من 1200px) */
-@media (max-width: 1200px) {
+@media only screen and (min-width: 358px) and (max-width: 599px) {
     .containeer {
-        scale: 1.5 !important;
+        zoom: 1.3 !important;
     }
 }
-
-/* 3. شاشات التابلت الصغيرة واللابتوب الصغير (أقل من 992px) */
-@media (min-width: 992px) {
+@media only screen and (min-width: 599px) and (max-width: 840px) {
     .containeer {
-        scale: 1.4 !important;
+        zoom: 1.4 !important;
     }
 }
-
-/* 4. شاشات التابلت العمودي (أقل من 768px) */
-@media (max-width: 768px) {
+@media only screen and (min-width: 1020px) {
     .containeer {
-        scale: 1.3 !important;
-    }
-}
-
-/* 5. شاشات الموبايل (أقل من 576px) */
-@media (max-width: 576px) {
-    .containeer {
-        scale: 1.2 !important;
-    }
-}
-
-/* 6. شاشات الموبايل الصغير جداً (أقل من 400px) - اختياري */
-@media (max-width: 400px) {
-    .containeer {
-        scale: 1 !important;
+        zoom: 1.4 !important;
     }
 }

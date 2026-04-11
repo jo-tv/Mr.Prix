@@ -849,3 +849,19 @@ if ("serviceWorker" in navigator) {
         .then(() => console.log("Service Worker registered"))
         .catch(err => console.error("SW registration failed:", err));
 }
+
+const menuToggle = document.querySelector(".menu-toggle");
+const menuRound = document.querySelector(".menu-round");
+const menuLines = document.querySelectorAll(".menu-line");
+const btnApp = document.querySelectorAll(".btn-app");
+if (menuToggle) {
+    menuToggle.addEventListener("click", () => {
+    menuToggle.classList.toggle("open");
+    menuRound.classList.toggle("open");
+    menuLines.forEach(line => line.classList.toggle("open"));
+
+    btnApp.forEach(e => {
+        e.classList.toggle("active");
+    });
+});
+}

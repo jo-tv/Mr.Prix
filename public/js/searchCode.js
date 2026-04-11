@@ -22,18 +22,18 @@ document.querySelectorAll('.copy-btn').forEach((button) => {
   });
 });
 
-const menuToggle = document.querySelector('.menu-toggle');
-const menuRound = document.querySelector('.menu-round');
-const menuLines = document.querySelectorAll('.menu-line');
-
+const menuToggle = document.querySelector(".menu-toggle");
+const menuRound = document.querySelector(".menu-round");
+const menuLines = document.querySelectorAll(".menu-line");
 const btnApp = document.querySelectorAll(".btn-app");
-menuToggle.addEventListener('click', () => {
-  menuToggle.classList.toggle('open');
-  menuRound.classList.toggle('open');
-  menuLines.forEach(line => line.classList.toggle('open')
-  );
+if (menuToggle) {
+    menuToggle.addEventListener("click", () => {
+    menuToggle.classList.toggle("open");
+    menuRound.classList.toggle("open");
+    menuLines.forEach(line => line.classList.toggle("open"));
 
-  btnApp.forEach(e => {
-    e.classList.toggle("active");
-  });
+    btnApp.forEach(e => {
+        e.classList.toggle("active");
+    });
 });
+}
