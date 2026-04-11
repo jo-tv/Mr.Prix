@@ -350,7 +350,7 @@
         zoom: 1.3 !important;
     }
 }
-@media only screen and (min-width: 599px) and (max-width: 840px) {
+@media only screen and (min-width: 599px) and (max-width: 1019px) {
     .containeer {
         zoom: 1.4 !important;
     }
