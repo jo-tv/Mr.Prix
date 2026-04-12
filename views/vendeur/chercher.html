@@ -119,6 +119,9 @@
                         ></i>
                     </div>
                     <button class="btn btn-success" id="searche">Search</button>
+                    <button class="btn btn-danger" id="btnOpen">
+                        <i class="bi bi-google"></i> Open Page
+                    </button>
                 </div>
                 <table
                     id="example"
@@ -186,20 +189,19 @@
             </div>
 
             <div class="menu-line">
-                <!--                 <div
-                    class="btn-app"
+                <div
+                    class="btn-app btn-mr"
                     data-label=" Trouver un produit avec photo 🔎"
                 >
                     <a href="searchee"></a>
                     <div class="fa">
                         <a href="searchee"
-                            ><i
-                                class="fa-brands fa-google"
-                                style="color: white"
-                            ></i
-                        ></a>
+                            ><img
+                                class="mr"
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuOjc-6Asf4x8K3m4dVJpbs4MrSWwNuj2iPdUBRFisqLgH4coivk5xB-94&amp;s=10"
+                        /></a>
                     </div>
-                </div> -->
+                </div>
                 <div class="btn-app" data-label="Recherche Codes 🔎">
                     <a href="table"></a>
                     <div class="fa">
@@ -285,6 +287,24 @@
             </div>
         </div>
         <!--fin FAB Button -->
+        <!--debar model chetcher code image -->
+
+        <div id="adressModal" class="custom-modal" style="display: none">
+            <div class="custom-modal-content">
+                <button
+                    id="closeAdressModal"
+                    class="btn btn-danger btn-sm"
+                    style="float: right"
+                >
+                    Fermer ×
+                </button>
+                <h3 class="mb-5 text-center text-success">
+                    Rechercher un produit avec aperçu visuel
+                </h3>
+                <iframe src="/searchee"></iframe>
+            </div>
+        </div>
+        <!--Fin model chetcher code image -->
 
         <!-- Loader -->
         <!-- From Uiverse.io by paesjr -->

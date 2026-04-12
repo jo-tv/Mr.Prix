@@ -1402,94 +1402,96 @@ app.post(
 const cors = require("cors");
 // ===============================================
 // حل fetch لجميع إصدارات Node
-// ===============================================
-const fetch = require("node-fetch");
-app.use(cors());
+// =============================================
 
 app.get("/searchee", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "views/vendeur/searchProducs.html")); // ✅ صفحة فارغة مؤقتاً
 });
 
-// ============= Route للبحث =============
+const fetch = require("node-fetch");
+
 app.get("/api/searchee", isAuthenticated, async (req, res) => {
+    const q = req.query.s?.trim();
+    if (!q) return res.status(400).json({ error: "Missing search query" });
+
+    const bricoURL = `https://mrbricolage.ma/wp-content/plugins/ajax-search-for-woocommerce-premium/includes/Engines/TNTSearchMySQL/Endpoints/search.php?s=${encodeURIComponent(q)}`;
+    const glovoURL = `https://api.glovoapp.com/v3/stores/453329/addresses/714876/search?query=${encodeURIComponent(q)}&searchId=04a29a7d-418b-4c1a-bd39-fcb5393248e6`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000); // timeout 8s
+
+    const baseHeaders = {
+        "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        Accept: "application/json",
+        "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8"
+    };
+
+    // fetch مع fallback فردي لكل مصدر
+    const safeFetch = async (url, headers) => {
+        try {
+            const res = await fetch(url, {
+                headers,
+                signal: controller.signal
+            });
+            const text = await res.text();
+            return text ? JSON.parse(text) : null;
+        } catch {
+            return null; // لا توقف الكل إذا فشل مصدر واحد
+        }
+    };
+
     try {
-        const q = req.query.s || "";
-        if (!q) return res.json({ error: "Missing search query" });
-
-        const bricoURL = `https://mrbricolage.ma/wp-content/plugins/ajax-search-for-woocommerce-premium/includes/Engines/TNTSearchMySQL/Endpoints/search.php?s=${encodeURIComponent(q)}`;
-        const glovoURL = `https://api.glovoapp.com/v3/stores/453329/addresses/714876/search?query=${encodeURIComponent(q)}&searchId=04a29a7d-418b-4c1a-bd39-fcb5393248e6`;
-
-        // جلب البيانات من المصدرين
-        const [bricoRes, glovoRes] = await Promise.all([
-            fetch(bricoURL, {
-                headers: {
-                    "User-Agent": "Mozilla/5.0",
-                    "Accept": "application/json",
-                    "Referer": "https://mrbricolage.ma",  // إضافة Referer
-                    "Accept-Language": "en-US,en;q=0.9" // تحديد اللغة
-                }
+        const [bricoData, glovoData] = await Promise.all([
+            safeFetch(bricoURL, {
+                ...baseHeaders,
+                Referer: "https://mrbricolage.ma"
             }),
-            fetch(glovoURL, {
-                headers: {
-                    "User-Agent": "Mozilla/5.0",
-                    "Accept": "application/json",
-                    "Referer": "https://glovoapp.com",  // إضافة Referer
-                    "Accept-Language": "en-US,en;q=0.9" // تحديد اللغة
-                }
+            safeFetch(glovoURL, {
+                ...baseHeaders,
+                Referer: "https://glovoapp.com"
             })
         ]);
+        clearTimeout(timeout);
 
-        // التعامل مع الاستجابة من Mr Bricolage
-        const bricoText = await bricoRes.text();
-        const bricoData = bricoText ? JSON.parse(bricoText) : {};
-
-        // التعامل مع استجابة Glovo
-        const glovoData = await glovoRes.json();
-
-        // معالجة بيانات Mr Bricolage
-        const bricoItems = (bricoData.suggestions || []).map(item => {
-            const match = item.thumb_html.match(/src="([^"]+)"/);
-            const img = match ? match[1] : "";
-
+        // Mr Bricolage
+        const bricoItems = (bricoData?.suggestions || []).map(item => {
+            const imgMatch = item.thumb_html?.match(/src="([^"]+)"/);
+            const img = imgMatch?.[1] || "";
             return {
-                title: item.value,
+                title: item.value || "",
                 desc: item.desc || "",
-                price: item.price.replace(/<[^>]*>/g, ""),
+                price: item.price?.replace(/<[^>]*>/g, "") || "",
                 sku: item.sku || "",
                 thumb: img || "https://via.placeholder.com/80?text=No+Image",
-                full_image: img.replace(/-\d+x\d+/, "") || "https://via.placeholder.com/400?text=No+Image",
+                full_image:
+                    img.replace(/-\d+x\d+/, "") ||
+                    "https://via.placeholder.com/400",
                 source: "bricolage"
             };
         });
 
-        // معالجة بيانات Glovo
-        const glovoProducts = glovoData?.results?.[0]?.products || [];
-        const glovoItems = glovoProducts.map(p => {
-            let img = "";
-            if (Array.isArray(p.imageUrl) && p.imageUrl.length > 0) {
-                img = p.imageUrl[0];
-            }
-
+        // Glovo — إصلاح استخراج الصورة
+        const glovoItems = (glovoData?.results?.[0]?.products || []).map(p => {
+            const img = Array.isArray(p.imageUrl)
+                ? p.imageUrl[0]
+                : p.imageUrl || "";
             return {
-                title: p.name,
+                title: p.name || "",
                 desc: p.description || "",
                 price: p.priceInfo?.displayText || `${p.price} MAD`,
                 sku: p.externalId || "",
-                thumb: p.imageUrl || "https://via.placeholder.com/80?text=No+Image",
-                full_image: p.imageUrl || "https://via.placeholder.com/400?text=No+Image",
+                thumb: img || "https://via.placeholder.com/80?text=No+Image",
+                full_image: img || "https://via.placeholder.com/400",
                 source: "glovo"
             };
         });
 
-        // دمج النتائج
-        const finalResults = [...bricoItems, ...glovoItems];
-
-        res.json({
-            count: finalResults.length,
-            results: finalResults
-        });
+        const results = [...bricoItems, ...glovoItems];
+        res.json({ count: results.length, results });
     } catch (err) {
-        res.json({ error: "Server error", details: err.message });
+        clearTimeout(timeout);
+        res.status(500).json({ error: "Server error", details: err.message });
     }
 });
 

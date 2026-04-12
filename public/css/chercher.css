@@ -279,13 +279,22 @@ thead input {
         padding: 8px !important;
         width: 60px !important;
     }
+    .custom-modal-content {
+        font-size: 12px;
+    }
+    .custom-modal {
+        zoom: 0.7 !important;
+    }
 }
-@media only screen and (min-width: 599px) and (max-width: 840px) {
+@media only screen and (min-width: 599px) and (max-width: 990px) {
     .containeer {
         zoom: 1.1 !important;
     }
     .content {
-        zoom: 0.9;
+        zoom: 0.9 !important;
+    }
+    .custom-modal {
+        zoom: 0.5 !important;
     }
 }
 @media only screen and (min-width: 1020px) {

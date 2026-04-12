@@ -115,6 +115,20 @@ window.addEventListener("load", function () {
     loader.style.display = "none";
 });
 
+// Modal
+document
+  .getElementById('btnOpen')
+  ?.addEventListener(
+    'click',
+    () => (document.getElementById('adressModal').style.display = 'block')
+  );
+document
+  .getElementById('closeAdressModal')
+  ?.addEventListener(
+    'click',
+    () => (document.getElementById('adressModal').style.display = 'none')
+  );
+
 const menuToggle = document.querySelector(".menu-toggle");
 const menuRound = document.querySelector(".menu-round");
 const menuLines = document.querySelectorAll(".menu-line");
