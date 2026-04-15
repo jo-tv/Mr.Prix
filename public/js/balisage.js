@@ -158,7 +158,7 @@ async function downloadPDF() {
     const cardsAll = document.querySelectorAll(".card");
 
     cardsAll.forEach(e => {
-        e.style.transform = " rotate(180deg)";
+        //e.style.transform = " rotate(180deg)";
         e.style.border = " none";
         e.querySelector(".actionss").style.display = " none";
     });
