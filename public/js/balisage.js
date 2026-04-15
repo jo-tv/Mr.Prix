@@ -149,39 +149,56 @@ function startScanner() {
 async function downloadPDF() {
     const { jsPDF } = window.jspdf;
 
-    const pdf = new jsPDF("landscape", "in", [1.97, 1.37]);
+    const CARD_W = 1.97;
+    const CARD_H = 1.37;
 
-    const cardsElements = document.querySelectorAll(".card");
+    const pdf = new jsPDF("landscape", "in", [CARD_W, CARD_H]);
 
-    document.querySelector(".cards").style.zoom = " 1";
+    const cards = document.querySelectorAll(".card");
 
-    const cardsAll = document.querySelectorAll(".card");
+    for (let i = 0; i < cards.length; i++) {
+        // 🔹 إنشاء نسخة من الكارد
+        const clone = cards[i].cloneNode(true);
 
-    cardsAll.forEach(e => {
-        //e.style.transform = " rotate(180deg)";
-        e.style.border = " none";
-        e.querySelector(".actionss").style.display = " none";
-    });
+        // 🔹 حذف الأزرار من النسخة فقط
+        const actions = clone.querySelector(".actions");
+        if (actions) actions.remove();
 
-    for (let i = 0; i < cardsElements.length; i++) {
-        const canvas = await html2canvas(cardsElements[i], {
-            scale: 1,
-            useCORS: true
+        // 🔹 إزالة الحدود
+        clone.style.border = "none";
+
+        // 🔹 تثبيت الحجم الحقيقي
+        clone.style.width = CARD_W + "in";
+        clone.style.height = CARD_H + "in";
+
+        // 🔹 وضع خارج الشاشة
+        clone.style.position = "fixed";
+        clone.style.left = "-9999px";
+        clone.style.top = "0";
+
+        document.body.appendChild(clone);
+
+        // 🔹 تحويل لصورة
+        const canvas = await html2canvas(clone, {
+            scale: 2, // ⚡ سرعة + جودة
+            useCORS: true,
+            backgroundColor: "#ffffff"
         });
 
-        const imgData = canvas.toDataURL("image/png");
+        // 🔹 ضغط الصورة (مهم)
+        const imgData = canvas.toDataURL("image/jpeg", 0.7);
 
         if (i !== 0) {
-            pdf.addPage([1.97, 1.37], "landscape");
+            pdf.addPage([CARD_W, CARD_H], "landscape");
         }
 
-        pdf.addImage(imgData, "PNG", 0, 0, 1.97, 1.37);
+        pdf.addImage(imgData, "JPEG", 0, 0, CARD_W, CARD_H);
+
+        // 🔹 حذف النسخة
+        document.body.removeChild(clone);
     }
 
     pdf.save("balisage.pdf");
-    setTimeout(() => {
-        window.location.reload();
-    }, 3000);
 }
 
 function generateBarcodes() {
