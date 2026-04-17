@@ -171,6 +171,7 @@ function clearCards() {
         cards = [];
         renderCards();
         document.querySelector(".item-count").textContent = cards.length || 0;
+        window.location.reload()
     }
 }
 
@@ -194,7 +195,7 @@ async function downloadPDF() {
             title.length > maxLength
                 ? title.substring(0, maxLength) + "..."
                 : title;
-        const title2 = "-----";
+        const title2 = ".";
 
         const code = card.querySelectorAll("#data")[0]?.innerText || "";
         const date = card.querySelectorAll("#data")[1]?.innerText || "";
@@ -206,14 +207,16 @@ async function downloadPDF() {
         const maxLength2 = 20;
         const shortTitle2 =
             title2.length > maxLength2
-                ? title2.substring(0, maxLength2) + "..."
+                ? title2.substring(0, maxLength2) + "....................."
                 : title2;
-        pdf.text(shortTitle2, W - 0.1, H - 0.08, { angle: 180 });
+        pdf.setTextColor(201, 197, 202);
+        pdf.text(shortTitle2, W - 0.1, H - 0.07, { angle: 180 });
         // 1. العنوان (Title)
-        pdf.setFont("Helvetica Rounded Bold", "bold");
-        pdf.setFontSize(9);
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont("Helvetica", "bold");
+        pdf.setFontSize(10);
         // x_new = W - 0.1 | y_new = H - 0.3
-        pdf.text(shortTitle, W - 0.22, H - 0.19, { angle: 180 });
+        pdf.text(shortTitle, W - 0.23, H - 0.24, { angle: 180 });
 
         // 2. الكود (Code)
         pdf.setFontSize(5);
@@ -223,24 +226,24 @@ async function downloadPDF() {
         pdf.text(date, W - 0.3, H - 0.75, { angle: 180 });
 
         // 4. نص الباركود
-        pdf.setFontSize(6);
-        pdf.text(barcodeText, W - 1.1, H - 0.8, { angle: 180 });
+        pdf.setFontSize(8);
+        pdf.text(barcodeText, W - 1.05, H - 0.73, { angle: 180 });
 
         // 5. السعر (Price)
         pdf.setFontSize(16);
         const rectY = 1.09;
         const rectH = 0.12;
-        const textY = rectY + rectH / 2 + 0.05;
+        const textY = rectY + rectH / 2 + 0;
         // السعر في المنتصف العرضي (W/2 يبقى كما هو) ولكن يقلب عمودياً
-        pdf.text(price, W / 1.1, H - textY, { align: "center", angle: 180 });
+        pdf.text(price, W / 1, H - textY, { align: "center", angle: 180 });
 
         // 6. الباركود (SVG)
         if (svg) {
             const clonedSVG = svg.cloneNode(true);
-            const svgW = 0.7;
+            const svgW = 0.9;
             const svgH = 0.35;
             const svgX = 1;
-            const svgY = 0.45;
+            const svgY = 0.35;
 
             await pdf.svg(clonedSVG, {
                 // لحساب موقع الـ SVG المقلوب: نطرح الإحداثي الأصلي ونطرح حجم العنصر نفسه
@@ -340,27 +343,14 @@ function showReader() {
                         html5QrCode.stop().then(() => {
                             html5QrCode.clear();
 
-                            // 🧠 نأخذ آخر بطاقة
-                            const cards = document.querySelectorAll(".card");
-                            const lastCard = cards[cards.length - 1];
-
-                            if (!lastCard) {
-                                alert("⚠️ لا توجد بطاقة لإدخال الرمز");
-                                isScanning = false;
-                                hideReader();
-                                return;
-                            }
-
-                            const refInput = lastCard.querySelector(".Ref");
+                            const refInput = document.querySelector(".Ref");
+                            const refBtn = document.querySelector("#refBtn");
 
                             // ✨ نضع الكود في آخر كارت
                             refInput.value = decodedText;
 
-                            // 🔥 نشغل نفس سلوك الإدخال اليدوي
-                            refInput.focus();
-
                             // محاكاة الضغط على زر Enter
-                            refInput.dispatchEvent(
+                            refBtn.dispatchEvent(
                                 new KeyboardEvent("keydown", {
                                     key: "Enter",
                                     code: "Enter",
@@ -371,7 +361,8 @@ function showReader() {
                             );
 
                             // كذلك نطلق change كضمان إضافي
-                            refInput.dispatchEvent(new Event("change"));
+                            refBtn.dispatchEvent(new Event("change"));
+                            refBtn.click();
 
                             isScanning = false;
                             hideReader();
