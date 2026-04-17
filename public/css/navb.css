@@ -140,9 +140,10 @@
     right: 150%; /* النص يظهر بجانب الأيقونة */
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(116, 116, 116, 0.768);
+    --angle: 45deg; 
+background: linear-gradient(var(--angle), #040214, #1a0f3c, #3c215d, #7d498c, #d799c5);
     color: #ffffff;
-    font-size: 0.45rem;
+    font-size: 0.5rem;
     font-family: "Merriweather", serif;
     font-weight: 900;
     font-style: italic;

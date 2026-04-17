@@ -50,21 +50,32 @@ function remplirForm(data) {
     document.getElementById("Anpf").value = data.anpf || "";
     document.getElementById("title").value = libelleClean || "";
     document.getElementById("barcode").value = data.genCode;
-    document.getElementById("price").value = PrixTotal || 0;
+    document.getElementById("price").value = (Number(PrixTotal) || 0).toFixed(
+        2
+    );
 }
 
 /* render */
+let currentPage = 1;
+const cardsPerPage = 60;
 function renderCards() {
     const container = document.getElementById("cards");
     container.innerHTML = "";
 
-    cards.forEach((card, i) => {
+    const start = (currentPage - 1) * cardsPerPage;
+    const end = start + cardsPerPage;
+
+    const paginatedCards = cards.slice(start, end);
+
+    paginatedCards.forEach((card, i) => {
+        const realIndex = start + i;
+
         const div = document.createElement("div");
         div.className = "card";
 
         div.innerHTML = `
             <div class="actionss">
-                <button onclick="deleteCard(${i})">❌</button>
+                <button onclick="deleteCard(${realIndex})">❌</button>
             </div>
 
             <div class="top">
@@ -81,20 +92,40 @@ function renderCards() {
                 </div>
             </div>
 
-            <div class="bottom">${card.price}.00 DH</div>
+            <div class="bottom">${card.price} DH</div>
         `;
 
         container.appendChild(div);
     });
 
     generateBarcodes();
+    renderPagination();
 }
-function getFormattedDate() {
-    return new Date().toLocaleDateString("fr-FR");
+function nextPage() {
+    if (currentPage * cardsPerPage < cards.length) {
+        currentPage++;
+        renderCards();
+    }
+}
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderCards();
+    }
+}
+function renderPagination() {
+    const totalPages = Math.ceil(cards.length / cardsPerPage);
+    document.getElementById("pageInfo").innerText =
+        `صفحة ${currentPage} من ${totalPages}`;
 }
 
 /* add / update */
+function getFormattedDate() {
+    return new Date().toLocaleDateString("fr-FR");
+}
 function addCard() {
+    const repetition = document.getElementById("repetition").value; // عدد المرات
+
     const newCard = {
         title: title.value,
         code: Anpf.value,
@@ -104,7 +135,9 @@ function addCard() {
     };
 
     if (editIndex === -1) {
-        cards.push(newCard);
+        for (let i = 0; i < repetition; i++) {
+            cards.unshift({ ...newCard }); // مهم copy باش ما يكونوش نفس المرجع
+        }
     } else {
         cards[editIndex] = newCard;
         editIndex = -1;
@@ -117,7 +150,7 @@ function addCard() {
 
 /* delete */
 function deleteCard(i) {
-    if (confirm("حذف؟")) {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cette étiquette ? ✅ 🚮")) {
         cards.splice(i, 1);
         localStorage.setItem("cards", JSON.stringify(cards));
         renderCards();
@@ -126,79 +159,101 @@ function deleteCard(i) {
 
 /* clear */
 function clearCards() {
-    localStorage.removeItem("cards");
-    cards = [];
-    renderCards();
-}
-
-/* scanner */
-function startScanner() {
-    const scanner = new Html5Qrcode("reader");
-
-    scanner.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 200 },
-        code => {
-            document.getElementById("barcode").value = code;
-            scanner.stop();
-        }
+    const confirmation = confirm(
+        "Êtes-vous sûr de vouloir supprimer toutes les étiquettes 🚮? Cette action est irréversible. ⚠️"
     );
+
+    // إذا ضغط المستخدم على "OK" يتم المسح
+    if (confirmation) {
+        localStorage.removeItem("cards");
+        cards = [];
+        renderCards();
+    }
 }
 
 /* PDF */
 async function downloadPDF() {
     const { jsPDF } = window.jspdf;
 
-    const CARD_W = 1.97;
-    const CARD_H = 1.37;
+    const W = 2.02;
+    const H = 1.26;
 
-    const pdf = new jsPDF("landscape", "in", [CARD_W, CARD_H]);
-
+    const pdf = new jsPDF("landscape", "in", [W, H]);
     const cards = document.querySelectorAll(".card");
 
     for (let i = 0; i < cards.length; i++) {
-        // 🔹 إنشاء نسخة من الكارد
-        const clone = cards[i].cloneNode(true);
+        const card = cards[i];
+        if (i !== 0) pdf.addPage([W, H], "landscape");
 
-        // 🔹 حذف الأزرار من النسخة فقط
-        const actions = clone.querySelector(".actions");
-        if (actions) actions.remove();
+        const title = card.querySelector(".title")?.innerText || "";
+        const maxLength = 20;
+        const shortTitle =
+            title.length > maxLength
+                ? title.substring(0, maxLength) + "..."
+                : title;
+        const title2 = "-----";
 
-        // 🔹 إزالة الحدود
-        clone.style.border = "none";
+        const code = card.querySelectorAll("#data")[0]?.innerText || "";
+        const date = card.querySelectorAll("#data")[1]?.innerText || "";
+        const barcodeText = card.querySelector(".barcode2")?.innerText || "";
+        const price = card.querySelector(".bottom")?.innerText || "";
+        const svg = card.querySelector(".barcode");
 
-        // 🔹 تثبيت الحجم الحقيقي
-        clone.style.width = CARD_W + "in";
-        clone.style.height = CARD_H + "in";
+        // --- رسم العناصر مقلوبة 180 درجة ---
+        const maxLength2 = 20;
+        const shortTitle2 =
+            title2.length > maxLength2
+                ? title2.substring(0, maxLength2) + "..."
+                : title2;
+        pdf.text(shortTitle2, W - 0.1, H - 0.08, { angle: 180 });
+        // 1. العنوان (Title)
+        pdf.setFont("Helvetica Rounded Bold", "bold");
+        pdf.setFontSize(9);
+        // x_new = W - 0.1 | y_new = H - 0.3
+        pdf.text(shortTitle, W - 0.22, H - 0.19, { angle: 180 });
 
-        // 🔹 وضع خارج الشاشة
-        clone.style.position = "fixed";
-        clone.style.left = "-9999px";
-        clone.style.top = "0";
+        // 2. الكود (Code)
+        pdf.setFontSize(5);
+        pdf.text(code, W - 0.3, H - 0.55, { angle: 180 });
 
-        document.body.appendChild(clone);
+        // 3. التاريخ (Date)
+        pdf.text(date, W - 0.3, H - 0.75, { angle: 180 });
 
-        // 🔹 تحويل لصورة
-        const canvas = await html2canvas(clone, {
-            scale: 2, // ⚡ سرعة + جودة
-            useCORS: true,
-            backgroundColor: "#ffffff"
-        });
+        // 4. نص الباركود
+        pdf.setFontSize(6);
+        pdf.text(barcodeText, W - 1.1, H - 0.8, { angle: 180 });
 
-        // 🔹 ضغط الصورة (مهم)
-        const imgData = canvas.toDataURL("image/jpeg", 0.7);
+        // 5. السعر (Price)
+        pdf.setFontSize(16);
+        const rectY = 1.09;
+        const rectH = 0.12;
+        const textY = rectY + rectH / 2 + 0.05;
+        // السعر في المنتصف العرضي (W/2 يبقى كما هو) ولكن يقلب عمودياً
+        pdf.text(price, W / 1.1, H - textY, { align: "center", angle: 180 });
 
-        if (i !== 0) {
-            pdf.addPage([CARD_W, CARD_H], "landscape");
+        // 6. الباركود (SVG)
+        if (svg) {
+            const clonedSVG = svg.cloneNode(true);
+            const svgW = 0.7;
+            const svgH = 0.35;
+            const svgX = 1;
+            const svgY = 0.45;
+
+            await pdf.svg(clonedSVG, {
+                // لحساب موقع الـ SVG المقلوب: نطرح الإحداثي الأصلي ونطرح حجم العنصر نفسه
+                x: W - svgX - svgW,
+                y: H - svgY - svgH,
+                width: svgW,
+                height: svgH,
+                // معظم مكتبات الـ SVG في jsPDF تقبل الدوران
+                rotation: 180
+            });
         }
 
-        pdf.addImage(imgData, "JPEG", 0, 0, CARD_W, CARD_H);
-
-        // 🔹 حذف النسخة
-        document.body.removeChild(clone);
+        pdf.setTextColor(0, 0, 0);
     }
 
-    pdf.save("balisage.pdf");
+    pdf.save(`balisage le ${getFormattedDate()}.pdf`);
 }
 
 function generateBarcodes() {
@@ -216,3 +271,162 @@ function generateBarcodes() {
 }
 
 renderCards();
+
+/* scanner */
+
+const scaner = document.getElementById("scaner");
+const readerDiv = document.getElementById("reader");
+const btnFermer = document.querySelector(".fermer");
+const containerScan = document.querySelector(".container-scan");
+
+let html5QrCode = null;
+let isScanning = false;
+
+window.onload = function () {
+    scaner.addEventListener("click", showReader);
+};
+
+function showReader() {
+    const readerDiv = document.getElementById("reader");
+    const btnFermer = document.querySelector(".fermer");
+    const beepSound = new Audio("/sounds/beep.mp3");
+
+    readerDiv.style.display = "block";
+    btnFermer.style.display = "block";
+    containerScan.style.zIndex = "9999999";
+
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader", {
+            verbose: false
+        });
+    }
+
+    if (isScanning) return;
+    isScanning = true;
+
+    Html5Qrcode.getCameras()
+        .then(devices => {
+            if (!devices || devices.length === 0) {
+                alert("🚫 لا توجد كاميرات متاحة. تأكد من منح الإذن!");
+                isScanning = false;
+                hideReader();
+                return;
+            }
+
+            const backCamera =
+                devices.find(device =>
+                    device.label.toLowerCase().includes("back")
+                ) || devices[0];
+
+            const config = {
+                fps: 30,
+                qrbox: { width: 350, height: 350 },
+                aspectRatio: 1.7778, // 16:9 مثالي للآيفون
+                facingMode: { exact: "environment" }
+            };
+
+            html5QrCode
+                .start(
+                    { deviceId: { exact: backCamera.id } },
+                    config,
+                    decodedText => {
+                        beepSound.play();
+
+                        html5QrCode.stop().then(() => {
+                            html5QrCode.clear();
+
+                            // 🧠 نأخذ آخر بطاقة
+                            const cards = document.querySelectorAll(".card");
+                            const lastCard = cards[cards.length - 1];
+
+                            if (!lastCard) {
+                                alert("⚠️ لا توجد بطاقة لإدخال الرمز");
+                                isScanning = false;
+                                hideReader();
+                                return;
+                            }
+
+                            const refInput = lastCard.querySelector(".Ref");
+
+                            // ✨ نضع الكود في آخر كارت
+                            refInput.value = decodedText;
+
+                            // 🔥 نشغل نفس سلوك الإدخال اليدوي
+                            refInput.focus();
+
+                            // محاكاة الضغط على زر Enter
+                            refInput.dispatchEvent(
+                                new KeyboardEvent("keydown", {
+                                    key: "Enter",
+                                    code: "Enter",
+                                    which: 13,
+                                    keyCode: 13,
+                                    bubbles: true
+                                })
+                            );
+
+                            // كذلك نطلق change كضمان إضافي
+                            refInput.dispatchEvent(new Event("change"));
+
+                            isScanning = false;
+                            hideReader();
+                        });
+                    },
+                    errorMessage => {
+                        // يمكن تجاهل أخطاء القراءة المؤقتة
+                    }
+                )
+                .catch(err => {
+                    console.error("📷 فشل بدء الكاميرا:", err);
+                    alert(
+                        "📵 تعذر فتح الكاميرا. تأكد من منح الصلاحيات أو استخدام متصفح يدعم الكاميرا."
+                    );
+                    isScanning = false;
+                    hideReader();
+                });
+        })
+        .catch(err => {
+            console.error("⚠️ خطأ في الحصول على الكاميرات:", err);
+            alert(
+                "⚠️ تعذر الوصول إلى الكاميرات. قد تحتاج إلى تغيير المتصفح أو السماح بالوصول."
+            );
+            isScanning = false;
+            hideReader();
+        });
+}
+
+function stopReader() {
+    const instance = window._qrCodeInstance;
+    if (instance && instance._isScanning) {
+        instance.stop().then(() => {
+            instance.clear();
+            delete window._qrCodeInstance;
+            hideReader();
+        });
+    } else {
+        hideReader();
+    }
+}
+
+function hideReader() {
+    readerDiv.style.display = "none";
+    btnFermer.style.display = "none";
+    containerScan.style.zIndex = "-9999999";
+}
+
+btnFermer.addEventListener("click", stopReader);
+const menuToggle = document.querySelector('.menu-toggle');
+const menuRound = document.querySelector('.menu-round');
+const menuLines = document.querySelectorAll('.menu-line');
+const btnApp = document.querySelectorAll(".btn-app");
+
+menuToggle.addEventListener('click', () => {
+  menuToggle.classList.toggle('open');
+  menuRound.classList.toggle('open');
+  menuLines.forEach(line => line.classList.toggle('open')
+  );
+  
+  btnApp.forEach(e => {
+    e.classList.toggle("active");
+  });
+});

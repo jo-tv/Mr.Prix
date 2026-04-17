@@ -8,6 +8,10 @@
         />
         <title>Mr-jo Balisage</title>
         <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        />
+        <link
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
             rel="stylesheet"
         />
@@ -17,9 +21,14 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
         <link rel="stylesheet" href="/css/balisage.css" />
+        <link rel="stylesheet" href="/css/navb.css" />
     </head>
 
     <body>
+        <div class="container-scan">
+            <button class="fermer">X</button>
+            <div id="reader"></div>
+        </div>
         <div class="container">
             <section class="actions-container">
                 <button class="action-btn pdf-btn" onclick="downloadPDF()">
@@ -27,7 +36,7 @@
                     <span>Télécharger PDF</span>
                 </button>
 
-                <button class="action-btn scan-btn" id="btnScan">
+                <button class="action-btn scan-btn" id="scaner">
                     <i class="bi bi-upc-scan"></i>
                     <span>Scanner</span>
                 </button>
@@ -88,6 +97,10 @@
                         <label>Prix</label>
                         <input id="price" type="number" placeholder="0" />
                     </div>
+                    <div class="form-group small">
+                        <label>Qté</label>
+                        <input id="repetition" type="number" value="1" />
+                    </div>
                 </div>
 
                 <div class="form-group button-group">
@@ -100,6 +113,11 @@
             <div id="reader"></div>
 
             <div class="cards" id="cards"></div>
+            <div id="pagination">
+                <button onclick="prevPage()">⬅ السابق</button>
+                <span id="pageInfo"></span>
+                <button onclick="nextPage()">التالي ➡</button>
+            </div>
         </div>
         <!-- From Uiverse.io by Yaya12085 -->
         <div class="card-alert">
@@ -124,6 +142,75 @@
                 <a class="read" href=""> حسنا </a>
             </div>
         </div>
+        <div class="containeer">
+            <div class="menu-toggle">
+                <span class="fa fa-plus"></span>
+            </div>
+            <div class="menu-round">
+                <div class="btn-app" data-label="Lecteur Prix">
+                    <div class="fa">
+                        <a href="/prixVen"
+                            ><i
+                                class="fa-solid fa-circle-left"
+                                style="color: white"
+                            ></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-line">
+                <div class="btn-app" data-label="affiche A4">
+                    <a href="afficheA4"></a>
+                    <div class="fa">
+                        <a href="afficheA4"
+                            ><i class="fa-solid fa-a" style="color: white"
+                                ><span style="font-size: 12px">4</span></i
+                            ></a
+                        >
+                    </div>
+                </div>
+                <div class="btn-app" data-label="affiche A5">
+                    <div class="fa">
+                        <a href="afficheA5"
+                            ><i class="fa-solid fa-a" style="color: white"
+                                ><span style="font-size: 12px">5</span></i
+                            ></a
+                        >
+                    </div>
+                </div>
+                <div class="btn-app" data-label="affiche A6">
+                    <a href="afficheA6"></a>
+                    <div class="fa">
+                        <a href="afficheA6"
+                            ><i class="fa-solid fa-a" style="color: white"
+                                ><span style="font-size: 12px">6</span></i
+                            ></a
+                        >
+                    </div>
+                </div>
+                <div class="btn-app" data-label="affiche A7">
+                    <a href="afficheA7"></a>
+                    <div class="fa">
+                        <a href="afficheA7"
+                            ><i class="fa-solid fa-a" style="color: white"
+                                ><span style="font-size: 12px">7</span></i
+                            ></a
+                        >
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Balisage ">
+                    <a href="balisage"></a>
+                    <div class="fa">
+                        <a href="balisage"
+                            ><i class="fa-solid fa-b" style="color: white"
+                                ><span style="font-size: 12px">S</span></i
+                            ></a
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://unpkg.com/svg2pdf.js"></script>
         <script src="js/codebar.min.js"></script>
         <script src="/js/balisage.js"></script>
     </body>

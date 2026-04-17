@@ -1,6 +1,12 @@
 body {
     font-family: Arial;
-    background: #f0f2f5;
+    background: linear-gradient(
+        45deg,
+        oklab(89.5% -0.041 -0.045),
+        oklab(90.7% 0 0),
+        oklab(92.1% 0.015 0.067),
+        oklab(85.3% 0.075 -0.005)
+    );
     padding: 20px;
 }
 
@@ -18,7 +24,15 @@ body {
     margin: 10px auto;
     padding: 20px;
     justify-content: space-around;
-    background: #add8e6;
+    --angle: 45deg;
+    background: linear-gradient(
+        var(--angle),
+        #87ceeb,
+        #a7d7e8,
+        #add8e6,
+        #e0ffff,
+        #ffffff
+    );
     box-shadow:
         rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
         rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
@@ -76,7 +90,8 @@ body {
     max-width: 1000px;
     border: 1px solid #000;
     border-radius: 10px;
-    background: #add8e6;
+    background: linear-gradient(45deg, #34495e, #e74c3c, #f39c12, #ecf0f1);
+    color: #ffff;
     margin-bottom: 20px;
     box-shadow:
         rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
@@ -114,6 +129,7 @@ body {
     border-radius: 4px;
     height: 30px;
     border-radius: 7px;
+    text-align: center;
 }
 
 .group-input {
@@ -158,20 +174,20 @@ body {
     grid-template-columns: repeat(auto-fill, 1.97in);
     justify-content: center;
     gap: 20px;
-    zoom: 0.9;
 }
 
 /* card */
 .card {
-    width: 1.97in;
-    height: 1.37in;
+    width: 1.96in;
+    height: 1.22in;
     background: white;
-    border: 1px solid black;
+    border: none;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
     box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
+    border: solid 1px #000;
 }
 
 .top {
@@ -180,20 +196,21 @@ body {
 }
 
 .title {
-    font-weight: bold;
     width: 95%;
     height: 13px;
     overflow: hidden;
     margin-bottom: 20px;
+    margin-top: 10px;
+    margin-left: 5px;
     font-size: 13px;
-    margin-top: 2px;
+    font-weight: 700;
 }
 
 .row {
     display: flex;
     justify-content: space-between;
-    align-items: end;
-    font-weight: 900;
+    align-items: center;
+    font-weight: 600;
     font-size: 12px;
     height: 25px;
 }
@@ -202,7 +219,7 @@ body {
 .barcode {
     height: 20px;
     width: 55%;
-    margin-right: 10px;
+    margin-right: 5px;
     background: repeating-linear-gradient(
         to right,
         black,
@@ -212,12 +229,13 @@ body {
     );
 }
 .barcode2 {
-    margin-right: 15px;
+    margin-right: 10px;
     font-size: 12px;
 }
 
 #data {
     font-size: 9px;
+    margin-left: 10px;
 }
 
 .bottom {
@@ -228,7 +246,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: end;
-    font-weight: 900;
+    font-weight: 600;
 }
 
 /* actionss */
@@ -323,4 +341,160 @@ body {
 .read {
     background-color: rgba(59, 130, 246, 1);
     color: rgba(255, 255, 255, 1);
+}
+#pagination {
+    margin-top: 30px;
+    text-align: center;
+}
+.pageInfo {
+    font-size: 16px;
+    font-weight: 900;
+}
+#pagination button {
+    padding: 8px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border: solid 1px #000;
+    background: #83abbe;
+    color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.container-scan {
+    width: 100%;
+    height: 200px;
+    z-index: -9999999;
+    position: fixed;
+    top: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#reader {
+    width: 80vw;
+    max-width: 320px;
+    background: black;
+    border-radius: 16px;
+    overflow: hidden;
+    display: none;
+    z-index: 1000011;
+    box-shadow:
+        rgba(0, 0, 0, 0.4) 0px 30px 60px,
+        rgba(0, 0, 0, 0.3) 0px 15px 30px;
+}
+/* زر الإغلاق */
+.fermer {
+    position: fixed;
+    top: 7%;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    display: none;
+    z-index: 10001;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+@media only screen and (min-width: 349px) and (max-width: 360px) {
+    .container {
+        zoom: 0.6 !important;
+    }
+    .article-form,
+    .form-info {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 10px;
+        margin: 10px auto;
+        padding: 10px;
+        width: 90%;
+        border: 1px solid #000;
+        border-radius: 10px;
+        background: linear-gradient(45deg, #34495e, #e74c3c, #f39c12, #ecf0f1);
+        color: #ffff;
+        margin-bottom: 20px;
+        box-shadow:
+            rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+            rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    }
+    .form-info {
+        display: none;
+    }
+    .form-group input {
+        padding: 8px;
+        box-shadow:
+            rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
+            rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
+            rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 4px;
+        height: 30px;
+        border-radius: 7px;
+    }
+    .containeer {
+        zoom: 1 !important;
+    }
+}
+@media only screen and (min-width: 361px) and (max-width: 599px) {
+    .container {
+        zoom: 0.7 !important;
+    }
+    .actions-container button {
+        font-size: 15px !important;
+    }
+    .actions-container button i {
+        font-size: 16px !important;
+    }
+    .article-form,
+    .form-info {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 10px;
+        margin: 10px auto;
+        padding: 10px;
+        width: 90%;
+        border: 1px solid #000;
+        border-radius: 10px;
+        background: linear-gradient(45deg, #34495e, #e74c3c, #f39c12, #ecf0f1);
+        color: #ffff;
+        margin-bottom: 20px;
+        box-shadow:
+            rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+            rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    }
+    .form-info {
+        display: none;
+    }
+    .form-group input {
+        padding: 8px;
+        box-shadow:
+            rgba(6, 24, 44, 0.4) 0px 0px 0px 2px,
+            rgba(6, 24, 44, 0.65) 0px 4px 6px -1px,
+            rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 4px;
+        height: 30px;
+        border-radius: 7px;
+    }
+    .containeer {
+        zoom: 1 !important;
+    }
+}
+@media only screen and (min-width: 599px) and (max-width: 990px) {
+    .containeer {
+        zoom: 1.1 !important;
+    }
+}
+@media only screen and (min-width: 1020px) {
+    .containeer {
+        zoom: 1.1 !important;
+    }
+    
 }
