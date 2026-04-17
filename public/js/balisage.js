@@ -96,6 +96,7 @@ function renderCards() {
         `;
 
         container.appendChild(div);
+        document.querySelector(".item-count").textContent = cards.length || 0;
     });
 
     generateBarcodes();
@@ -154,6 +155,7 @@ function deleteCard(i) {
         cards.splice(i, 1);
         localStorage.setItem("cards", JSON.stringify(cards));
         renderCards();
+        document.querySelector(".item-count").textContent = cards.length || 0;
     }
 }
 
@@ -168,6 +170,7 @@ function clearCards() {
         localStorage.removeItem("cards");
         cards = [];
         renderCards();
+        document.querySelector(".item-count").textContent = cards.length || 0;
     }
 }
 
@@ -284,6 +287,8 @@ let isScanning = false;
 
 window.onload = function () {
     scaner.addEventListener("click", showReader);
+
+    document.querySelector(".item-count").textContent = cards.length;
 };
 
 function showReader() {
@@ -415,18 +420,17 @@ function hideReader() {
 }
 
 btnFermer.addEventListener("click", stopReader);
-const menuToggle = document.querySelector('.menu-toggle');
-const menuRound = document.querySelector('.menu-round');
-const menuLines = document.querySelectorAll('.menu-line');
+const menuToggle = document.querySelector(".menu-toggle");
+const menuRound = document.querySelector(".menu-round");
+const menuLines = document.querySelectorAll(".menu-line");
 const btnApp = document.querySelectorAll(".btn-app");
 
-menuToggle.addEventListener('click', () => {
-  menuToggle.classList.toggle('open');
-  menuRound.classList.toggle('open');
-  menuLines.forEach(line => line.classList.toggle('open')
-  );
-  
-  btnApp.forEach(e => {
-    e.classList.toggle("active");
-  });
+menuToggle.addEventListener("click", () => {
+    menuToggle.classList.toggle("open");
+    menuRound.classList.toggle("open");
+    menuLines.forEach(line => line.classList.toggle("open"));
+
+    btnApp.forEach(e => {
+        e.classList.toggle("active");
+    });
 });
