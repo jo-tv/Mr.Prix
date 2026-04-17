@@ -57,7 +57,7 @@ function remplirForm(data) {
 
 /* render */
 let currentPage = 1;
-const cardsPerPage = 60;
+const cardsPerPage = 80;
 function renderCards() {
     const container = document.getElementById("cards");
     container.innerHTML = "";
