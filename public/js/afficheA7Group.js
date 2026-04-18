@@ -330,7 +330,7 @@ document.getElementById("downloadAll").addEventListener("click", async () => {
         await prepareSvg(clone);
 
         const canvas = await html2canvas(clone, {
-            scale: 2,
+            scale: 1.2,
             useCORS: true
         });
 
