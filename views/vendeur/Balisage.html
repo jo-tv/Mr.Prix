@@ -75,7 +75,8 @@
                         <input
                             id="barcode"
                             type="number"
-                            placeholder="Entrer code article"readonly
+                            placeholder="Entrer code article"
+                            readonly
                         />
                     </div>
 
@@ -104,6 +105,15 @@
                         <input
                             id="price"
                             type="number"
+                            placeholder="0"
+                            readonly
+                        />
+                    </div>
+                    <div class="form-group small" style="display:none">
+                        <label>promotion</label>
+                        <input
+                            id="promo"
+                            type="text"
                             placeholder="0"
                             readonly
                         />
@@ -226,7 +236,8 @@
                 <span class="item-count">0</span>
             </button>
         </div>
-        <script src="https://unpkg.com/svg2pdf.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/svg2pdf.js@2.5.0/dist/svg2pdf.umd.min.js"></script>
         <script src="js/codebar.min.js"></script>
         <script src="/js/balisage.js"></script>
     </body>

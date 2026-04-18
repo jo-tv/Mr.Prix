@@ -201,7 +201,7 @@ body {
     height: 13px;
     overflow: hidden;
     margin-bottom: 20px;
-    margin-top: 10px;
+    margin-top: 5px;
     margin-left: 5px;
     font-size: 13px;
     font-weight: 700;
@@ -213,7 +213,7 @@ body {
     align-items: center;
     font-weight: 600;
     font-size: 12px;
-    height: 25px;
+    height: 20px;
 }
 
 /* barcode */
@@ -221,17 +221,19 @@ body {
     height: 20px;
     width: 55%;
     margin-right: 5px;
-    background: repeating-linear-gradient(
-        to right,
-        black,
-        black 1px,
-        white 1px,
-        white 2px
-    );
+    background: transparent; /* أو خليه بلا */
 }
 .barcode2 {
     margin-right: 10px;
     font-size: 12px;
+}
+.promo {
+    font-size: 12px;
+    font-weight: 900;
+    position: absolute;
+    left: 10px;
+    top: 20%;
+    color: red;
 }
 
 #data {

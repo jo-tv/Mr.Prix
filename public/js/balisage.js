@@ -47,6 +47,11 @@ function remplirForm(data) {
 
     let PrixTotal =
         data.prixPro <= 0 || data.prixPro == "" ? data.prix : data.prixPro;
+    let promotion;
+    data.prixPro <= 0 || data.prixPro == ""
+        ? (promotion = "")
+        : (promotion = "promotion");
+    document.getElementById("promo").value = promotion || "";
     document.getElementById("Anpf").value = data.anpf || "";
     document.getElementById("title").value = libelleClean || "";
     document.getElementById("barcode").value = data.genCode;
@@ -80,7 +85,7 @@ function renderCards() {
 
             <div class="top">
                 <div class="title">${card.title}</div>
-
+                <div class="promo">${card.promotion}</div>
                 <div class="row">
                     <div id="data">${card.code}</div>
                     <svg class="barcode"></svg>
@@ -132,6 +137,7 @@ function addCard() {
         code: Anpf.value,
         barcode: barcode.value,
         price: price.value,
+        promotion: promo.value,
         date: getFormattedDate()
     };
 
@@ -171,7 +177,7 @@ function clearCards() {
         cards = [];
         renderCards();
         document.querySelector(".item-count").textContent = cards.length || 0;
-        window.location.reload()
+        window.location.reload();
     }
 }
 
@@ -179,8 +185,8 @@ function clearCards() {
 async function downloadPDF() {
     const { jsPDF } = window.jspdf;
 
-    const W = 2.02;
-    const H = 1.26;
+    const W = 2.01;
+    const H = 1.22;
 
     const pdf = new jsPDF("landscape", "in", [W, H]);
     const cards = document.querySelectorAll(".card");
@@ -198,6 +204,7 @@ async function downloadPDF() {
         const title2 = ".";
 
         const code = card.querySelectorAll("#data")[0]?.innerText || "";
+        const promo = card.querySelectorAll(".promo")[0]?.innerText || "";
         const date = card.querySelectorAll("#data")[1]?.innerText || "";
         const barcodeText = card.querySelector(".barcode2")?.innerText || "";
         const price = card.querySelector(".bottom")?.innerText || "";
@@ -210,28 +217,30 @@ async function downloadPDF() {
                 ? title2.substring(0, maxLength2) + "....................."
                 : title2;
         pdf.setTextColor(201, 197, 202);
-        pdf.text(shortTitle2, W - 0.1, H - 0.07, { angle: 180 });
+        pdf.text(shortTitle2, W - 0, H - 0.07, { angle: 180 });
         // 1. العنوان (Title)
         pdf.setTextColor(0, 0, 0);
         pdf.setFont("Helvetica", "bold");
         pdf.setFontSize(10);
         // x_new = W - 0.1 | y_new = H - 0.3
-        pdf.text(shortTitle, W - 0.23, H - 0.24, { angle: 180 });
+        pdf.text(shortTitle, W - 0.05, H - 0.24, { angle: 180 });
 
         // 2. الكود (Code)
+        pdf.setFontSize(9);
+        pdf.text(promo, W - 0.1, H - 0.4, { angle: 180 });
         pdf.setFontSize(5);
-        pdf.text(code, W - 0.3, H - 0.55, { angle: 180 });
+        pdf.text(code, W - 0.1, H - 0.55, { angle: 180 });
 
         // 3. التاريخ (Date)
-        pdf.text(date, W - 0.3, H - 0.75, { angle: 180 });
+        pdf.text(date, W - 0.1, H - 0.7, { angle: 180 });
 
         // 4. نص الباركود
         pdf.setFontSize(8);
         pdf.text(barcodeText, W - 1.05, H - 0.73, { angle: 180 });
 
         // 5. السعر (Price)
-        pdf.setFontSize(16);
-        const rectY = 1.09;
+        pdf.setFontSize(18);
+        const rectY = 1.06;
         const rectH = 0.12;
         const textY = rectY + rectH / 2 + 0;
         // السعر في المنتصف العرضي (W/2 يبقى كما هو) ولكن يقلب عمودياً
@@ -263,13 +272,22 @@ async function downloadPDF() {
 }
 
 function generateBarcodes() {
-    const svgElements = document.querySelectorAll(".barcode");
+    const containers = document.querySelectorAll(".card");
 
-    svgElements.forEach((svg, i) => {
-        JsBarcode(svg, cards[i].barcode, {
+    containers.forEach(card => {
+        const svg = card.querySelector(".barcode");
+        const text = card.querySelector(".barcode2");
+
+        if (!svg || !text) return;
+
+        const value = text.textContent.trim();
+
+        if (!value) return;
+
+        JsBarcode(svg, value, {
             format: "CODE128",
-            width: 1.2,
-            height: 30,
+            width: 2.5, // 🔥 مهم بزاف
+            height: 80, // 🔥 مهم للطباعة
             displayValue: false,
             margin: 0
         });

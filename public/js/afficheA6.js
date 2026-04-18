@@ -419,7 +419,7 @@ document.getElementById("downloadAll").addEventListener("click", async () => {
 
         // التقاط الصورة بدقة عالية
         const canvas = await html2canvas(clone, {
-            scale: 3,
+            scale: 1.3,
             useCORS: true,
             backgroundColor: "#ffffff"
         });
