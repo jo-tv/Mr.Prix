@@ -218,6 +218,7 @@ async function downloadPDF() {
                 : title2;
         pdf.setTextColor(201, 197, 202);
         pdf.text(shortTitle2, W - 0, H - 0.07, { angle: 180 });
+        pdf.text(shortTitle2, W - 1.95, H - 0.07, { angle: 180 });
         // 1. العنوان (Title)
         pdf.setTextColor(0, 0, 0);
         pdf.setFont("Helvetica", "bold");
@@ -236,7 +237,7 @@ async function downloadPDF() {
 
         // 4. نص الباركود
         pdf.setFontSize(8);
-        pdf.text(barcodeText, W - 1.05, H - 0.73, { angle: 180 });
+        pdf.text(barcodeText, W - 0.94, H - 0.73, { angle: 180 });
 
         // 5. السعر (Price)
         pdf.setFontSize(18);
@@ -244,15 +245,15 @@ async function downloadPDF() {
         const rectH = 0.12;
         const textY = rectY + rectH / 2 + 0;
         // السعر في المنتصف العرضي (W/2 يبقى كما هو) ولكن يقلب عمودياً
-        pdf.text(price, W / 1, H - textY, { align: "center", angle: 180 });
+        pdf.text(price, W / 0.9, H - textY, { align: "center", angle: 180 });
 
         // 6. الباركود (SVG)
         if (svg) {
             const clonedSVG = svg.cloneNode(true);
             const svgW = 0.9;
             const svgH = 0.35;
-            const svgX = 1;
-            const svgY = 0.35;
+            const svgX = 0.89;
+            const svgY = 0.3;
 
             await pdf.svg(clonedSVG, {
                 // لحساب موقع الـ SVG المقلوب: نطرح الإحداثي الأصلي ونطرح حجم العنصر نفسه
@@ -286,8 +287,8 @@ function generateBarcodes() {
 
         JsBarcode(svg, value, {
             format: "CODE128",
-            width: 2.5, // 🔥 مهم بزاف
-            height: 80, // 🔥 مهم للطباعة
+            width: 4.5, // 🔥 مهم بزاف
+            height: 100, // 🔥 مهم للطباعة
             displayValue: false,
             margin: 0
         });
