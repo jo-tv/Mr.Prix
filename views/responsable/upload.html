@@ -1,431 +1,399 @@
 <!doctype html>
 <!-- === Coding by CodingLab | www.codinglabweb.com === -->
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      http-equiv="X-UA-Compatible"
-      content="IE=edge"
-    />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-    <title>Programe prix Mr bricolage</title>
-    <link
-      rel="manifest"
-      href="/manifest.json"
-    />
-    <meta
-      name="theme-color"
-      content="#007bff"
-    />
-    <link
-      rel="manifest"
-      href="/manifest.json"
-    />
-    <meta
-      name="theme-color"
-      content="#007bff"
-    />
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Programe prix Mr bricolage</title>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#007bff" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#007bff" />
 
-    <!-- ===== CSS ===== -->
-    <link
-      rel="stylesheet"
-      href="css/style.css"
-    />
-    <link
-      rel="stylesheet"
-      href="css/navb.css"
-    />
-    <link
-      rel="stylesheet"
-      href="css/upload.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-    />
-    <!-- ===== Boxicons CSS ===== -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script
-      src="https://kit.fontawesome.com/fb67a05d46.js"
-      crossorigin="anonymous"
-    ></script>
-    <link
-      href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  </head>
-  <body>
-    <!-- مكان الرسائل -->
-    <div
-      id="toast"
-      class="toast"
-    ></div>
-    <!-- From Uiverse.io by andrew-demchenk0 -->
-    <div class="info">
-      <div class="info__icon">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          viewBox="0 0 24 24"
-          height="24"
-          fill="none"
-        >
-          <path
-            fill="#393a37"
-            d="m12 1.5c-5.79844 0-10.5 4.70156-10.5 10.5 0 5.7984 4.70156 10.5 10.5 10.5 5.7984 0 10.5-4.7016 10.5-10.5 0-5.79844-4.7016-10.5-10.5-10.5zm.75 15.5625c0 .1031-.0844.1875-.1875.1875h-1.125c-.1031 0-.1875-.0844-.1875-.1875v-6.375c0-.1031.0844-.1875.1875-.1875h1.125c.1031 0 .1875.0844.1875.1875zm-.75-8.0625c-.2944-.00601-.5747-.12718-.7808-.3375-.206-.21032-.3215-.49305-.3215-.7875s.1155-.57718.3215-.7875c.2061-.21032.4864-.33149.7808-.3375.2944.00601.5747.12718.7808.3375.206.21032.3215.49305.3215.7875s-.1155.57718-.3215.7875c-.2061.21032-.4864.33149-.7808.3375z"
-          ></path>
-        </svg>
-      </div>
-      <div class="info__title">Veuillez télécharger uniquement un fichier au format .xlsx.</div>
-      <div class="info__close">
-        <svg
-          height="20"
-          viewBox="0 0 20 20"
-          width="20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z"
-            fill="#393a37"
-          ></path>
-        </svg>
-      </div>
-    </div>
-
-    <img src="img/back.png" />
-
-    <!-- Container upload -->
-    <div class="container">
-      <div class="header">
-        <p>📂! يرجى تصفح واختيار ملف للرفع</p>
-        <p>Browse File to upload!</p>
-      </div>
-      <label
-        for="file"
-        class="footer"
-      >
-        <p>Not selected file</p>
-      </label>
-      <input
-        id="file"
-        type="file"
-        name="file"
-      />
-    </div>
-
-    <!-- FAB -->
-    <div class="containeer">
-      <!-- القائمة كما هي بدون تغيير -->
-    </div>
-
-    <!-- Loading overlay -->
-    <div
-      id="loadingOverlay"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #000000cc;
-        color: white;
-        font-size: 24px;
-        text-align: center;
-        padding-top: 20%;
-        z-index: 1000;
-      "
-    >
-      ⏳ جاري رفع الملف... <span id="countdown">3</span>
-    </div>
-
-    <!-- شريط التقدم -->
-    <div
-      id="uploadProgressContainer"
-      style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 6px;
-        background: #ccc;
-        z-index: 10001;
-        display: none;
-      "
-    >
-      <div
-        id="uploadProgressBar"
-        style="width: 0%; height: 100%; background: #4caf50; transition: width 0.2s"
-      ></div>
-    </div>
-
-    <!--nav FAB Button -->
-    <div class="containeer">
-      <div class="menu-toggle">
-        <span class="fa fa-plus"></span>
-      </div>
-
-      <div class="menu-round">
-        <div
-          class="btn-app"
-          data-label="Album">
-          <a href="galerie"></a>
-          <div class="fa">
-            <a href="galerie"
-              ><i
-                class="fas fa-file-image"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="mis à jour Data">
-          <a href="upload"></a>
-          <div class="fa">
-            <a href="upload">
-              <i
-                class="fas fa-file-arrow-up"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="Déconnexion">
-          <a href="logout"></a>
-          <div class="fa">
-            <a href="logout"
-              ><i
-                class="fas fa-sign-out-alt"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-      </div>
-
-      <div class="menu-line">
-        <div
-          class="btn-app"
-          data-label="Recherche Produits">
-          <a href="CHERCHER"></a>
-          <div class="fa">
-            <a href="CHERCHER"
-              ><i
-                class="fas fa-search"
-                style="color: white"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="dashboard Inventaire">
-          <a href="dashboard"></a>
-          <div class="fa">
-            <a href="/dashboard"
-              ><i
-                class="fa-solid fa-chart-line"
-                style="color: white"></i>
-            </a>
-          </div>
-        </div>
-        <div
-          class="btn-app"
-          data-label="Prix Vente">
-          <a href="prix"></a>
-          <div class="fa">
-            <a href="prix"
-              ><i
-                class="fas fa-cash-register"
-                style="color: white"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- خلفية تغطي الشاشة -->
-    <div
-      id="passwordOverlay"
-      style="
-        position: fixed;
-        inset: 0;
-        background: rgb(128, 120, 120);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-      "
-    >
-      <div
-        style="
-          background: white;
-          padding: 25px;
-          border-radius: 10px;
-          width: 80%;
-          margin: 0 auto;
-          text-align: center;
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        "
-      >
-        <h3>🔐 Accès protégé</h3>
-        <p>Veuillez entrer le mot de passe :</p>
-        <input
-          id="passwordInput"
-          type="password"
-          style="
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #aaa;
-          "
+        <!-- ===== CSS ===== -->
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="css/navb.css" />
+        <link rel="stylesheet" href="css/upload.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
         />
-        <button
-          onclick="submitPassword()"
-          style="
-            padding: 10px;
-            width: 100%;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-          "
+        <!-- ===== Boxicons CSS ===== -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script
+            src="https://kit.fontawesome.com/fb67a05d46.js"
+            crossorigin="anonymous"
+        ></script>
+        <link
+            href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css"
+            rel="stylesheet"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    </head>
+    <body>
+        <!-- مكان الرسائل -->
+        <div id="toast" class="toast"></div>
+        <!-- From Uiverse.io by andrew-demchenk0 -->
+        <div class="info">
+            <div class="info__icon">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    viewBox="0 0 24 24"
+                    height="24"
+                    fill="none"
+                >
+                    <path
+                        fill="#393a37"
+                        d="m12 1.5c-5.79844 0-10.5 4.70156-10.5 10.5 0 5.7984 4.70156 10.5 10.5 10.5 5.7984 0 10.5-4.7016 10.5-10.5 0-5.79844-4.7016-10.5-10.5-10.5zm.75 15.5625c0 .1031-.0844.1875-.1875.1875h-1.125c-.1031 0-.1875-.0844-.1875-.1875v-6.375c0-.1031.0844-.1875.1875-.1875h1.125c.1031 0 .1875.0844.1875.1875zm-.75-8.0625c-.2944-.00601-.5747-.12718-.7808-.3375-.206-.21032-.3215-.49305-.3215-.7875s.1155-.57718.3215-.7875c.2061-.21032.4864-.33149.7808-.3375.2944.00601.5747.12718.7808.3375.206.21032.3215.49305.3215.7875s-.1155.57718-.3215.7875c-.2061.21032-.4864.33149-.7808.3375z"
+                    ></path>
+                </svg>
+            </div>
+            <div class="info__title">
+                Veuillez télécharger uniquement un fichier au format .xlsx.
+            </div>
+            <div class="info__close">
+                <svg
+                    height="20"
+                    viewBox="0 0 20 20"
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z"
+                        fill="#393a37"
+                    ></path>
+                </svg>
+            </div>
+        </div>
+
+        <img src="img/back.png" />
+
+        <!-- Container upload -->
+        <div class="container">
+            <div class="header">
+                <p>📂! يرجى تصفح واختيار ملف للرفع</p>
+                <p>Browse File to upload!</p>
+            </div>
+            <label for="file" class="footer">
+                <p>Not selected file</p>
+            </label>
+            <input id="file" type="file" name="file" />
+        </div>
+
+        <!-- Loading overlay -->
+        <div
+            id="loadingOverlay"
+            style="
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: #000000cc;
+                color: white;
+                font-size: 24px;
+                text-align: center;
+                padding-top: 20%;
+                z-index: 1000;
+            "
         >
-          Entrer
-        </button>
+            ⏳ جاري رفع الملف... <span id="countdown">3</span>
+        </div>
 
-        <p
-          id="errorMsg"
-          style="color: red; margin-top: 10px"
-        ></p>
-      </div>
-    </div>
-    <div id="topLoad">
-      <div id="loading"><i class="bi bi-battery-charging"></i> Chargement des données...</div>
-    </div>
-    <script src="js/main2.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-      const fileInput = document.getElementById('file');
-      const loadingOverlay = document.getElementById('loadingOverlay');
-      const countdownSpan = document.getElementById('countdown');
-      const progressContainer = document.getElementById('uploadProgressContainer');
-      const progressBar = document.getElementById('uploadProgressBar');
+        <!-- شريط التقدم -->
+        <div
+            id="uploadProgressContainer"
+            style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 6px;
+                background: #ccc;
+                z-index: 10001;
+                display: none;
+            "
+        >
+            <div
+                id="uploadProgressBar"
+                style="
+                    width: 0%;
+                    height: 100%;
+                    background: #4caf50;
+                    transition: width 0.2s;
+                "
+            ></div>
+        </div>
 
-      // دالة العد التنازلي
-      function startCountdown(seconds) {
-        return new Promise((resolve) => {
-          countdownSpan.textContent = seconds;
-          let countdown = seconds;
-          const interval = setInterval(() => {
-            countdown--;
-            if (countdown > 0) {
-              countdownSpan.textContent = countdown;
-            } else {
-              clearInterval(interval);
-              countdownSpan.textContent = '⏳ جاري الرفع...';
-              resolve();
+        <!--nav FAB Button -->
+        <div class="containeer">
+            <div class="menu-toggle">
+                <span class="fa fa-plus"></span>
+            </div>
+
+            <div class="menu-round">
+                <div class="btn-app" data-label="cloudinary">
+                    <a href="cloudinary/index"></a>
+                    <div class="fa">
+                        <a href="cloudinary/index"
+                            ><i
+                                class="fa-solid fa-cloud-arrow-up"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="mis à jour Data">
+                    <a href="upload"></a>
+                    <div class="fa">
+                        <a href="upload">
+                            <i
+                                class="fas fa-file-arrow-up"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Déconnexion">
+                    <a href="logout"></a>
+                    <div class="fa">
+                        <a href="logout"
+                            ><i
+                                class="fas fa-sign-out-alt"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-line">
+              <div class="btn-app" data-label="Album">
+                    <a href="galerie"></a>
+                    <div class="fa">
+                        <a href="galerie"
+                            ><i
+                                class="fas fa-file-image"
+                                style="color: white"
+                            ></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Recherche Produits">
+                    <a href="CHERCHER"></a>
+                    <div class="fa">
+                        <a href="CHERCHER"
+                            ><i class="fas fa-search" style="color: white"></i
+                        ></a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="dashboard Inventaire">
+                    <a href="dashboard"></a>
+                    <div class="fa">
+                        <a href="/dashboard"
+                            ><i
+                                class="fa-solid fa-chart-line"
+                                style="color: white"
+                            ></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="btn-app" data-label="Prix Vente">
+                    <a href="prix"></a>
+                    <div class="fa">
+                        <a href="prix"
+                            ><i
+                                class="fas fa-cash-register"
+                                style="color: white"
+                            ></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- خلفية تغطي الشاشة -->
+        <div
+            id="passwordOverlay"
+            style="
+                position: fixed;
+                inset: 0;
+                background: rgb(128, 120, 120);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 99999999999999;
+            "
+        >
+            <div
+                style="
+                    background: white;
+                    padding: 25px;
+                    border-radius: 10px;
+                    width: 80%;
+                    margin: 0 auto;
+                    text-align: center;
+                    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+                "
+            >
+                <h3>🔐 Accès protégé</h3>
+                <p>Veuillez entrer le mot de passe :</p>
+                <input
+                    id="passwordInput"
+                    type="password"
+                    style="
+                        width: 100%;
+                        padding: 10px;
+                        margin: 10px 0;
+                        border-radius: 8px;
+                        border: 1px solid #aaa;
+                    "
+                />
+                <button
+                    onclick="submitPassword()"
+                    style="
+                        padding: 10px;
+                        width: 100%;
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                    "
+                >
+                    Entrer
+                </button>
+
+                <p id="errorMsg" style="color: red; margin-top: 10px"></p>
+            </div>
+        </div>
+        <div id="topLoad">
+            <div id="loading">
+                <i class="bi bi-battery-charging"></i> Chargement des données...
+            </div>
+        </div>
+        <script src="js/main2.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            const fileInput = document.getElementById("file");
+            const loadingOverlay = document.getElementById("loadingOverlay");
+            const countdownSpan = document.getElementById("countdown");
+            const progressContainer = document.getElementById(
+                "uploadProgressContainer"
+            );
+            const progressBar = document.getElementById("uploadProgressBar");
+
+            // دالة العد التنازلي
+            function startCountdown(seconds) {
+                return new Promise(resolve => {
+                    countdownSpan.textContent = seconds;
+                    let countdown = seconds;
+                    const interval = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            countdownSpan.textContent = countdown;
+                        } else {
+                            clearInterval(interval);
+                            countdownSpan.textContent = "⏳ جاري الرفع...";
+                            resolve();
+                        }
+                    }, 1000);
+                });
             }
-          }, 1000);
-        });
-      }
 
-      // اظهار شريط التقدم
-      function showProgressBar() {
-        progressContainer.style.display = 'block';
-        progressBar.style.width = '0%';
-      }
+            // اظهار شريط التقدم
+            function showProgressBar() {
+                progressContainer.style.display = "block";
+                progressBar.style.width = "0%";
+            }
 
-      // حركة وهمية للشريط حتى اكتمال العملية
-      function fakeProgress() {
-        return new Promise((resolve) => {
-          let width = 0;
-          const interval = setInterval(() => {
-            width += Math.random() * 3;
-            if (width > 95) width = 95;
-            progressBar.style.width = width + '%';
-          }, 200);
-          resolve(interval);
-        });
-      }
+            // حركة وهمية للشريط حتى اكتمال العملية
+            function fakeProgress() {
+                return new Promise(resolve => {
+                    let width = 0;
+                    const interval = setInterval(() => {
+                        width += Math.random() * 3;
+                        if (width > 95) width = 95;
+                        progressBar.style.width = width + "%";
+                    }, 200);
+                    resolve(interval);
+                });
+            }
 
-      function completeProgress(interval) {
-        clearInterval(interval);
-        progressBar.style.width = '100%';
-        setTimeout(() => {
-          progressContainer.style.display = 'none';
-          progressBar.style.width = '0%';
-        }, 500);
-      }
+            function completeProgress(interval) {
+                clearInterval(interval);
+                progressBar.style.width = "100%";
+                setTimeout(() => {
+                    progressContainer.style.display = "none";
+                    progressBar.style.width = "0%";
+                }, 500);
+            }
 
-      // حذف الملفات القديمة
-      async function clearOldFiles() {
-        try {
-          const res = await axios.post('/clear-old-files');
-          console.log('🧹 Files cleared:', res.data);
-        } catch (err) {
-          console.error(err);
-        }
-      }
+            // حذف الملفات القديمة
+            async function clearOldFiles() {
+                try {
+                    const res = await axios.post("/clear-old-files");
+                    console.log("🧹 Files cleared:", res.data);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
 
-      // رفع الملف
-      async function uploadToCloudinary(file) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'unsigned_xlsx');
+            // رفع الملف
+            async function uploadToCloudinary(file) {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", "unsigned_xlsx");
 
-        const res = await axios.post(
-          'https://api.cloudinary.com/v1_1/dvvknaxx6/raw/upload',
-          formData
-        );
-        return res.data.secure_url;
-      }
+                const res = await axios.post(
+                    "https://api.cloudinary.com/v1_1/dvvknaxx6/raw/upload",
+                    formData
+                );
+                return res.data.secure_url;
+            }
 
-      // إرسال إلى السيرفر
-      async function sendToServer(url) {
-        await axios.post('/process-cloudinary-file', { url });
-      }
+            // إرسال إلى السيرفر
+            async function sendToServer(url) {
+                await axios.post("/process-cloudinary-file", { url });
+            }
 
-      fileInput.addEventListener('change', async () => {
-        const file = fileInput.files[0];
-        if (!file) return alert('يرجى اختيار ملف');
-        if (!file.name.endsWith('.xlsx')) {
-          alert('📂 المرجوا تحميل الملفات بصيغة .xlsx فقط');
-          fileInput.value = '';
-          return;
-        }
+            fileInput.addEventListener("change", async () => {
+                const file = fileInput.files[0];
+                if (!file) return alert("يرجى اختيار ملف");
+                if (!file.name.endsWith(".xlsx")) {
+                    alert("📂 المرجوا تحميل الملفات بصيغة .xlsx فقط");
+                    fileInput.value = "";
+                    return;
+                }
 
-        loadingOverlay.style.display = 'flex';
-        showProgressBar();
-        const interval = await fakeProgress();
+                loadingOverlay.style.display = "flex";
+                showProgressBar();
+                const interval = await fakeProgress();
 
-        try {
-          await startCountdown(3);
-          await clearOldFiles();
-          const cloudinaryUrl = await uploadToCloudinary(file);
-          await sendToServer(cloudinaryUrl);
-          alert('✅ تم رفع الملف ومعالجته بنجاح!');
-        } catch (err) {
-          console.error(err);
-          alert('❌ حدث خطأ أثناء العملية.');
-        } finally {
-          completeProgress(interval);
-          loadingOverlay.style.display = 'none';
-          fileInput.value = '';
-          countdownSpan.textContent = '';
-        }
-      });
+                try {
+                    await startCountdown(3);
+                    await clearOldFiles();
+                    const cloudinaryUrl = await uploadToCloudinary(file);
+                    await sendToServer(cloudinaryUrl);
+                    alert("✅ تم رفع الملف ومعالجته بنجاح!");
+                } catch (err) {
+                    console.error(err);
+                    alert("❌ حدث خطأ أثناء العملية.");
+                } finally {
+                    completeProgress(interval);
+                    loadingOverlay.style.display = "none";
+                    fileInput.value = "";
+                    countdownSpan.textContent = "";
+                }
+            });
 
-      // إخفاء Loader عند تحميل الصفحة
-      window.addEventListener('load', () => {
-        const loader = document.getElementById('wifi-loader');
-        if (loader) loader.style.display = 'none';
-      });
-    </script>
-  </body>
+            // إخفاء Loader عند تحميل الصفحة
+            window.addEventListener("load", () => {
+                const loader = document.getElementById("wifi-loader");
+                if (loader) loader.style.display = "none";
+            });
+        </script>
+    </body>
 </html>
