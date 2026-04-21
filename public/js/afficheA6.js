@@ -143,7 +143,9 @@ const container = document.getElementById("cardsContainer");
 function saveToLocal() {
     const cardsData = [];
 
-    document.querySelectorAll(".card").forEach(card => {
+    const cards = document.querySelectorAll(".card");
+    document.querySelector(".item-count").textContent = cards.length;
+    cards.forEach(card => {
         const amountEl = card.querySelector(".amount");
         const oldPriceEl = card.querySelector(".old-price");
 
@@ -179,8 +181,10 @@ function loadFromLocal() {
     const data = JSON.parse(localStorage.getItem("saved_cardsA6") || "[]");
     if (data.length === 0) {
         addCard(); // إضافة بطاقة فارغة إذا كانت الذاكرة فارغة
+        document.querySelector(".item-count").textContent = data.length;
     } else {
         data.forEach(item => addCard(item));
+        document.querySelector(".item-count").textContent = data.length;
     }
 }
 
@@ -312,6 +316,7 @@ function addCard(data = null) {
 async function prepareSvg(cardElement) {
     const svg = cardElement.querySelector("svg");
     const canvas = document.createElement("canvas");
+    if (!svg) return; // 🔥 مهم جداً
     const ctx = canvas.getContext("2d");
     const svgData = new XMLSerializer().serializeToString(svg);
     const img = new Image();
@@ -386,65 +391,93 @@ async function prepareSvg(cardElement) {
 // 5. تحميل الـ PDF
 document.getElementById("downloadAll").addEventListener("click", async () => {
     const { jsPDF } = window.jspdf;
-    const cards = document.querySelectorAll(".card");
+    const cards = Array.from(document.querySelectorAll(".card"));
 
-    // إنشاء PDF بمقاس A4
+    if (cards.length === 0) return;
+
+    const overlay = document.getElementById("loaderOverlay");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+
+    let done = 0;
+    const total = cards.length;
+
+    overlay.style.display = "flex";
+    document.body.style.pointerEvents = "none";
+
+    // 📄 PDF A6
     const pdf = new jsPDF("p", "mm", "a6");
 
-    // مقاسات البطاقة بالمليمتر (A7)
     const cardWidth = 105;
     const cardHeight = 148;
 
-    for (let i = 0; i < cards.length; i++) {
-        // إنشاء نسخة للرندر
-        const clone = cards[i].cloneNode(true);
+    try {
+        for (let i = 0; i < cards.length; i++) {
+            const clone = cards[i].cloneNode(true);
 
-        // تنظيف النسخة من زر الحذف
-        const removeBtn = clone.querySelector(".remove-btn");
-        clone.querySelector(".arc").style.display = "none";
-        if (removeBtn) removeBtn.remove();
-        clone.style.zoom = "1";
-        Object.assign(clone.style, {
-            position: "fixed",
-            left: "-10000px",
-            top: "0",
-            width: "105mm",
-            height: "148mm",
-            display: "block"
-        });
-        document.body.appendChild(clone);
+            // تنظيف
+            clone.querySelector(".remove-btn")?.remove();
+            clone.querySelector(".arc")?.remove();
 
-        // معالجة الـ SVG (تأكد أن هذه الدالة موجودة في كودك)
-        await prepareSvg(clone);
+            Object.assign(clone.style, {
+                position: "fixed",
+                left: "-10000px",
+                top: "0",
+                width: "105mm",
+                height: "148mm",
+                background: "#ffffff"
+            });
 
-        // التقاط الصورة بدقة عالية
-        const canvas = await html2canvas(clone, {
-            scale: 1.3,
-            useCORS: true,
-            backgroundColor: "#ffffff"
-        });
+            document.body.appendChild(clone);
 
-        const imgData = canvas.toDataURL("image/jpeg", 1.0);
+            if (typeof prepareSvg === "function") {
+                await prepareSvg(clone);
+            }
 
-        // نضع الإحداثيات 0 و 0 لوضعها في الزاوية اليسرى العليا تماماً
-        pdf.addImage(
-            imgData,
-            "JPEG",
-            0, // الإحداثي الأفقي (اليسار)
-            0, // الإحداثي الرأسي (الأعلى)
-            cardWidth,
-            cardHeight
-        );
+            const canvas = await html2canvas(clone, {
+                scale: 1.4,
+                useCORS: true,
+                backgroundColor: "#ffffff"
+            });
 
-        // إضافة صفحة جديدة لكل بطاقة (باستثناء الأخيرة)
-        if (i < cards.length - 1) {
-            pdf.addPage("a6", "p");
+            document.body.removeChild(clone);
+
+            // 🔥 فرض الأبيض النهائي (حل الرمادي)
+            const finalCanvas = document.createElement("canvas");
+            finalCanvas.width = canvas.width;
+            finalCanvas.height = canvas.height;
+
+            const ctx = finalCanvas.getContext("2d");
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+            ctx.drawImage(canvas, 0, 0);
+
+            const imgData = finalCanvas.toDataURL("image/jpeg", 0.9);
+
+            pdf.addImage(imgData, "JPEG", 0, 0, cardWidth, cardHeight);
+
+            if (i < cards.length - 1) {
+                pdf.addPage("a6", "p");
+            }
+
+            // 📊 Progress
+            done++;
+            const percent = Math.round((done / total) * 100);
+            progressBar.style.width = percent + "%";
+            progressText.innerText = percent + "%";
         }
 
-        document.body.removeChild(clone);
+        pdf.save("AfficheA6.pdf");
+        progressText.innerText = "تم الانتهاء ✅";
+    } catch (err) {
+        console.error(err);
+        progressText.innerText = "حدث خطأ ❌";
+    } finally {
+        setTimeout(() => {
+            overlay.style.display = "none";
+            document.body.style.pointerEvents = "auto";
+        }, 1200);
     }
-
-    pdf.save("AfficheA6.pdf");
 });
 // دوال مساعدة
 function getFormattedDate() {

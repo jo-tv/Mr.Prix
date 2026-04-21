@@ -25,7 +25,6 @@ body {
     font-family: sans-serif !important;
     color: white !important;
     height: 200px;
-    
 }
 .carde h5,
 .carde h3 {
@@ -249,5 +248,44 @@ table td {
     100% {
         -webkit-transform: scale3d(1, 1, 1);
         transform: scale3d(1, 1, 1);
+    }
+}
+@media only screen and (min-width: 358px) and (max-width: 599px) {
+    .card {
+        zoom: 0.6 !important;
+    }
+    #loading {
+        font-size: 1.5rem !important;
+    }
+    #loading i {
+        font-size: 80px !important;
+    }
+    #adressModal {
+        zoom: 0.5 !important;
+    }
+}
+@media only screen and (min-width: 599px) and (max-width: 1019px) {
+    .card {
+        zoom: 0.8 !important;
+    }
+    #loading {
+        font-size: 2.2rem !important;
+    }
+    #loading i {
+        font-size: 100px !important;
+    }
+    #adressModal {
+        zoom: 0.8 !important;
+    }
+}
+@media only screen and (min-width: 1020px) {
+    .card {
+        zoom: 1 !important;
+    }
+    #loading {
+        font-size: 3rem !important;
+    }
+    #loading i {
+        font-size: 120px !important;
     }
 }

@@ -2,6 +2,8 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
         <title>Liste des Produits</title>
 
         <!-- ✅ استدعاء مكتبة Bootstrap + FontAwesome + Excel -->
@@ -73,7 +75,7 @@
             }
 
             #loading i {
-                font-size: 150px;
+                font-size: 120px;
                 margin-right: 30px;
                 color: #41c72de1;
             }
@@ -217,6 +219,39 @@
                     flex-direction: column;
                 }
             }
+            @media only screen and (min-width: 358px) and (max-width: 599px) {
+                .container-fluid {
+                    zoom: 0.6 !important;
+                }
+                #loading {
+                    font-size: 1.2rem !important;
+                }
+                #loading i {
+                    font-size: 80px !important;
+                }
+            }
+            @media only screen and (min-width: 600px) and (max-width: 1019px) {
+                .container-fluid {
+                    zoom: 0.7 !important;
+                }
+                #loading {
+                    font-size: 2rem !important;
+                }
+                #loading i {
+                    font-size: 100px !important;
+                }
+            }
+            @media only screen and (min-width: 1020px) {
+                .container-fluid {
+                    zoom: 1 !important;
+                }
+                #loading {
+                    font-size: 3rem !important;
+                }
+                #loading i {
+                    font-size: 120px !important;
+                }
+            }
         </style>
     </head>
 
@@ -228,8 +263,8 @@
                 class="container-fluid d-flex justify-content-between align-items-center"
             >
                 <span class="navbar-brand mb-0 h1">
-                    <i class="fas fa-users"></i> Inventaire Complet des Produits
-                    et Vendeurs (<span class="fs-4 text-bg-success"
+                    <i class="fas fa-users"></i> Édité Inventaire Complet (<span
+                        class="fs-4 text-bg-success"
                         >Sans Groupés</span
                     >)
                 </span>
@@ -495,7 +530,7 @@
                 </form>
             </div>
         </div>
-                <!-- خلفية تغطي الشاشة -->
+        <!-- خلفية تغطي الشاشة -->
         <div
             id="passwordOverlay"
             style="
@@ -505,7 +540,7 @@
                 display: none;
                 justify-content: center;
                 align-items: center;
-                z-index: 9999;
+                z-index: 99999999999999;
             "
         >
             <div

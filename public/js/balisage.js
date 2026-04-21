@@ -251,18 +251,17 @@ async function downloadPDF() {
         if (svg) {
             const clonedSVG = svg.cloneNode(true);
             const svgW = 0.9;
-            const svgH = 0.35;
+            const svgH = 1.2;
             const svgX = 0.89;
-            const svgY = 0.3;
+            const svgY = -0.12;
 
             await pdf.svg(clonedSVG, {
                 // لحساب موقع الـ SVG المقلوب: نطرح الإحداثي الأصلي ونطرح حجم العنصر نفسه
                 x: W - svgX - svgW,
                 y: H - svgY - svgH,
                 width: svgW,
-                height: svgH,
+                height: svgH
                 // معظم مكتبات الـ SVG في jsPDF تقبل الدوران
-                rotation: 180
             });
         }
 
@@ -287,8 +286,8 @@ function generateBarcodes() {
 
         JsBarcode(svg, value, {
             format: "CODE128",
-            width: 4.5, // 🔥 مهم بزاف
-            height: 100, // 🔥 مهم للطباعة
+            width: 4, // 🔥 مهم بزاف
+            height: 120, // 🔥 مهم للطباعة
             displayValue: false,
             margin: 0
         });

@@ -411,23 +411,12 @@ th {
     font-size: 0.875rem;
     line-height: 1.25rem;
     font-weight: 600;
-}
-
-.read {
     background-color: rgba(59, 130, 246, 1);
     color: rgba(255, 255, 255, 1);
 }
 
-
-.containeer {
-    zoom: 1.3 !important;
-}
-
 /* Responsive */
 @media only screen and (min-width: 358px) and (max-width: 599px) {
-    .containeer {
-        zoom: 1.3 !important;
-    }
     .actions-container {
         flex-direction: row;
     }
@@ -454,9 +443,6 @@ th {
     }
 }
 @media only screen and (min-width: 599px) and (max-width: 840px) {
-    .containeer {
-        zoom: 1.2 !important;
-    }
     .actions-container {
         flex-direction: row;
     }
@@ -467,7 +453,7 @@ th {
     .action-btn {
         width: 20%;
         justify-content: center;
-        font-size: 13px !important;
+        font-size: 14px !important;
     }
     .button-group {
         align-self: stretch;
@@ -477,8 +463,25 @@ th {
     }
 }
 @media only screen and (min-width: 1020px) {
-    .containeer {
-        zoom: 1.1 !important;
+    .grid th {
+        font-size: 14px !important;
+        font-weight: 700;
+        text-align: center;
+        padding: 3px auto;
+    }
+    .grid td {
+        font-size: 13px !important;
+        font-weight: 500;
+        text-align: center;
+        padding: 4px auto;
+    }
+    .label {
+        font-size: 14px !important;
+        font-weight: 600;
+    }
+    .td-info {
+        font-size: 13px !important;
+        font-weight: 400;
     }
 }
 
@@ -539,27 +542,5 @@ th {
         width: 100%;
         break-inside: avoid !important;
         opacity: 1 !important;
-    }
-}
-@media only screen and (min-width: 1020px) {
-    .grid th {
-        font-size: 14px !important;
-        font-weight: 700;
-        text-align: center;
-        padding: 3px auto;
-    }
-    .grid td {
-        font-size: 13px !important;
-        font-weight: 500;
-        text-align: center;
-        padding: 4px auto;
-    }
-    .label {
-        font-size: 14px !important;
-        font-weight: 600;
-    }
-    .td-info {
-        font-size: 13px !important;
-        font-weight: 400;
     }
 }

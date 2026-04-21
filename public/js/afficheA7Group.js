@@ -142,10 +142,10 @@ const container = document.getElementById("cardsContainer");
 // 1. وظيفة حفظ البيانات في LocalStorage
 function saveToLocal() {
     const cards = document.querySelectorAll(".card");
+    document.querySelector(".item-count").textContent = cards.length;
 
     // إذا لم يبقَ أي كارد، امسح التخزين
     if (cards.length === 0) {
-        localStorage.removeItem("saved_cardsA7");
         return;
     }
 
@@ -169,10 +169,12 @@ function saveToLocal() {
 // 2. وظيفة استعادة البيانات
 function loadFromLocal() {
     const data = JSON.parse(localStorage.getItem("saved_cardsA7") || "[]");
+    document.querySelector(".item-count").textContent = data.length;
     if (data.length === 0) {
         addCard(); // إضافة بطاقة فارغة إذا كانت الذاكرة فارغة
     } else {
         data.forEach(item => addCard(item));
+        document.querySelector(".item-count").textContent = data.length;
     }
 }
 
@@ -285,7 +287,18 @@ async function prepareSvg(cardElement) {
 // 5. تحميل الـ PDF
 document.getElementById("downloadAll").addEventListener("click", async () => {
     const { jsPDF } = window.jspdf;
-    const cards = document.querySelectorAll(".card");
+    const cards = Array.from(document.querySelectorAll(".card"));
+
+    if (cards.length === 0) return;
+
+    // 🔒 UI LOCK
+    const overlay = document.getElementById("loaderOverlay");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+
+    overlay.style.display = "flex";
+    document.body.style.pointerEvents = "none";
+
     const pdf = new jsPDF("p", "mm", "a4");
 
     const pageWidth = 210;
@@ -293,127 +306,186 @@ document.getElementById("downloadAll").addEventListener("click", async () => {
 
     const cols = 2;
     const rows = 4;
+    const gap = 8;
 
-    const gap = 8; // المسافة بين الكروت
-
-    // 🔽 نصغّرو الكارد شوية
     const cardWidth = 96;
     const cardHeight = 65;
-
     const padding = 2;
 
-    // 🔽 نحسبو الحجم الكامل ديال grid
     const gridWidth = cols * cardWidth + (cols - 1) * gap;
     const gridHeight = rows * cardHeight + (rows - 1) * gap;
 
-    // 🔽 نوسّطو grid كامل
     const startX = (pageWidth - gridWidth) / 2;
     const startY = (pageHeight - gridHeight) / 2;
 
-    for (let i = 0; i < cards.length; i++) {
-        const clone = cards[i].cloneNode(true);
+    const container = document.createElement("div");
+    Object.assign(container.style, {
+        position: "fixed",
+        left: "-10000px",
+        top: "0"
+    });
+    document.body.appendChild(container);
 
-        clone.querySelector(".remove-btn")?.remove();
-        clone.style.zoom = "1";
+    const batchSize = 5;
+    const total = cards.length;
+    let done = 0;
 
-        Object.assign(clone.style, {
-            position: "fixed",
-            left: "-10000px",
-            top: "0",
-            width: cardWidth + "mm",
-            height: cardHeight + "mm",
-            background: "white"
-        });
+    try {
+        for (let i = 0; i < cards.length; i += batchSize) {
+            const batch = cards.slice(i, i + batchSize);
 
-        document.body.appendChild(clone);
+            const canvases = await Promise.all(
+                batch.map(async card => {
+                    const clone = card.cloneNode(true);
 
-        await prepareSvg(clone);
+                    clone.querySelector(".remove-btn")?.remove();
+                    clone.style.zoom = "1";
 
-        const canvas = await html2canvas(clone, {
-            scale: 1.2,
-            useCORS: true
-        });
+                    Object.assign(clone.style, {
+                        width: cardWidth + "mm",
+                        height: cardHeight + "mm",
+                        background: "#ffffff"
+                    });
 
-        const imgData = canvas.toDataURL("image/jpeg", 1.0);
+                    container.appendChild(clone);
 
-        // 🔽 position داخل grid
-        const col = i % cols;
-        const row = Math.floor(i / cols) % rows;
+                    if (typeof prepareSvg === "function") {
+                        await prepareSvg(clone);
+                    }
 
-        const x = startX + col * (cardWidth + gap);
-        const y = startY + row * (cardHeight + gap);
+                    const canvas = await html2canvas(clone, {
+                        scale: 1.2,
+                        useCORS: true,
+                        backgroundColor: "#ffffff"
+                    });
 
-        // الكارد
-        pdf.addImage(imgData, "JPEG", x, y, cardWidth, cardHeight);
+                    container.removeChild(clone);
 
-        // border منقط للقص
-        pdf.setDrawColor(0);
-        pdf.setLineWidth(0.2);
-        pdf.setLineDash([2, 2]);
+                    // 🔥 حل نهائي ضد الرمادي
+                    const finalCanvas = document.createElement("canvas");
+                    finalCanvas.width = canvas.width;
+                    finalCanvas.height = canvas.height;
 
-        pdf.rect(
-            x - padding,
-            y - padding,
-            cardWidth + padding * 2,
-            cardHeight + padding * 2
-        );
+                    const ctx = finalCanvas.getContext("2d");
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+                    ctx.drawImage(canvas, 0, 0);
 
-        pdf.setLineDash([]);
+                    return finalCanvas;
+                })
+            );
 
-        // crop marks
-        const mark = 3;
+            canvases.forEach((canvas, index) => {
+                const globalIndex = i + index;
 
-        pdf.line(x - padding, y - padding, x - padding + mark, y - padding);
-        pdf.line(x - padding, y - padding, x - padding, y - padding + mark);
+                const imgData = canvas.toDataURL("image/jpeg", 0.75);
 
-        pdf.line(
-            x + cardWidth + padding,
-            y - padding,
-            x + cardWidth + padding - mark,
-            y - padding
-        );
-        pdf.line(
-            x + cardWidth + padding,
-            y - padding,
-            x + cardWidth + padding,
-            y - padding + mark
-        );
+                const col = globalIndex % cols;
+                const row = Math.floor(globalIndex / cols) % rows;
 
-        pdf.line(
-            x - padding,
-            y + cardHeight + padding,
-            x - padding + mark,
-            y + cardHeight + padding
-        );
-        pdf.line(
-            x - padding,
-            y + cardHeight + padding,
-            x - padding,
-            y + cardHeight + padding - mark
-        );
+                const x = startX + col * (cardWidth + gap);
+                const y = startY + row * (cardHeight + gap);
 
-        pdf.line(
-            x + cardWidth + padding,
-            y + cardHeight + padding,
-            x + cardWidth + padding - mark,
-            y + cardHeight + padding
-        );
-        pdf.line(
-            x + cardWidth + padding,
-            y + cardHeight + padding,
-            x + cardWidth + padding,
-            y + cardHeight + padding - mark
-        );
+                pdf.addImage(imgData, "JPEG", x, y, cardWidth, cardHeight);
 
-        // صفحة جديدة بعد 8
-        if ((i + 1) % 8 === 0 && i + 1 < cards.length) {
-            pdf.addPage();
+                // border
+                pdf.setDrawColor(0);
+                pdf.setLineWidth(0.2);
+                pdf.setLineDash([2, 2]);
+
+                pdf.rect(
+                    x - padding,
+                    y - padding,
+                    cardWidth + padding * 2,
+                    cardHeight + padding * 2
+                );
+
+                pdf.setLineDash([]);
+
+                // crop marks
+                const mark = 3;
+
+                pdf.line(
+                    x - padding,
+                    y - padding,
+                    x - padding + mark,
+                    y - padding
+                );
+                pdf.line(
+                    x - padding,
+                    y - padding,
+                    x - padding,
+                    y - padding + mark
+                );
+
+                pdf.line(
+                    x + cardWidth + padding,
+                    y - padding,
+                    x + cardWidth + padding - mark,
+                    y - padding
+                );
+                pdf.line(
+                    x + cardWidth + padding,
+                    y - padding,
+                    x + cardWidth + padding,
+                    y - padding + mark
+                );
+
+                pdf.line(
+                    x - padding,
+                    y + cardHeight + padding,
+                    x - padding + mark,
+                    y + cardHeight + padding
+                );
+                pdf.line(
+                    x - padding,
+                    y + cardHeight + padding,
+                    x - padding,
+                    y + cardHeight + padding - mark
+                );
+
+                pdf.line(
+                    x + cardWidth + padding,
+                    y + cardHeight + padding,
+                    x + cardWidth + padding - mark,
+                    y + cardHeight + padding
+                );
+                pdf.line(
+                    x + cardWidth + padding,
+                    y + cardHeight + padding,
+                    x + cardWidth + padding,
+                    y + cardHeight + padding - mark
+                );
+
+                // صفحات
+                if (
+                    (globalIndex + 1) % 8 === 0 &&
+                    globalIndex + 1 < cards.length
+                ) {
+                    pdf.addPage();
+                }
+
+                // 📊 progress
+                done++;
+                const percent = Math.round((done / total) * 100);
+                progressBar.style.width = percent + "%";
+                progressText.innerText = percent + "%";
+            });
         }
 
-        document.body.removeChild(clone);
-    }
+        pdf.save("AfficheA7.pdf");
 
-    pdf.save("AfficheA7.pdf");
+        progressText.innerText = "تم الانتهاء ✅";
+    } catch (err) {
+        console.error(err);
+        progressText.innerText = "حدث خطأ ❌";
+    } finally {
+        setTimeout(() => {
+            overlay.style.display = "none";
+            document.body.style.pointerEvents = "auto";
+            document.body.removeChild(container);
+        }, 1200);
+    }
 });
 // دوال مساعدة
 function getFormattedDate() {

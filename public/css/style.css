@@ -832,16 +832,11 @@ img {
     .ticket {
         zoom: 0.6;
     }
-    .containeer {
-        zoom: 1.1 !important;
-    }
+    
 }
 @media only screen and (min-width: 599px) and (max-width: 990px) {
     .ticket {
         zoom: 0.7;
-    }
-    .containeer {
-        zoom: 1.1 !important;
     }
     input {
         zoom: 1.1 !important;
@@ -850,9 +845,6 @@ img {
 @media only screen and (min-width: 1020px) {
     .ticket {
         zoom: 0.7 !important;
-    }
-    .containeer {
-        zoom: 1 !important;
     }
     input {
         zoom: 1.2 !important;

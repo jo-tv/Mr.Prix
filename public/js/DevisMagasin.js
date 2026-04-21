@@ -287,7 +287,7 @@ async function downloadPDF() {
 
     // 🟢 إعدادات عالية الجودة
     const canvas = await html2canvas(devis, {
-        scale: 3, // 🔥 جودة عالية
+        scale: 2, // 🔥 جودة عالية
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#fff",
@@ -359,7 +359,9 @@ async function downloadPDF() {
     }
 
     // 4️⃣ حفظ الملف
-    pdf.save("devis.pdf");
+    const nameDevis = document.querySelector(".name-client").textContent.trim();
+
+    pdf.save(`${nameDevis.substring(0, 15) + "...." || "NAME CLIENT"}.pdf`);
 
     // 🟢 استرجاع الحالة
     devis.style.width = originalWidth;
@@ -367,6 +369,7 @@ async function downloadPDF() {
 
     deleteButtons.forEach(btn => (btn.style.display = "inline-block"));
     if (htmlFooter) htmlFooter.style.display = "block";
+    
 }
 /* ===================================== */
 /*  viderPanier                      */
