@@ -152,6 +152,7 @@ function addCard() {
 
     localStorage.setItem("cards", JSON.stringify(cards));
     renderCards();
+    document.querySelector("#repetition").value = "1";
     document.querySelector(".form-info").style.display = "none";
 }
 

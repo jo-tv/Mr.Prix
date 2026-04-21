@@ -25,22 +25,24 @@ body {
     font-family: sans-serif !important;
     color: white !important;
     height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
 }
 .carde h5,
 .carde h3 {
     text-align: center;
     font-weight: 900 !important;
-    font-size: 25px !important;
+    font-size: 22px;
     letter-spacing: 0.5px !important;
     text-shadow: 4px 4px 6px rgba(66, 68, 90, 1);
 }
 h5 {
     font-weight: 700 !important;
-    font-size: 25px !important;
     letter-spacing: 0.5px !important;
     text-shadow: 0px 0px 4px rgba(90, 163, 68, 1);
 }
-.carde h3,
 .carde i {
     color: #f7f7f8;
     font-size: 37px !important;
@@ -251,8 +253,18 @@ table td {
     }
 }
 @media only screen and (min-width: 358px) and (max-width: 599px) {
+    .carde h5,
+    .carde h3 {
+        font-size: 20px !important;
+    }
+    .carde i {
+        font-size: 25px !important;
+    }
     .card {
-        zoom: 0.6 !important;
+        zoom: 1 !important;
+    }
+    .container-fluid {
+        font-size: 12px !important;
     }
     #loading {
         font-size: 1.5rem !important;
@@ -264,9 +276,9 @@ table td {
         zoom: 0.5 !important;
     }
 }
-@media only screen and (min-width: 599px) and (max-width: 1019px) {
+@media only screen and (min-width: 599px) and (max-width: 900px) {
     .card {
-        zoom: 0.8 !important;
+        zoom: 1 !important;
     }
     #loading {
         font-size: 2.2rem !important;
@@ -278,7 +290,7 @@ table td {
         zoom: 0.8 !important;
     }
 }
-@media only screen and (min-width: 1020px) {
+@media only screen and (min-width: 901px) {
     .card {
         zoom: 1 !important;
     }

@@ -370,7 +370,7 @@
 }
 @media only screen and (min-width: 358px) and (max-width: 599px) {
     .containeer {
-        zoom: 1.4 !important;
+        zoom: 1.35 !important;
     }
 }
 @media only screen and (min-width: 599px) and (max-width: 1019px) {
