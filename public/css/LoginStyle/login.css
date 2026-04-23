@@ -50,10 +50,11 @@ h6 {
     border-radius: 10px;
 }
 .tile .tile-header {
-    background-image: url("https://i.postimg.cc/dVd6W21k/1776818883128.png");
+    background-image: url("https://i.postimg.cc/Zn6j995N/20260423-155729.png");
     background-position: center;
-    background-size: contain;
-    height: 14rem;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 25.3rem;
 }
 .tile .tile-body {
     padding: 2rem;

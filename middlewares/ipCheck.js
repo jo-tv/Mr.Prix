@@ -1,52 +1,49 @@
 function ipCheck(req, res, next) {
+    function getClientIP(req) {
+        let ip = null;
 
-  function getClientIP(req) {
-    let ip = null;
+        // ✅ الأفضل دائمًا: x-forwarded-for
+        const forwarded = req.headers["x-forwarded-for"];
 
-    // ✅ الأفضل دائمًا: x-forwarded-for
-    const forwarded = req.headers["x-forwarded-for"];
+        if (forwarded) {
+            ip = forwarded.split(",")[0].trim(); // 🔥 أول IP هو الحقيقي
+        } else if (req.socket?.remoteAddress) {
+            ip = req.socket.remoteAddress;
+        }
 
-    if (forwarded) {
-      ip = forwarded.split(",")[0].trim(); // 🔥 أول IP هو الحقيقي
-    } else if (req.socket?.remoteAddress) {
-      ip = req.socket.remoteAddress;
+        // تنظيف IP
+        if (!ip) return null;
+        if (ip === "::1") ip = "127.0.0.1";
+        ip = ip.replace("::ffff:", "");
+
+        return ip;
     }
 
-    // تنظيف IP
-    if (!ip) return null;
-    if (ip === "::1") ip = "127.0.0.1";
-    ip = ip.replace("::ffff:", "");
+    const userIP = getClientIP(req);
 
-    return ip;
-  }
+    // console.log("🌍 Client IP:", userIP);
+    //   console.log("📡 x-forwarded-for:", req.headers["x-forwarded-for"]);
 
-  const userIP = getClientIP(req);
+    // ✅ قائمة IPs المسموحة
+    const allowedIPs = [
+        "127.0.0.1",
+        "154.144.255.22"
+        //"10.50.223." // شبكة
+    ];
 
-  // console.log("🌍 Client IP:", userIP);
-//   console.log("📡 x-forwarded-for:", req.headers["x-forwarded-for"]);
+    function isIPAllowed(ip) {
+        if (!ip) return false;
 
-  // ✅ قائمة IPs المسموحة
-  const allowedIPs = [
-    "127.0.0.1",
-    "154.144.255.22",
-    "140.248.66.",
-    "102.100.191.33",
-    "10.50.223." // شبكة
-  ];
+        return allowedIPs.some(item => {
+            if (item.endsWith(".")) {
+                return ip.startsWith(item); // prefix
+            }
+            return ip === item; // exact match
+        });
+    }
 
-  function isIPAllowed(ip) {
-    if (!ip) return false;
-
-    return allowedIPs.some(item => {
-      if (item.endsWith(".")) {
-        return ip.startsWith(item); // prefix
-      }
-      return ip === item; // exact match
-    });
-  }
-
-  if (!isIPAllowed(userIP)) {
-    return res.status(403).send(`
+    if (!isIPAllowed(userIP)) {
+        return res.status(403).send(`
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -92,9 +89,9 @@ function ipCheck(req, res, next) {
 </body>
 </html>
     `);
-  }
+    }
 
-  next();
+    next();
 }
 
 module.exports = ipCheck;
