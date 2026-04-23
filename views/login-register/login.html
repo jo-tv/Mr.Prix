@@ -2,42 +2,134 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
+        <title>Login page</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#007bff" />
-        <title>Login Mr-JO</title>
-        <link rel="stylesheet" href="css/login.css" />
+        <link
+            rel="stylesheet"
+            href="https://public.codepenassets.com/css/reset-2.0.min.css"
+        />
+        <link rel="stylesheet" href="./css/LoginStyle/login.css" />
     </head>
-    <body>
-        <div class="ring">
-<form class="login" id="loginForm">
-                <h2>Login</h2>
-                <div class="inputBx">
-                    <input
-                        type="text"
-                        placeholder="Username"
-                        name="username"
-                        required
-                    />
-                </div>
-                <div class="inputBx">
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        name="password"
-                        required
-                    />
-                </div>
-                <div class="inputBx">
-                    <input type="submit" value="Sign in" />
-                </div>
-                <div class="links">
-                    <a id="forgetPasswordLink" href="#">Forget Password</a>
-                    <a id="signupLink" href="#">Signup</a>
-                </div>
-            </form>
-        </div>
 
+    <body>
+        <div class="tile">
+            <div class="tile-header">
+                <h2
+                    style="
+                        color: white;
+                        opacity: 0.75;
+                        font-size: 4rem;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100%;
+                    "
+                ></h2>
+            </div>
+
+            <div class="tile-body">
+                <form class="form" id="loginForm">
+                    <label class="form-input">
+                        <i class="material-icons">username</i>
+                        <input type="text" name="username" required />
+                        <span class="label">Username</span>
+                        <span class="underline"></span>
+                    </label>
+
+                    <label class="form-input">
+                        <i class="material-icons">lock</i>
+                        <input type="password" name="password" required />
+                        <span class="label">Password</span>
+                        <div class="underline"></div>
+                    </label>
+
+                    <div
+                        class="submit-container clearfix"
+                        style="margin-top: 2rem"
+                    >
+                        <button
+                            id="submit"
+                            role="button"
+                            type="submit"
+                            class="btn btn-irenic float-right"
+                            tabindex="0"
+                        >
+                            Se Connecter ➡️
+                        </button>
+
+                        <div class="login-pending">
+                            <div class="spinner">
+                                <span class="dot1"></span>
+                                <span class="dot2"></span>
+                            </div>
+
+                            <div class="login-granted-content">
+                                <img
+                                    class="img"
+                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXQPznfT-VJSkkmsw5dDmshXHdsCbVfJQbtRfsxmFPbkCqJYzlgxiwXjQ&amp;s=10"
+                                    alt=""
+                                />
+                                <i class="material-icons">done</i>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="area">
+            <ul class="circles">
+                <li>
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGISVbp7K6gk8_ZEosKh_tH9OIMsDp8AaRzesYOWFTHQ&amp;s=10"
+                    />
+                </li>
+                <li>
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMJrzA5DprCKYfqozqtWqXZgaUPIKUtZHpwrTUSYanaw&amp;s=10"
+                    />
+                </li>
+                <li>
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ4ejdsksXc6Kckhx0lgDzfpl5c5aStjf-uITLXyMkvQ&amp;s=10"
+                    />
+                </li>
+                <li>
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMJrzA5DprCKYfqozqtWqXZgaUPIKUtZHpwrTUSYanaw&amp;s=10"
+                    />
+                </li>
+                <li>
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuOjc-6Asf4x8K3m4dVJpbs4MrSWwNuj2iPdUBRFisqLgH4coivk5xB-94&amp;s=10"
+                    />
+                </li>
+                <li>
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuOjc-6Asf4x8K3m4dVJpbs4MrSWwNuj2iPdUBRFisqLgH4coivk5xB-94&amp;s=10"
+                    />
+                </li>
+                <li>
+                    <img
+                        src="https://img.freepik.com/vecteurs-premium/trouver-modele-conception-logo-produit_145155-4160.jpg"
+                    />
+                </li>
+                <li>
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuOjc-6Asf4x8K3m4dVJpbs4MrSWwNuj2iPdUBRFisqLgH4coivk5xB-94&amp;s=10"
+                    />
+                </li>
+                <li>
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuOjc-6Asf4x8K3m4dVJpbs4MrSWwNuj2iPdUBRFisqLgH4coivk5xB-94&amp;s=10"
+                    />
+                </li>
+                <li>
+                    <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ4ejdsksXc6Kckhx0lgDzfpl5c5aStjf-uITLXyMkvQ&amp;s=10"
+                    />
+                </li>
+            </ul>
+        </div>
         <div class="info" dir="rtl" id="infoBox">
             <div class="info__icon">
                 <svg
@@ -68,6 +160,7 @@
                 </svg>
             </div>
         </div>
-        <script src="/js/login.js" defer></script>
+
+        <script src="/js/Loginsj/login.js"></script>
     </body>
 </html>
