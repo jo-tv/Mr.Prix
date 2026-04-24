@@ -373,7 +373,7 @@ document.getElementById("downloadAll").addEventListener("click", async () => {
             const removeBtn = clone.querySelector(".remove-btn");
             clone.querySelector(".arc")?.remove();
             if (removeBtn) removeBtn.remove();
-
+            clone.style.zoom = "1";
             Object.assign(clone.style, {
                 position: "fixed",
                 left: "-10000px",

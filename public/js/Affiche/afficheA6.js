@@ -418,7 +418,7 @@ document.getElementById("downloadAll").addEventListener("click", async () => {
             // تنظيف
             clone.querySelector(".remove-btn")?.remove();
             clone.querySelector(".arc")?.remove();
-
+            clone.style.zoom = "1"
             Object.assign(clone.style, {
                 position: "fixed",
                 left: "-10000px",
