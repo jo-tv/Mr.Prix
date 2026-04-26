@@ -186,8 +186,8 @@ function clearCards() {
 async function downloadPDF() {
     const { jsPDF } = window.jspdf;
 
-    const W = 2.01;
-    const H = 1.22;
+    const W = 2.02;
+    const H = 1.26;
 
     const pdf = new jsPDF("landscape", "in", [W, H]);
     const cards = document.querySelectorAll(".card");
@@ -220,6 +220,8 @@ async function downloadPDF() {
         pdf.setTextColor(201, 197, 202);
         pdf.text(shortTitle2, W - 0, H - 0.07, { angle: 180 });
         pdf.text(shortTitle2, W - 1.95, H - 0.07, { angle: 180 });
+        pdf.text(shortTitle2, W - 0, H - 1.22, { angle: 180 });
+        pdf.text(shortTitle2, W - 1.95, H - 1.22, { angle: 180 });
         // 1. العنوان (Title)
         pdf.setTextColor(0, 0, 0);
         pdf.setFont("Helvetica", "bold");
@@ -230,9 +232,8 @@ async function downloadPDF() {
         // 2. الكود (Code)
         pdf.setFontSize(9);
         pdf.text(promo, W - 0.1, H - 0.4, { angle: 180 });
-        pdf.setFontSize(5);
+        pdf.setFontSize(6);
         pdf.text(code, W - 0.1, H - 0.55, { angle: 180 });
-
         // 3. التاريخ (Date)
         pdf.text(date, W - 0.1, H - 0.7, { angle: 180 });
 
@@ -241,17 +242,14 @@ async function downloadPDF() {
         pdf.text(barcodeText, W - 0.94, H - 0.73, { angle: 180 });
 
         // 5. السعر (Price)
-        pdf.setFontSize(18);
-        const rectY = 1.06;
-        const rectH = 0.12;
-        const textY = rectY + rectH / 2 + 0;
+        pdf.setFontSize(19);
         // السعر في المنتصف العرضي (W/2 يبقى كما هو) ولكن يقلب عمودياً
-        pdf.text(price, W / 0.9, H - textY, { align: "center", angle: 180 });
+        pdf.text(price, W / 0.95, H - 1.15, { align: "center", angle: 180 });
 
         // 6. الباركود (SVG)
         if (svg) {
             const clonedSVG = svg.cloneNode(true);
-            const svgW = 0.9;
+            const svgW = 1;
             const svgH = 1.2;
             const svgX = 0.89;
             const svgY = -0.12;
