@@ -144,3 +144,17 @@ if ("serviceWorker" in navigator) {
         .then(() => console.log("Service Worker registered"))
         .catch(err => console.error("SW registration failed:", err));
 }
+navigator.geolocation.getCurrentPosition(async (pos) => {
+
+    await fetch("/verify-gps", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+        })
+    });
+
+}, () => {
+    alert("⚠️ يجب السماح بالموقع");
+});

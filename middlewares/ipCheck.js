@@ -1,112 +1,132 @@
 const geoip = require("geoip-lite");
 const axios = require("axios");
 
-function ipCheck(req, res, next) {
-    function getClientIP(req) {
-        let ip =
-            req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-            req.socket?.remoteAddress;
+const allowedIPs = ["127.0.0.1", "102.100.19.218", "154.144.255.22"];
 
-        if (!ip) return null;
-        if (ip === "::1") ip = "127.0.0.1";
-        ip = ip.replace("::ffff:", "");
+function getClientIP(req) {
+    let ip =
+        req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
+        req.socket.remoteAddress;
 
-        return ip;
-    }
+    if (!ip) return null;
 
-    const userIP = getClientIP(req);
+    ip = ip.replace("::ffff:", "");
+    if (ip === "::1") ip = "127.0.0.1";
 
-    console.log("━━━━━━━━━━━━━━━━━━━━━━");
-    console.log("🌍 Client IP:", userIP);
-    console.log("📡 x-forwarded-for:", req.headers["x-forwarded-for"]);
-
-    // ✅ whitelist
-    const allowedIPs = ["127.0.0.1", "154.144.255.22", "143.244.46.242","102.100.19.218"];
-
-    function isIPAllowed(ip) {
-        if (!ip) return false;
-
-        return allowedIPs.some(item => {
-            if (item.endsWith(".")) {
-                return ip.startsWith(item);
-            }
-            return ip === item;
-        });
-    }
-
-    if (isIPAllowed(userIP)) {
-        console.log("✅ IP in whitelist → bypass");
-        return next();
-    }
-
-    // 🌍 GeoIP check
-    const geo = geoip.lookup(userIP);
-
-    console.log("📍 Geo result:", geo);
-
-    if (!geo) {
-        console.log("❌ Geo lookup failed");
-        return deny(res, "❌ لا يمكن تحديد موقعك");
-    }
-
-    const city = geo.city?.toLowerCase();
-    console.log("🏙️ City detected:", city);
-
-    if (!city || !city.includes("marr")) {
-        console.log("🚫 Not in Marrakech");
-        return deny(res, "🚫 الخدمة متاحة فقط داخل مراكش");
-    }
-
-    console.log("✅ داخل مراكش (حسب IP)");
-
-    // 🔍 VPN check
-    checkVPN(userIP)
-        .then(isVPN => {
-            console.log(
-                "🛡️ VPN Check:",
-                isVPN ? "VPN DETECTED ❌" : "Clean ✅"
-            );
-
-            if (isVPN) {
-                return deny(res, "🚫 VPN غير مسموح");
-            }
-
-            console.log("✅ Passed all checks");
-            next();
-        })
-        .catch(err => {
-            console.log("❌ VPN check error:", err.message);
-            return deny(res, "❌ خطأ في التحقق من الشبكة");
-        });
+    return ip;
 }
 
-// 🔍 VPN API
+async function ipCheck(req, res, next) {
+    const ip = getClientIP(req);
+
+    console.log("🌍 IP:", ip);
+
+    // 1️⃣ تحقق من IP
+    if (!allowedIPs.includes(ip)) {
+        console.log("🚫 IP not allowed");
+        return deny(res, "🚫 IP غير مسموح");
+    }
+
+    console.log("✅ IP allowed");
+
+    // 2️⃣ تحقق من المدينة
+    const geo = geoip.lookup(ip);
+
+    console.log("📍 GEO:", geo);
+
+    if (!geo || !geo.city) {
+        return deny(res, "❌ لا يمكن تحديد الموقع");
+    }
+
+    const city = geo.city.toLowerCase();
+
+    console.log("🏙️ City:", city);
+
+    if (!city.includes("marr")) {
+        console.log("🚫 Not Marrakech");
+        return deny(res, "🚫 فقط مراكش مسموح");
+    }
+
+    console.log("✅ داخل مراكش");
+
+    // 3️⃣ تحقق من VPN
+    const isVPN = await checkVPN(ip);
+
+    console.log("🛡️ VPN:", isVPN);
+
+    if (isVPN) {
+        return deny(res, "🚫 VPN غير مسموح");
+    }
+
+    console.log("✅ ALL CONDITIONS PASSED");
+
+    next();
+}
+
+// 🔍 VPN check
 async function checkVPN(ip) {
     try {
         const res = await axios.get(
             `http://ip-api.com/json/${ip}?fields=proxy,hosting`
         );
 
-        console.log("🌐 VPN API Response:", res.data);
-
         return res.data.proxy || res.data.hosting;
-    } catch (err) {
-        console.log("❌ API error:", err.message);
-        return true;
+    } catch (e) {
+        console.log("❌ VPN API error:", e.message);
+        return true; // fail = block
     }
 }
 
-// ❌ Deny page
-function deny(res, message) {
-    console.log("⛔ ACCESS DENIED:", message);
+// ❌ deny
+function deny(res, msg) {
+    console.log("⛔ BLOCKED:", msg);
 
     return res.status(403).send(`
-    <html>
-    <body style="font-family:sans-serif;text-align:center;padding:50px;">
-        <h1>🚫 Accès refusé</h1>
-        <p>${message}</p>
-    </body>
-    </html>
+        <!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accès refusé</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#ff4e50,#f9d423);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+  .box {
+    background:#fff;
+    padding:30px;
+    border-radius:10px;
+    text-align:center;
+    width:90%;
+    max-width:400px;
+  }
+  h1 { color:#e63946; }
+  p { margin:15px 0; }
+  a {
+    display:inline-block;
+    padding:10px 20px;
+    background:#457b9d;
+    color:#fff;
+    border-radius:5px;
+    text-decoration:none;
+  }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>🚫 Accès refusé</h1>
+    <p>Désolé, l’accès à l’application n’est pas disponible depuis votre emplacement actuel. Veuillez contacter le support pour obtenir de l’aide. ⚠️</p>
+    <p>${msg}</p>
+    <a href="/">Retour</a>
+  </div>
+</body>
+</html>
     `);
 }
 
