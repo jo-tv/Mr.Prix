@@ -1,88 +1,50 @@
-const geoip = require("geoip-lite");
-const axios = require("axios");
+function ipCheck(req, res, next) {
+    function getClientIP(req) {
+        let ip = null;
 
-const allowedIPs = ["127.0.0.1", "102.100.19.218", "154.144.255.22"];
+        // ✅ الأفضل دائمًا: x-forwarded-for
+        const forwarded = req.headers["x-forwarded-for"];
 
-function getClientIP(req) {
-    let ip =
-        req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-        req.socket.remoteAddress;
+        if (forwarded) {
+            ip = forwarded.split(",")[0].trim(); // 🔥 أول IP هو الحقيقي
+        } else if (req.socket?.remoteAddress) {
+            ip = req.socket.remoteAddress;
+        }
 
-    if (!ip) return null;
+        // تنظيف IP
+        if (!ip) return null;
+        if (ip === "::1") ip = "127.0.0.1";
+        ip = ip.replace("::ffff:", "");
 
-    ip = ip.replace("::ffff:", "");
-    if (ip === "::1") ip = "127.0.0.1";
-
-    return ip;
-}
-
-async function ipCheck(req, res, next) {
-    const ip = getClientIP(req);
-
-    console.log("🌍 IP:", ip);
-
-    // 1️⃣ تحقق من IP
-    if (!allowedIPs.includes(ip)) {
-        console.log("🚫 IP not allowed");
-        return deny(res, "🚫 IP غير مسموح");
+        return ip;
     }
 
-    console.log("✅ IP allowed");
+    const userIP = getClientIP(req);
 
-    // 2️⃣ تحقق من المدينة
-    const geo = geoip.lookup(ip);
+    // console.log("🌍 Client IP:", userIP);
+    //   console.log("📡 x-forwarded-for:", req.headers["x-forwarded-for"]);
 
-    console.log("📍 GEO:", geo);
+    // ✅ قائمة IPs المسموحة
+    const allowedIPs = [
+        "127.0.0.1",
+        "154.144.255.22"
+        //"10.50.223." // شبكة
+    ];
 
-    if (!geo || !geo.city) {
-        return deny(res, "❌ لا يمكن تحديد الموقع");
+    function isIPAllowed(ip) {
+        if (!ip) return false;
+
+        return allowedIPs.some(item => {
+            if (item.endsWith(".")) {
+                return ip.startsWith(item); // prefix
+            }
+            return ip === item; // exact match
+        });
     }
 
-    const city = geo.city.toLowerCase();
-
-    console.log("🏙️ City:", city);
-
-    if (!city.includes("marr")) {
-        console.log("🚫 Not Marrakech");
-        return deny(res, "🚫 فقط مراكش مسموح");
-    }
-
-    console.log("✅ داخل مراكش");
-
-    // 3️⃣ تحقق من VPN
-    const isVPN = await checkVPN(ip);
-
-    console.log("🛡️ VPN:", isVPN);
-
-    if (isVPN) {
-        return deny(res, "🚫 VPN غير مسموح");
-    }
-
-    console.log("✅ ALL CONDITIONS PASSED");
-
-    next();
-}
-
-// 🔍 VPN check
-async function checkVPN(ip) {
-    try {
-        const res = await axios.get(
-            `http://ip-api.com/json/${ip}?fields=proxy,hosting`
-        );
-
-        return res.data.proxy || res.data.hosting;
-    } catch (e) {
-        console.log("❌ VPN API error:", e.message);
-        return true; // fail = block
-    }
-}
-
-// ❌ deny
-function deny(res, msg) {
-    console.log("⛔ BLOCKED:", msg);
-
-    return res.status(403).send(`
-        <!DOCTYPE html>
+    if (!isIPAllowed(userIP)) {
+        return res.status(403).send(`
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -122,12 +84,14 @@ function deny(res, msg) {
   <div class="box">
     <h1>🚫 Accès refusé</h1>
     <p>Désolé, l’accès à l’application n’est pas disponible depuis votre emplacement actuel. Veuillez contacter le support pour obtenir de l’aide. ⚠️</p>
-    <p>${msg}</p>
     <a href="/">Retour</a>
   </div>
 </body>
 </html>
     `);
+    }
+
+    next();
 }
 
 module.exports = ipCheck;
