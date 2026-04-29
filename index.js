@@ -1444,14 +1444,10 @@ app.get("/api/searchee", isAuthenticated, async (req, res) => {
     };
 
     try {
-        const [bricoData, glovoData] = await Promise.all([
+        const [bricoData] = await Promise.all([
             safeFetch(bricoURL, {
                 ...baseHeaders,
                 Referer: "https://mrbricolage.ma"
-            }),
-            safeFetch(glovoURL, {
-                ...baseHeaders,
-                Referer: "https://glovoapp.com"
             })
         ]);
         clearTimeout(timeout);
@@ -1473,23 +1469,7 @@ app.get("/api/searchee", isAuthenticated, async (req, res) => {
             };
         });
 
-        // Glovo — إصلاح استخراج الصورة
-        const glovoItems = (glovoData?.results?.[0]?.products || []).map(p => {
-            const img = Array.isArray(p.imageUrl)
-                ? p.imageUrl[0]
-                : p.imageUrl || "";
-            return {
-                title: p.name || "",
-                desc: p.description || "",
-                price: p.priceInfo?.displayText || `${p.price} MAD`,
-                sku: p.externalId || "",
-                thumb: img || "https://via.placeholder.com/80?text=No+Image",
-                full_image: img || "https://via.placeholder.com/400",
-                source: "glovo"
-            };
-        });
-
-        const results = [...bricoItems, ...glovoItems];
+        const results = [...bricoItems];
         res.json({ count: results.length, results });
     } catch (err) {
         clearTimeout(timeout);

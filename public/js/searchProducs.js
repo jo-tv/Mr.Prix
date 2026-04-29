@@ -50,8 +50,8 @@ function fetchResults() {
                 return;
             }
             const rs = data.results;
-            const finResulte = rs.filter(num => num.title != "");
-            console.log(finResulte);
+            const finResulte = rs.filter(num => num.price != "");
+
             currentData = finResulte;
             currentPage = 1;
             showPage(currentPage);
@@ -106,6 +106,7 @@ function showPage(page) {
 function createPagination() {
     const totalPages = Math.ceil(currentData.length / itemsPerPage);
     const maxButtons = 5;
+    console.log(totalPages);
 
     paginationDiv.innerHTML = ""; // إعادة البناء بالكامل
 
@@ -114,6 +115,7 @@ function createPagination() {
         btn.textContent = text;
         if (active) btn.classList.add("active");
         if (disabled) btn.disabled = true;
+        totalPages == 1 ? (btn.style.display = "none") : null;
         btn.addEventListener("click", () => showPage(page));
         paginationDiv.appendChild(btn);
     };
