@@ -3,24 +3,14 @@
 // ====================================
 // التحقق من أن المستخدم مسجل الدخول
 // ====================================
-/* function isAuthenticated(req, res, next) {
+function isAuthenticated(req, res, next) {
     if (req.session && req.session.user) {
+        // console.log(req.session.user.deviceId);
         return next();
     }
 
     if (req.headers.accept && req.headers.accept.includes("text/html")) {
-        return res.redirect("/login");
-    }
-
-    return res.status(401).json({ error: "يجب تسجيل الدخول" });
-} */
-function isAuthenticated(req, res, next) {
-  if (req.session && req.session.user) {
-    return next();
-  }
-
-  if (req.headers.accept && req.headers.accept.includes("text/html")) {
-    return res.send(`
+        return res.send(`
           <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -118,43 +108,43 @@ function isAuthenticated(req, res, next) {
 </body>
 </html>
         `);
-  }
+    }
 
-  return res.status(401).json({ error: "يجب تسجيل الدخول" });
+    return res.status(401).json({ error: "يجب تسجيل الدخول" });
 }
 
 // ====================================
 // التحقق من أن المستخدم مسؤول (responsable)
 // ====================================
 function isResponsable(req, res, next) {
-  if (req.session.user && req.session.user.role === "responsable") {
-    return next();
-  }
+    if (req.session.user && req.session.user.role === "responsable") {
+        return next();
+    }
 
-  if (req.headers.accept && req.headers.accept.includes("text/html")) {
-    return res.redirect("/login");
-  }
+    if (req.headers.accept && req.headers.accept.includes("text/html")) {
+        return res.redirect("/login");
+    }
 
-  return res.status(403).json({ error: "هذه الصفحة مخصصة للمسؤول فقط" });
+    return res.status(403).json({ error: "هذه الصفحة مخصصة للمسؤول فقط" });
 }
 
 // ====================================
 // التحقق من أن المستخدم بائع (vendeur)
 // ====================================
 function isVendeur(req, res, next) {
-  if (req.session.user && req.session.user.role === "vendeur") {
-    return next();
-  }
+    if (req.session.user && req.session.user.role === "vendeur") {
+        return next();
+    }
 
-  if (req.headers.accept && req.headers.accept.includes("text/html")) {
-    return res.redirect("/login");
-  }
+    if (req.headers.accept && req.headers.accept.includes("text/html")) {
+        return res.redirect("/login");
+    }
 
-  return res.status(403).json({ error: "هذه الصفحة مخصصة للبائع فقط" });
+    return res.status(403).json({ error: "هذه الصفحة مخصصة للبائع فقط" });
 }
 
 module.exports = {
-  isAuthenticated,
-  isResponsable,
-  isVendeur
+    isAuthenticated,
+    isResponsable,
+    isVendeur
 };

@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Dashboard des Appareils</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+        />
+
+        <style>
+            :root {
+                --primary-color: #4e73df;
+                --bg-color: #f8f9fc;
+            }
+
+            body {
+                background-color: var(--bg-color);
+                font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            }
+
+            .main-card {
+                border: none;
+                border-radius: 12px;
+                box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+                margin-bottom: 2rem;
+                zoom: 0.8;
+                font-weight: 700;
+            }
+
+            .btn-action {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+            }
+
+            .status-badge {
+                padding: 0.6em 1em;
+                border-radius: 8px;
+                font-weight: 600;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container py-5">
+            <div class="card main-card">
+                <div class="card-header bg-white py-3">
+                    <h5 class="m-0 text-primary fw-bold">
+                        <i class="fa fa-plus-circle me-2"></i> Ajouter un
+                        Appareil
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold"
+                                >Nom d'utilisateur</label
+                            >
+                            <div class="input-group">
+                                <span class="input-group-text"
+                                    ><i class="fa fa-user text-muted"></i
+                                ></span>
+                                <input
+                                    id="username"
+                                    class="form-control"
+                                    placeholder="Ex: Jean_Dupont"
+                                />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold"
+                                >ID de l'appareil</label
+                            >
+                            <div class="input-group">
+                                <span class="input-group-text"
+                                    ><i class="fa fa-tablet-alt text-muted"></i
+                                ></span>
+                                <input
+                                    id="deviceId"
+                                    class="form-control"
+                                    placeholder="Ex: DEV-9988"
+                                />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Rôle</label>
+                            <select id="role" class="form-select">
+                                <option value="vendeur">🛒 Vendeur</option>
+                                <option value="responsable">
+                                    👨‍💼 Responsable
+                                </option>
+                                <option value="">👨‍💼 Responsable/Vendeur</option>
+                            </select>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button
+                                onclick="save()"
+                                class="btn btn-success px-4 shadow-sm"
+                            >
+                                <i class="fa fa-save me-2"></i> Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card main-card">
+                <div
+                    class="card-header bg-white d-flex justify-content-between align-items-center py-3"
+                >
+                    <h5 class="m-0 text-primary fw-bold">
+                        <i class="fa fa-list me-2"></i> Liste des Appareils
+                    </h5>
+                    <button
+                        onclick="loadDevices()"
+                        class="btn btn-sm btn-light border"
+                    >
+                        <i class="fa fa-sync"></i> Actualiser
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table
+                            id="devicesTable"
+                            class="table table-hover align-middle w-100"
+                        >
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID Appareil</th>
+                                    <th>Utilisateur</th>
+                                    <th>Rôle</th>
+                                    <th>Statut</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fa fa-edit me-2"></i>Modifier l'appareil
+                        </h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="editId" />
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold"
+                                >Nom d'utilisateur</label
+                            >
+                            <input id="editUsername" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold"
+                                >ID de l'appareil</label
+                            >
+                            <input id="editDeviceId" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Rôle</label>
+                            <select id="editRole" class="form-select">
+                                <option value="vendeur">🛒 Vendeur</option>
+                                <option value="responsable">
+                                    👨‍💼 Responsable
+                                </option>
+                                <option value="">👨‍💼 Responsable/vendeur</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Annuler
+                        </button>
+                        <button
+                            type="button"
+                            onclick="updateDevice()"
+                            class="btn btn-primary"
+                        >
+                            Enregistrer les modifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+        <script>
+            let table;
+            let editModal;
+
+            // 2. انتظر تحميل الصفحة بالكامل ثم قم بتهيئة الـ Modal
+            document.addEventListener("DOMContentLoaded", function () {
+                const modalElement = document.getElementById("editModal");
+                if (modalElement) {
+                    editModal = new bootstrap.Modal(modalElement);
+                }
+            });
+
+            $(document).ready(function () {
+                table = $("#devicesTable").DataTable({
+                    language: {
+                        url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json"
+                    },
+                    pageLength: 10,
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, "Tout"]
+                    ]
+                });
+                loadDevices();
+            });
+
+            // Alerts professionnelles
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+
+            async function loadDevices() {
+                try {
+                    const res = await fetch("/admin/devices");
+                    const data = await res.json();
+                    table.clear();
+
+                    data.forEach(d => {
+                        const status = d.active
+                            ? '<span class="badge bg-success-subtle text-success status-badge">Actif</span>'
+                            : '<span class="badge bg-danger-subtle text-danger status-badge">Bloqué</span>';
+
+                        const actions = `
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-outline-warning btn-action" onclick='openEditModal(${JSON.stringify(d)})' title="Modifier">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="btn btn-outline-primary btn-action" onclick="toggle('${d._id}')" title="Changer statut">
+                        <i class="fa fa-sync-alt"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-action" onclick="removeDevice('${d._id}')" title="Supprimer">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+            `;
+
+                        table.row.add([
+                            d.username,
+                            `<span class="fw-bold text-secondary">${d.deviceId}</span>`,
+
+                            `<span class="text-capitalize">${d.role|| "R/V"}</span>`,
+                            status,
+                            actions
+                        ]);
+                    });
+                    table.draw();
+                } catch (err) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "Erreur de chargement"
+                    });
+                }
+            }
+
+            // 2. وظيفة لفتح الـ Modal وتعبئة البيانات
+            function openEditModal(device) {
+                document.getElementById("editId").value = device._id;
+                document.getElementById("editUsername").value = device.username;
+                document.getElementById("editDeviceId").value = device.deviceId;
+                document.getElementById("editRole").value = device.role;
+                editModal.show();
+            }
+
+            // 3. وظيفة إرسال التحديثات للسيرفر
+            async function updateDevice() {
+                const id = document.getElementById("editId").value;
+                const updatedData = {
+                    username: document.getElementById("editUsername").value,
+                    deviceId: document.getElementById("editDeviceId").value,
+                    role: document.getElementById("editRole").value
+                };
+
+                try {
+                    const res = await fetch(`/admin/devices/update/${id}`, {
+                        // تأكد من مطابقة هذا المسار في الـ Backend
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(updatedData)
+                    });
+
+                    if (res.ok) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Mis à jour !",
+                            text: "Les données ont été modifiées avec succès.",
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        editModal.hide();
+                        loadDevices();
+                    } else {
+                        throw new Error();
+                    }
+                } catch (err) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Erreur",
+                        text: "Échec de la modification"
+                    });
+                }
+            }
+
+            async function save() {
+                const username = document.getElementById("username").value;
+                const deviceId = document.getElementById("deviceId").value;
+
+                if (!username || !deviceId) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Champs manquants",
+                        text: "Veuillez remplir toutes les informations.",
+                        confirmButtonColor: "#4e73df"
+                    });
+                    return;
+                }
+
+                try {
+                    const res = await fetch("/admin/devices/new", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            username,
+                            deviceId,
+                            role: document.getElementById("role").value
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Succès !",
+                        text: data.message || "Appareil ajouté avec succès",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    loadDevices();
+                } catch (err) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Erreur",
+                        text: "Impossible d'ajouter l'appareil"
+                    });
+                }
+            }
+
+            async function removeDevice(id) {
+                const result = await Swal.fire({
+                    title: "Êtes-vous sûr ?",
+                    text: "Cette action est irréversible !",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#e74a3b",
+                    cancelButtonColor: "#858796",
+                    confirmButtonText: "Oui, supprimer",
+                    cancelButtonText: "Annuler"
+                });
+
+                if (result.isConfirmed) {
+                    await fetch(`/admin/devices/${id}`, { method: "DELETE" });
+                    Toast.fire({
+                        icon: "success",
+                        title: "Supprimé avec succès"
+                    });
+                    loadDevices();
+                }
+            }
+
+            async function toggle(id) {
+                try {
+                    await fetch(`/admin/devices/${id}`, { method: "PUT" });
+                    Toast.fire({ icon: "info", title: "Statut mis à jour" });
+                    loadDevices();
+                } catch (err) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "Échec de l'opération"
+                    });
+                }
+            }
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

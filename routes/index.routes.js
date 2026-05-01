@@ -4,77 +4,79 @@ const router = express.Router();
 
 // استيراد الميدلوير
 const {
-  isAuthenticated,
-  isResponsable,
-  isVendeur
+    isAuthenticated,
+    isResponsable,
+    isVendeur
 } = require("../middlewares/auth");
 
 // ===================
 // الصفحة الرئيسية الخاصة بالمسؤول
 // ===================
 router.get("/", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/index.html"));
+    res.sendFile(path.join(__dirname, "../views/responsable/index.html"));
 });
 
 router.get("/upload", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/upload.html"));
+    res.sendFile(path.join(__dirname, "../views/responsable/upload.html"));
 });
 
 // صفحة الأسعار الخاصة بالمسؤول
 router.get("/prix", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/index.html"));
+    res.sendFile(path.join(__dirname, "../views/responsable/index.html"));
 });
 
 router.get("/cmd", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/search.html"));
+    res.sendFile(path.join(__dirname, "../views/responsable/search.html"));
 });
 
 router.get("/devisRS", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/DevisMagasin.html"));
+    res.sendFile(
+        path.join(__dirname, "../views/responsable/DevisMagasin.html")
+    );
 });
 
 router.get("/CHERCHER", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/CHERCHER.html"));
+    res.sendFile(path.join(__dirname, "../views/responsable/CHERCHER.html"));
 });
 
 router.get("/galerie", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/galerie.html"));
+    res.sendFile(path.join(__dirname, "../views/responsable/galerie.html"));
 });
 
 router.get("/totalProduit", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../views/responsable/produitCumil.html")
-  ); // ✅ صفحة فارغة مؤقتاً
+    res.sendFile(
+        path.join(__dirname, "../views/responsable/produitCumil.html")
+    ); // ✅ صفحة فارغة مؤقتاً
 });
 
 router.get("/infoPassPage", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/info.html")); // ✅ صفحة فارغة مؤقتاً
+    res.sendFile(path.join(__dirname, "../views/responsable/info.html")); // ✅ صفحة فارغة مؤقتاً
 });
 
 router.get("/pageUser", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/pageUser.html")); // ✅ صفحة فارغة مؤقتاً
+    res.sendFile(path.join(__dirname, "../views/responsable/pageUser.html")); // ✅ صفحة فارغة مؤقتاً
 });
 
 router.get("/dashboard", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/responsable/dashboard.html")); // ✅ صفحة فارغة مؤقتاً
+    res.sendFile(path.join(__dirname, "../views/responsable/dashboard.html")); // ✅ صفحة فارغة مؤقتاً
 });
 
 router.get("/listVendeurs", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../views/responsable/List-Vendeurs.html")
-  ); // ✅ صفحة فارغة مؤقتاً
+    res.sendFile(
+        path.join(__dirname, "../views/responsable/List-Vendeurs.html")
+    ); // ✅ صفحة فارغة مؤقتاً
 });
 
 router.get("/produitTotal", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../views/responsable/produitTotal.html")
-  ); // ✅ صفحة فارغة مؤقتاً
+    res.sendFile(
+        path.join(__dirname, "../views/responsable/produitTotal.html")
+    ); // ✅ صفحة فارغة مؤقتاً
 });
 
 router.get("/editProduitInv", isAuthenticated, isResponsable, (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../views/responsable/editProduitInv.html")
-  ); // ✅ صفحة فارغة مؤقتاً
+    res.sendFile(
+        path.join(__dirname, "../views/responsable/editProduitInv.html")
+    ); // ✅ صفحة فارغة مؤقتاً
 });
 
 // ===================
@@ -82,69 +84,102 @@ router.get("/editProduitInv", isAuthenticated, isResponsable, (req, res) => {
 // ===================
 
 router.get("/prixVen", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/prixVen.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/prixVen.html"));
 });
 
 router.get("/serchCode", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/searchCode.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/searchCode.html"));
 });
 
 router.get("/inventaire", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/inventaire.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/inventaire.html"));
 });
 
 router.get("/inventaire2", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/inventaire2.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/inventaire2.html"));
 });
 
 router.get("/Album", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/Album.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/Album.html"));
 });
 
 router.get("/table", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/chercher.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/chercher.html"));
 });
 
 router.get("/chart", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/chercher.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/chercher.html"));
 });
 
 router.get("/calc", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/calc.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/calc.html"));
 });
 
 router.get("/devis", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/Devis.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/Devis.html"));
 });
 
 router.get("/devisMagazin", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/DevisMagasin.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/DevisMagasin.html"));
 });
 
 router.get("/balisage", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/Balisage.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/Balisage.html"));
 });
 router.get("/afficheA7", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/afficheA7Group.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/afficheA7Group.html"));
 });
 router.get("/afficheA6", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/afficheA6.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/afficheA6.html"));
 });
 router.get("/afficheA5", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/afficheA5.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/afficheA5.html"));
 });
 router.get("/afficheA4", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/afficheA4.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/afficheA4.html"));
 });
 router.get("/test", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/tesTafficheA4.html"));
+    res.sendFile(path.join(__dirname, "../views/vendeur/tesTafficheA4.html"));
 });
 
 // إضافة نقطة GET لعرض البيانات في صفحة HTML
 router.get("/InvSmartManager", isAuthenticated, isVendeur, (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/vendeur/inventairePro.html")); // ✅ صفحة فارغة مؤقتاً
+    res.sendFile(path.join(__dirname, "../views/vendeur/inventairePro.html")); // ✅ صفحة فارغة مؤقتاً
 });
 // ================================
 //fin صفحة الأسعار الخاصة بالبائع
 // =================================
+// ======================================
+// جلب بيانات الدور الحالي للمستخدم
+// ======================================
+router.get("/get-role", isAuthenticated, (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: "غير مصرح" });
+    }
+    res.json({ role: req.session.user.role });
+});
+// ======================================
+// صفحة تسجيل الدخول (إذا كان مسجلاً يتم منعه من الدخول إليها)
+// =====================================
+router.get("/login", (req, res) => {
+    // إذا كان مسجلاً بالفعل، أعد توجيهه حسب دوره
+    if (req.session && req.session.user) {
+        return res.redirect(
+            req.session.user.role === "vendeur" ? "/prixVen" : "/"
+        );
+    }
+    res.sendFile(path.join(__dirname, "../views/login-register/login.html"));
+});
+// ======================================
+// صفحة التسجيل (نفس منطق صفحة تسجيل الدخول)
+// ======================================
+router.get("/tassgile", (req, res) => {
+    if (req.session && req.session.user) {
+        return res.redirect(
+            req.session.user.role === "vendeur" ? "/prixVen" : "/"
+        );
+    }
+    res.sendFile(path.join(__dirname, "../views/login-register/register.html"));
+});
+
 module.exports = router;

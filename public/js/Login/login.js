@@ -1,26 +1,32 @@
-
-
 document.addEventListener("DOMContentLoaded", () => {
+    // =========================
+    // ⚙️ إعدادات
+    // =========================
+    const MAX_ATTEMPTS = 4;
+
+    // =========================
+    // 🎯 العناصر
+    // =========================
     const form = document.getElementById("loginForm");
     const usernameInput = form.elements["username"];
     const passwordInput = form.elements["password"];
-    const submitButton = form.querySelector("#submit");
+    const submitButton = document.getElementById("submit");
 
     const infoDiv = document.getElementById("infoBox");
     const messageBox = document.getElementById("messageBox");
 
-    const MAX_ATTEMPTS = 4;
-    const BLOCK_MINUTES = 15;
+    let timer = null;
 
-    // عرض رسالة
+    // =========================
+    // 💬 UI
+    // =========================
     const showMessage = (message, color = "#f44336") => {
         messageBox.textContent = message;
         infoDiv.style.backgroundColor = color;
-        infoDiv.style.color = "white";
         infoDiv.style.opacity = "1";
+        infoDiv.style.color = "#fff";
     };
 
-    // إخفاء الرسالة
     const hideMessage = () => {
         infoDiv.style.opacity = "0";
     };
@@ -37,45 +43,81 @@ document.addEventListener("DOMContentLoaded", () => {
         submitButton.disabled = false;
     };
 
-    const getLoginState = () => {
-        const state = localStorage.getItem("loginState");
-        return state ? JSON.parse(state) : { attempts: 0, blockUntil: 0 };
+    // =========================
+    // 💾 STORAGE (موحد)
+    // =========================
+    const getState = () => {
+        return (
+            JSON.parse(localStorage.getItem("authState")) || {
+                attempts: 0,
+                blockUntil: 0
+            }
+        );
     };
 
-    const setLoginState = (attempts, blockUntil = 0) => {
+    const setState = (attempts = 0, blockUntil = 0) => {
         localStorage.setItem(
-            "loginState",
+            "authState",
             JSON.stringify({ attempts, blockUntil })
         );
     };
 
-    const checkBlockStatus = () => {
-        const { attempts, blockUntil } = getLoginState();
+    const clearState = () => {
+        localStorage.removeItem("authState");
+    };
+
+    // =========================
+    // 🔒 BLOCK SYSTEM
+    // =========================
+    const lockForm = (minutes, message) => {
+        const blockUntil = Date.now() + minutes * 60 * 1000;
+
+        setState(0, blockUntil);
+
+        showMessage(message, "#ff9800");
+        disableForm();
+
+        startTimer();
+    };
+
+    const startTimer = () => {
+        if (timer) clearTimeout(timer);
+
+        const state = getState();
         const now = Date.now();
 
-        if (blockUntil && now < blockUntil) {
-            const remaining = Math.ceil((blockUntil - now) / 60000);
+        if (state.blockUntil && now < state.blockUntil) {
+            const remaining = state.blockUntil - now;
+
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+
             showMessage(
-                `تم حظرك مؤقتاً. الرجاء الانتظار ${remaining} دقيقة.`,
+                `🚫 تم حظر الوصول. الوقت المتبقي: ${minutes} دقيقة و ${seconds} ثانية`,
                 "#ff9800"
             );
+
             disableForm();
-            setTimeout(checkBlockStatus, 60000); // إعادة التحقق كل دقيقة
+
+            timer = setTimeout(startTimer, 1000);
         } else {
+            clearState();
             enableForm();
             hideMessage();
-            setLoginState(0); // إعادة المحاولات
         }
     };
 
+    // =========================
+    // 🔐 LOGIN
+    // =========================
     form.addEventListener("submit", async e => {
         e.preventDefault();
 
-        const { attempts, blockUntil } = getLoginState();
-        const now = Date.now();
+        const state = getState();
 
-        if (blockUntil && now < blockUntil) {
-            showMessage(`أنت محظور مؤقتًا. الرجاء الانتظار.`, "#ff9800");
+        // 🔒 إذا محظور
+        if (state.blockUntil && Date.now() < state.blockUntil) {
+            startTimer();
             return;
         }
 
@@ -83,78 +125,112 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = passwordInput.value.trim();
 
         try {
+            const fp = await FingerprintJS.load();
+            const result = await fp.get();
+            const deviceId = result.visitorId;
+
             const res = await fetch("/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username, password, deviceId })
             });
 
-            if (res.ok) {
-                localStorage.removeItem("loginState");
-                const result = await res.json();
+            const data = await res.json();
+            const status = data.status;
 
-                submitButton.classList.add("pending");
-                submitButton.classList.add("granted");
+            // =========================
+            // ❌ NEW DEVICE
+            // =========================
+            if (status === "new_device") {
+                lockForm(
+                    2,
+                    "📱 الدخول غير مسموح من هذا الجهاز. اتصل بالإدارة."
+                );
 
-                showMessage("تم تسجيل الدخول بنجاح", "#4CAF50");
+                const phone = "212601862102";
+                const msg = encodeURIComponent(
+                    `📌 *تنبيه: طلب تسجيل  المرجوا ادخال اسم الكامل فقط *
+                      👤 الاسم الكامل: 
+                      📱 معرّف الجهاز:
+                      ${data.deviceId}
+                      ⏳ الحالة: بانتظار الموافقة
+                      🔒 يرجى التحقق قبل الإجراء`
+                );
 
-                // إعادة التوجيه حسب الدور
-                const roleRes = await fetch("/get-role");
-                const user = await roleRes.json();
+                window.open(`https://wa.me/${phone}?text=${msg}`);
+                return;
+            }
 
-                setTimeout(() => {
-                    if (user.role === "vendeur") {
-                        window.location.href = "/prixVen";
-                    } else if (user.role === "responsable") {
-                        window.location.href = "/prix";
-                    }
-                }, 1000);
-            } else {
-                const message = await res.text();
-                const newAttempts = attempts + 1;
+            // =========================
+            // ❌ WRONG PASSWORD
+            // =========================
+            if (status === "wrong_credentials" || status === "user_not_found") {
+                const newAttempts = state.attempts + 1;
 
                 if (newAttempts >= MAX_ATTEMPTS) {
-                    const newBlockUntil =
-                        Date.now() + BLOCK_MINUTES * 60 * 1000;
-                    setLoginState(newAttempts, newBlockUntil);
-                    showMessage(
-                        `تم تجاوز عدد المحاولات. الرجاء الانتظار ${BLOCK_MINUTES} دقيقة.`,
-                        "#ff9800"
+                    lockForm(
+                        20,
+                        "🚫 تجاوزت الحد المسموح من المحاولات. الحساب محظور لمدة 20 دقيقة."
                     );
-                    disableForm();
-                    setTimeout(checkBlockStatus, 60000);
                 } else {
-                    setLoginState(newAttempts);
+                    setState(newAttempts, 0);
+
                     showMessage(
-                        `بيانات غير صحيحة. المحاولة (${newAttempts}/${MAX_ATTEMPTS})`
+                        `❌ الحد مسموح به (${newAttempts}/${MAX_ATTEMPTS})`,
+                        "#f44336"
                     );
                 }
+
+                return;
             }
+
+            // =========================
+            // ❌ BLOCKED
+            // =========================
+            if (status === "blocked") {
+                lockForm(20, "​🚫 تم تقييد الوصول: صلاحيات غير كافية");
+                return;
+            }
+
+            // =========================
+            // ✅ SUCCESS
+            // =========================
+            if (status === "ok") {
+                clearState();
+
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+
+                enableForm();
+                hideMessage();
+
+                showMessage("✅ تم تسجيل الدخول بنجاح", "#4CAF50");
+
+                setTimeout(() => {
+                    window.location.href =
+                        data.role === "vendeur" ? "/prixVen" : "/prix";
+                }, 800);
+
+                return;
+            }
+
+            showMessage("❌ Erreur serveur", "#f44336");
         } catch (err) {
             console.error(err);
-            showMessage("فشل الاتصال بالخادم. حاول لاحقاً.");
+            showMessage("❌ خطأ في الاتصال");
         }
     });
-    checkBlockStatus();
-});
 
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker
-        .register("/service-worker.js")
-        .then(() => console.log("Service Worker registered"))
-        .catch(err => console.error("SW registration failed:", err));
-}
-navigator.geolocation.getCurrentPosition(async (pos) => {
-
-    await fetch("/verify-gps", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude
-        })
-    });
-
-}, () => {
-    alert("⚠️ يجب السماح بالموقع");
+    // =========================
+    // 🚀 INIT
+    // =========================
+    startTimer();
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+            .register("/service-worker.js")
+            .then(() => console.log("Service Worker registered"))
+            .catch(err => console.error("SW registration failed:", err));
+    }
 });

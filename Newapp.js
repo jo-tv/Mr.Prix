@@ -6,6 +6,7 @@ const compression = require("compression");
 const path = require("path");
 const XLSX = require("xlsx");
 require("dotenv").config();
+const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
 const serverless = require("serverless-http");
 const http = require("http");
@@ -17,6 +18,7 @@ const { v2: cloudinary } = require("cloudinary");
 // استدعاء نموذج المستخدم - تأكد من المسار الصحيح
 // ===============================================
 const User = require("./models/user.js");
+const Device = require("./models/Device.js");
 const Inventaire = require("./models/Inventaire.js");
 const Product = require("./models/Product.js");
 const PagePasswords = require("./models/PagePasswords.js");
@@ -106,7 +108,7 @@ const MongoStore = require("connect-mongo");
 
 app.use(
     session({
-        secret: "secret-key",
+        secret: "7f8b9c2a5d1e4f3a6b8c0d9e2f1a3b5c7d9e0f2a4b6c8d0e1f3a5b7c9d1e3f5a",
         resave: false,
         saveUninitialized: false,
         store: MongoStore.create({
@@ -465,106 +467,302 @@ app.post("/register", async (req, res) => {
     }
 });
 // ======================================
-// معالجة بيانات تسجيل الدخول
+// 🔐 إعدادات الحماية
 // ======================================
-const loginAttempts = {}; // تخزين مؤقت للمحاولات
 
-const MAX_ATTEMPTS = 4;
-const BLOCK_DURATION = 15 * 60 * 1000; // 15 دقيقة
+const loginAttempts = {}; // تخزين محاولات تسجيل الدخول
+const blockedDevices = {}; // تخزين الأجهزة المحظورة مؤقتًا
+
+const MAX_ATTEMPTS = 4; // أقصى عدد محاولات
+const BLOCK_DURATION = 15 * 60 * 1000; // 15 دقيقة (للمستخدم)
+const BLOCK_DEVICE_DURATION = 15 * 60 * 1000; // 15 دقيقة (للجهاز)
+
 // ======================================
-// Middleware: الحد من المحاولات
+// 🛡️ Middleware: الحد من المحاولات
 // ======================================
 const loginRateLimiter = (req, res, next) => {
     const { username } = req.body;
+
     if (!username) {
-        return res.status(400).send("الرجاء إدخال اسم المستخدم");
+        return res.status(400).json({
+            message: "اسم المستخدم مطلوب"
+        });
     }
 
     const attempts = loginAttempts[username];
 
     if (attempts) {
-        const timeSinceLastAttempt = Date.now() - attempts.lastAttempt;
+        const diff = Date.now() - attempts.lastAttempt;
 
+        // ❌ تجاوز عدد المحاولات
         if (attempts.count >= MAX_ATTEMPTS) {
-            if (timeSinceLastAttempt < BLOCK_DURATION) {
-                const minutesLeft = Math.ceil(
-                    (BLOCK_DURATION - timeSinceLastAttempt) / 60000
-                );
-                return res
-                    .status(429)
-                    .send(
-                        `لقد تجاوزت عدد المحاولات المسموح بها. يرجى المحاولة بعد ${minutesLeft} دقيقة.`
-                    );
-            } else {
-                // إعادة التعيين بعد انتهاء المدة
-                delete loginAttempts[username];
+            if (diff < BLOCK_DURATION) {
+                const minutesLeft = Math.ceil((BLOCK_DURATION - diff) / 60000);
+
+                return res.status(429).json({
+                    message: `🚫 تم حظر الحساب مؤقتًا. حاول بعد ${minutesLeft} دقيقة`
+                });
             }
+
+            // ✅ انتهت مدة الحظر
+            delete loginAttempts[username];
         }
     }
 
     next();
 };
+
 // ======================================
-// زيادة المحاولات عند الفشل
+// ❌ تسجيل محاولة فاشلة
 // ======================================
 const registerFailedAttempt = username => {
     const now = Date.now();
+
     if (!loginAttempts[username]) {
-        loginAttempts[username] = { count: 1, lastAttempt: now };
+        loginAttempts[username] = {
+            count: 1,
+            lastAttempt: now
+        };
     } else {
         loginAttempts[username].count += 1;
         loginAttempts[username].lastAttempt = now;
     }
 };
+
 // ======================================
-// إعادة تعيين المحاولات عند النجاح
+// ✅ إعادة تعيين المحاولات
 // ======================================
 const resetAttempts = username => {
     delete loginAttempts[username];
 };
-// ======================================
-// مسار تسجيل الدخول
-// ======================================
-const { v4: uuidv4 } = require("uuid");
 
-app.post("/login", async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        return res
-            .status(400)
-            .json({ message: "الرجاء إدخال اسم المستخدم وكلمة المرور" });
+// ======================================
+// 🔒 فحص حظر الجهاز
+// ======================================
+const checkDeviceBlock = deviceId => {
+    const blockedAt = blockedDevices[deviceId];
+
+    if (!blockedAt) return null;
+
+    const diff = Date.now() - blockedAt;
+
+    // ❌ الجهاز مازال محظور
+    if (diff < BLOCK_DEVICE_DURATION) {
+        const minutesLeft = Math.ceil((BLOCK_DEVICE_DURATION - diff) / 60000);
+
+        return `🚫 الجهاز موقوف. حاول بعد ${minutesLeft} دقيقة`;
     }
+
+    // ✅ انتهى الحظر
+    delete blockedDevices[deviceId];
+    return null;
+};
+
+// ============================
+// 🧠 LOGIN ROUTE CLEAN VERSION
+// ============================
+app.post("/login", loginRateLimiter, async (req, res) => {
+    const { username, password, deviceId } = req.body;
 
     try {
+        // ============================
+        // 🧪 تحقق من البيانات
+        // ============================
+        if (!username || !password || !deviceId) {
+            return res.status(400).json({
+                status: "missing_fields",
+                message: "جميع الحقول مطلوبة"
+            });
+        }
+
+        // ============================
+        // 🔍 البحث عن المستخدم
+        // ============================
         const user = await User.findOne({ username });
+
         if (!user) {
-            return res
-                .status(401)
-                .json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
+            registerFailedAttempt(username);
+
+            return res.status(401).json({
+                status: "user_not_found",
+                message: "بيانات خاطئة"
+            });
         }
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) {
-            return res
-                .status(401)
-                .json({ message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
+        // ============================
+        // 🔐 التحقق من كلمة السر
+        // ============================
+        const match = await bcrypt.compare(password, user.password);
+
+        if (!match) {
+            registerFailedAttempt(username);
+
+            const attempts = loginAttempts[username]?.count || 0;
+
+            if (attempts >= MAX_ATTEMPTS) {
+                loginAttempts[username].blockUntil =
+                    Date.now() + BLOCK_DURATION;
+
+                return res.status(429).json({
+                    status: "blocked",
+                    message: "🚫 Trop de tentatives. Compte bloqué 20 minutes.",
+                    blockUntil: loginAttempts[username].blockUntil
+                });
+            }
+
+            return res.status(401).json({
+                status: "wrong_credentials",
+                message: "بيانات خاطئة",
+                attempts
+            });
         }
 
-        // إنشاء معرف فريد للجلسة لكل تسجيل دخول
+        // ============================
+        // 📱 تحقق من الجهاز
+        // ============================
+        const device = await Device.findOne({ deviceId });
+
+        // ❌ جهاز غير مسجل
+        if (!device) {
+            // حظر مؤقت للجهاز
+            blockedDevices[deviceId] = Date.now();
+
+            return res.json({
+                status: "new_device",
+                message: "📱 جهاز غير مسجل",
+                deviceId
+            });
+        }
+
+        // ❌ جهاز غير مفعل
+        if (!device.active) {
+            return res.json({
+                status: "blocked",
+                message: "🚫 الجهاز غير مفعل"
+            });
+        }
+
+        // ============================
+        // ✅ نجاح تسجيل الدخول
+        // ============================
+        resetAttempts(username);
+
         const sessionId = uuidv4();
 
-        // حفظ بيانات المستخدم في الجلسة مع معرف فريد
         req.session.user = {
             username: user.username,
-            role: user.role,
-            sessionId // معرف فريد لكل جهاز/جلسة
+            nameId: device.username,
+            role: device.role || user.role,
+            deviceId,
+            sessionId
         };
 
-        return res.status(200).json({ message: "success" });
+        return res.json({
+            status: "ok",
+            role: device.role
+        });
+    } catch (err) {
+        console.error("🔥 LOGIN ERROR:", err);
+
+        return res.status(500).json({
+            status: "server_error",
+            message: "خطأ في السيرفر"
+        });
+    }
+});
+
+app.get("/admin/devices/new", (req, res) => {
+    res.sendFile(__dirname + "/views/responsable/Iddevace.html");
+
+    app.get(
+        "/admin/devices",
+
+        async (req, res) => {
+            try {
+                const devices = await Device.find(); // بدون populate
+
+                res.json(devices);
+            } catch (err) {
+                console.error("ERROR:", err);
+                res.status(500).json({
+                    message: "خطأ في السيرفر",
+                    error: err.message
+                });
+            }
+        }
+    );
+});
+app.post("/admin/devices/new", async (req, res) => {
+    const { username, deviceId, role } = req.body;
+
+    try {
+        const device = await Device.create({
+            deviceId,
+            role,
+            username,
+            active: true
+        });
+
+        res.json({
+            message: "✅ تم تسجيل الجهاز",
+            device
+        });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ message: "حدث خطأ أثناء تسجيل الدخول" });
+        res.status(500).json({
+            message: "خطأ في السيرفر"
+        });
     }
+});
+app.put("/admin/devices/:id", async (req, res) => {
+    const device = await Device.findById(req.params.id);
+
+    device.active = !device.active;
+    await device.save();
+
+    res.json({ message: "تم التحديث" });
+});
+// Route: PUT /admin/devices/update/:id
+app.put("/admin/devices/update/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { username, deviceId, role } = req.body;
+
+        // تحديث البيانات بناءً على الـ ID
+        const updatedDevice = await Device.findByIdAndUpdate(
+            id,
+            {
+                username,
+                deviceId,
+                role
+            },
+            { new: true, runValidators: true } // new: true ليعيد البيانات بعد التعديل
+        );
+
+        if (!updatedDevice) {
+            return res.status(404).json({
+                success: false,
+                message: "Appareil non trouvé"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Appareil mis à jour avec succès !",
+            data: updatedDevice
+        });
+    } catch (error) {
+        console.error("Erreur Update:", error);
+        res.status(500).json({
+            success: false,
+            message: "Erreur lors de la mise à jour des données"
+        });
+    }
+});
+
+app.delete("/admin/devices/:id", async (req, res) => {
+    await Device.findByIdAndDelete(req.params.id);
+    res.json({ message: "تم الحذف" });
 });
 // ======================================
 // جلب بيانات الدور الحالي للمستخدم
@@ -1495,7 +1693,6 @@ app.get("/export-inventaire", exportInventaireXLSX);
 // ========================================
 //  code shearch product to site web MR
 // ========================================
-
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
