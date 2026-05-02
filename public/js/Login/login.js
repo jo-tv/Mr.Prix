@@ -161,9 +161,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
                 // window.open(`https://wa.me/${phone}?text=${msg}`);
-                const intentUrl = `intent://send?phone=${phone}&text=${msg}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
-                window.location.href = intentUrl;
+                
+// رابط التطبيق (Android intent)
+const intentUrl = `intent://send?phone=${phone}&text=${msg}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
 
+// رابط الويب fallback
+const webUrl = `https://wa.me/${phone}?text=${msg}`;
+
+// نحاول فتح التطبيق
+window.location.href = intentUrl;
+
+// بعد وقت قصير، إذا لم يفتح التطبيق، نحول للويب
+setTimeout(() => {
+  window.location.href = webUrl;
+}, 1500);
                 return;
             }
 
