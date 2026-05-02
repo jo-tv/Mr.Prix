@@ -572,3 +572,11 @@ h6 {
     font-weight: bold;
     direction: rtl;
 }
+@media (min-width: 998px) {
+    .tile {
+        zoom: 1.5;
+    }
+    .info{
+      top: 5% !important;
+    }
+}
