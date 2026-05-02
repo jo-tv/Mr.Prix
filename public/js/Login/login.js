@@ -149,15 +149,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const phone = "212601862102";
                 const msg = encodeURIComponent(
-                    `📌 *تنبيه: طلب تسجيل  المرجوا ادخال اسم الكامل فقط *
-                      👤 الاسم الكامل: 
-                      📱 معرّف الجهاز:
-                      ${data.deviceId}
-                      ⏳ الحالة: بانتظار الموافقة
-                      🔒 يرجى التحقق قبل الإجراء`
+                    `🔔 *إشعار نظام التسجيل*
+---------------------------------
+✅   يرجى اضافة اسم كامل قبل ارسال 
+👤 الاسم: 
+=================
+📱 المعرّف: ${data.deviceId}
+🔄 الحالة: #قيد_المراجعة
+----------------------------------
+                `
                 );
 
-                window.open(`https://wa.me/${phone}?text=${msg}`);
+                // window.open(`https://wa.me/${phone}?text=${msg}`);
+                const intentUrl = `intent://send?phone=${phone}&text=${msg}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+                window.location.href = intentUrl;
+
                 return;
             }
 

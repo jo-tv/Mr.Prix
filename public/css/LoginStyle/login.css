@@ -576,7 +576,8 @@ h6 {
     .tile {
         zoom: 1.5;
     }
-    .info{
-      top: 5% !important;
+    .info {
+        top: 5% !important;
+        zoom: 1.3;
     }
 }

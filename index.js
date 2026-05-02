@@ -658,6 +658,7 @@ app.post("/login", loginRateLimiter, async (req, res) => {
 
 app.get("/admin/devices/new", isAuthenticated, isResponsable, (req, res) => {
     res.sendFile(__dirname + "/views/responsable/Iddevace.html");
+    
     app.get("/admin/devices", async (req, res) => {
         try {
             const devices = await Device.find(); // بدون populate
