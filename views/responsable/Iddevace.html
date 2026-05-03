@@ -21,7 +21,11 @@
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
         />
-
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="/css/navb.css" />
         <style>
             :root {
                 --primary-color: #4e73df;
@@ -220,6 +224,24 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+        <!--nav FAB Button -->
+        <div class="containeer">
+            <div class="menu-toggle">
+                <span class="fa fa-plus"></span>
+            </div>
+            <div class="menu-round">
+                <div class="btn-app" data-label=" view session">
+                    <div class="fa">
+                        <a href="/admin/devices/session"
+                            ><i
+                                class="fa-solid fa-circle-left"
+                                style="color: white"
+                            ></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script>
             let table;
             let editModal;
@@ -284,7 +306,7 @@
                             d.username,
                             `<span class="fw-bold text-secondary">${d.deviceId}</span>`,
 
-                            `<span class="text-capitalize">${d.role|| "R/V"}</span>`,
+                            `<span class="text-capitalize">${d.role || "R/V"}</span>`,
                             status,
                             actions
                         ]);
@@ -424,6 +446,21 @@
                         title: "Échec de l'opération"
                     });
                 }
+            }
+            const menuToggle = document.querySelector(".menu-toggle");
+            const menuRound = document.querySelector(".menu-round");
+            const menuLines = document.querySelectorAll(".menu-line");
+            const btnApp = document.querySelectorAll(".btn-app");
+            if (menuToggle) {
+                menuToggle.addEventListener("click", () => {
+                    menuToggle.classList.toggle("open");
+                    menuRound.classList.toggle("open");
+                    menuLines.forEach(line => line.classList.toggle("open"));
+
+                    btnApp.forEach(e => {
+                        e.classList.toggle("active");
+                    });
+                });
             }
         </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

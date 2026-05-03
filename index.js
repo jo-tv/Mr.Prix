@@ -23,6 +23,7 @@ const Inventaire = require("./models/Inventaire.js");
 const Product = require("./models/Product.js");
 const PagePasswords = require("./models/PagePasswords.js");
 const ipCheck = require("./middlewares/ipCheck.js");
+const sessionDeviceMiddleware = require("./middlewares/sessionSecurity.js");
 const {
     isAuthenticated,
     isResponsable,
@@ -106,22 +107,11 @@ app.use(express.json({ limit: "10mb" }));
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 
-app.use(
-    session({
-        secret: "7f8b9c2a5d1e4f3a6b8c0d9e2f1a3b5c7d9e0f2a4b6c8d0e1f3a5b7c9d1e3f5a",
-        resave: false,
-        saveUninitialized: false,
-        store: MongoStore.create({
-            mongoUrl: process.env.MONGO_URI, // أو ضع الرابط مباشرة للتجربة
-            collectionName: "sessions"
-        }),
-        cookie: {
-            secure: false, // اجعلها true إذا كنت تستخدم HTTPS
-            maxAge: 1000 * 60 * 60 * 4 // مدة الجلسة: يوم واحد
-        }
-    })
-);
+const sessionConfig = require("./middlewares/session");
 
+app.use(sessionConfig);
+
+app.use(sessionDeviceMiddleware);
 // ===============================================
 // ✅ إعداد آمن مع البروكسي
 // ==============================================
@@ -637,6 +627,7 @@ app.post("/login", loginRateLimiter, async (req, res) => {
         req.session.user = {
             username: user.username,
             nameId: device.username,
+            active: device.active,
             role: device.role || user.role,
             deviceId,
             sessionId
@@ -658,7 +649,7 @@ app.post("/login", loginRateLimiter, async (req, res) => {
 
 app.get("/admin/devices/new", isAuthenticated, isResponsable, (req, res) => {
     res.sendFile(__dirname + "/views/responsable/Iddevace.html");
-    
+
     app.get("/admin/devices", async (req, res) => {
         try {
             const devices = await Device.find(); // بدون populate
@@ -673,6 +664,102 @@ app.get("/admin/devices/new", isAuthenticated, isResponsable, (req, res) => {
         }
     });
 });
+app.get(
+    "/admin/devices/session",
+    isAuthenticated,
+    isResponsable,
+    (req, res) => {
+        res.sendFile(__dirname + "/views/responsable/Session.html");
+
+        app.get("/admin/devices", async (req, res) => {
+            try {
+                const devices = await Device.find(); // بدون populate
+
+                res.json(devices);
+            } catch (err) {
+                console.error("ERROR:", err);
+                res.status(500).json({
+                    message: "خطأ في السيرفر",
+                    error: err.message
+                });
+            }
+        });
+    }
+);
+app.get("/admin/sessions", isAuthenticated, isResponsable, async (req, res) => {
+    try {
+        const store = req.sessionStore;
+        store.all((err, sessions) => {
+            if (err) {
+                return res
+                    .status(500)
+                    .json({ error: "Failed to fetch sessions" });
+            }
+            const parsed = Object.entries(sessions).map(([id, data]) => {
+                let sessionData = data;
+
+                // بعض stores كيخزنوها string
+                if (typeof data.session === "string") {
+                    try {
+                        sessionData = JSON.parse(data.session);
+                    } catch (e) {}
+                }
+
+                return {
+                    sessionId: id,
+                    user: sessionData.user || null,
+                    expires: sessionData.cookie?.expires || null,
+                    ip: sessionData.firstIp || null,
+                    ua: sessionData.firstUA || null
+                };
+            });
+
+            res.json(parsed);
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+app.delete(
+    "/admin/sessions",
+    isAuthenticated,
+    isResponsable,
+    async (req, res) => {
+        const collection = mongoose.connection.collection("sessions");
+
+        await collection.deleteMany({});
+        await req.session.destroy(() => {});
+        res.json({ message: "All sessions deleted" });
+    }
+);
+
+app.delete(
+    "/admin/sessions/:id",
+    isAuthenticated,
+    isResponsable,
+    async (req, res) => {
+        try {
+            const collection = mongoose.connection.collection("sessions");
+
+            
+
+            const result = await collection.deleteOne({
+                _id: req.params.id
+            });
+
+            
+
+            res.json({
+                message: "Session deleted",
+                deleted: result.deletedCount
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "error" });
+        }
+    }
+);
 app.post("/admin/devices/new", async (req, res) => {
     const { username, deviceId, role } = req.body;
 
@@ -701,12 +788,55 @@ app.put(
     isAuthenticated,
     isResponsable,
     async (req, res) => {
-        const device = await Device.findById(req.params.id);
+        try {
+            const device = await Device.findById(req.params.id);
 
-        device.active = !device.active;
-        await device.save();
+            if (!device) {
+                return res.status(404).json({ message: "Device not found" });
+            }
 
-        res.json({ message: "تم التحديث" });
+            device.active = !device.active;
+            await device.save();
+
+            const collection = mongoose.connection.collection("sessions");
+
+            const sessions = await collection.find().toArray();
+
+            let destroyed = 0;
+
+            for (const s of sessions) {
+                let sessionData;
+
+                try {
+                    sessionData = JSON.parse(s.session);
+                } catch {
+                    continue;
+                }
+
+                const sessionDeviceId = sessionData?.user?.deviceId;
+
+                if (
+                    sessionDeviceId &&
+                    String(sessionDeviceId) === String(device.deviceId)
+                ) {
+                    console.log("🔥 MATCH → deleting real session:", s._id);
+
+                    await collection.deleteOne({ _id: s._id });
+
+                    destroyed++;
+                }
+            }
+
+            console.log("🎯 Total destroyed:", destroyed);
+
+            res.json({
+                message: "Sessions deleted from Mongo مباشرة",
+                destroyed
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Server error" });
+        }
     }
 );
 
@@ -1654,7 +1784,6 @@ app.get("/export-inventaire", exportInventaireXLSX);
  console.log("⏰ Cron Job: Envoi inventaire quotidien");
  await exportInventaireXLSX();
 });  */
-
 // ========================================
 //  code shearch product to site web MR
 // ========================================
