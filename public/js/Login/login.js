@@ -127,8 +127,73 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const fp = await FingerprintJS.load();
             const result = await fp.get();
-            const deviceId = result.visitorId;
 
+            // =========================
+            // Canvas Fingerprint
+            // =========================
+            function canvasFP() {
+                try {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+
+                    ctx.textBaseline = "top";
+                    ctx.font = "14px Arial";
+                    ctx.fillStyle = "#f60";
+                    ctx.fillRect(0, 0, 100, 50);
+
+                    ctx.fillStyle = "#069";
+                    ctx.fillText("FingerprintJS-Canvas", 2, 2);
+
+                    ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+                    ctx.fillText("DeviceCheck", 4, 20);
+
+                    return canvas.toDataURL();
+                } catch (e) {
+                    return "canvas-error";
+                }
+            }
+
+            // =========================
+            // SHA-256 HASH
+            // =========================
+            async function sha256(str) {
+                const buffer = new TextEncoder().encode(str);
+                const hash = await crypto.subtle.digest("SHA-256", buffer);
+                return [...new Uint8Array(hash)]
+                    .map(b => b.toString(16).padStart(2, "0"))
+                    .join("");
+            }
+
+            // =========================
+            // Extra signals
+            // =========================
+            const extra = {
+                lang: navigator.language,
+                cores: navigator.hardwareConcurrency,
+                memory: navigator.deviceMemory || 0,
+                screen: `${screen.width}x${screen.height}`,
+                colorDepth: screen.colorDepth,
+                canvas: canvasFP()
+            };
+
+            // =========================
+            // Build raw fingerprint
+            // =========================
+            const rawString = JSON.stringify({
+                fp: result.visitorId,
+                ...extra
+            });
+
+            // =========================
+            // Strong Device ID
+            // =========================
+            const deviceId = await sha256(rawString);
+
+            console.log("Strong Device ID:", deviceId);
+
+            // =========================
+            // LOGIN REQUEST
+            // =========================
             const res = await fetch("/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -148,38 +213,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
                 const phone = "212601862102";
+
                 const msg = encodeURIComponent(
                     `🔔 *إشعار نظام التسجيل*
 ---------------------------------
-✅   يرجى اضافة اسم كامل قبل ارسال 
-👤 الاسم: 
-=================
+👤 الاسم:
 📱 المعرّف: ${data.deviceId}
 🔄 الحالة: #قيد_المراجعة
-----------------------------------
-                `
+----------------------------------`
                 );
 
-                // window.open(`https://wa.me/${phone}?text=${msg}`);
-                
-// رابط التطبيق (Android intent)
-const intentUrl = `intent://send?phone=${phone}&text=${msg}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+                const intentUrl = `intent://send?phone=${phone}&text=${msg}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+                const webUrl = `https://wa.me/${phone}?text=${msg}`;
 
-// رابط الويب fallback
-const webUrl = `https://wa.me/${phone}?text=${msg}`;
+                window.location.href = intentUrl;
 
-// نحاول فتح التطبيق
-window.location.href = intentUrl;
+                setTimeout(() => {
+                    window.location.href = webUrl;
+                }, 1500);
 
-// بعد وقت قصير، إذا لم يفتح التطبيق، نحول للويب
-setTimeout(() => {
-  window.location.href = webUrl;
-}, 1500);
                 return;
             }
 
             // =========================
-            // ❌ WRONG PASSWORD
+            // ❌ WRONG CREDENTIALS
             // =========================
             if (status === "wrong_credentials" || status === "user_not_found") {
                 const newAttempts = state.attempts + 1;
@@ -191,7 +248,6 @@ setTimeout(() => {
                     );
                 } else {
                     setState(newAttempts, 0);
-
                     showMessage(
                         `❌ الحد مسموح به (${newAttempts}/${MAX_ATTEMPTS})`,
                         "#f44336"
@@ -205,7 +261,7 @@ setTimeout(() => {
             // ❌ BLOCKED
             // =========================
             if (status === "blocked") {
-                lockForm(20, "​🚫 تم تقييد الوصول: صلاحيات غير كافية");
+                lockForm(20, "🚫 تم تقييد الوصول: صلاحيات غير كافية");
                 return;
             }
 
@@ -233,6 +289,9 @@ setTimeout(() => {
                 return;
             }
 
+            // =========================
+            // ERROR
+            // =========================
             showMessage("❌ Erreur serveur", "#f44336");
         } catch (err) {
             console.error(err);
